@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 1 kısmen tamam (`tsx`, `vitest`, `dotenv` kuruldu); `xlsx` kaynağı için karar bekleniyor
+> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 1 tamam; sıradaki adım 2 (vitest kurulumu, `npm test`)
 > **Son güncelleme:** 21.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.2) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2)
 
@@ -48,7 +48,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 ### Teknik hat (VS Code) – [PHASE1_PLAN.md](PHASE1_PLAN.md) bölüm 7
 
-- [~] 1. Bağımlılıklar: `tsx`, `vitest`, `dotenv` kuruldu (21.10.2026); `@types/node` ^24'e yükseltildi (vitest 5 şartı, yerel Node 24). `xlsx` açık: npm'deki 0.18.5 yamanmamış güvenlik açıkları içeriyor, SheetJS CDN sürümü (0.20.3) veya `exceljs` seçilecek
+- [x] 1. Bağımlılıklar: `tsx`, `vitest`, `dotenv`, `exceljs` (21.10.2026, commit `4874f4d` + bu commit). `xlsx` yerine `exceljs`: npm'deki `xlsx` 0.18.5 yamanmamış açıklar içeriyor. `@types/node` ^24 (vitest 5 şartı, yerel Node 24)
 - [ ] 2. Vitest kurulumu, `npm test`
 - [ ] 3. `geo.ts` + testler (dört liste)
 - [ ] 4. `plan.ts` + testler (beklenen / en kötü durum, oturum ataması)
@@ -117,7 +117,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Adım 1 (kısmi): `tsx`, `vitest`, `dotenv` eklendi, `@types/node` ^24 | bu commit |
+| 21.10.2026 | Adım 1 tamam: `exceljs` eklendi (`xlsx` yerine) | bu commit |
+| 21.10.2026 | Adım 1 (kısmi): `tsx`, `vitest`, `dotenv` eklendi, `@types/node` ^24 | `4874f4d` |
 | 21.10.2026 | Neon veritabanı Vercel üzerinden oluşturuldu ve bağlandı | `93f65ec` |
 | 21.10.2026 | Anayasaya eklendi: kullanım kolaylığı, tek yerden yönetim, admin paneli (ROADMAP 3.2) | `4e9e12d` |
 | 21.10.2026 | Aşama 1 planı 1.2; STATUS.md oluşturuldu | `612e3ad` |

@@ -92,7 +92,7 @@ runs/                       # tarama çıktıları (gitignore)
 data/                       # üretilen belediye verisi (gitignore)
 ```
 
-Eklenecek paketler: `xlsx` (veya `exceljs`), `tsx`, `vitest`, `zod` (mevcut), `dotenv`.
+Eklenecek paketler: `exceljs` (`xlsx` npm sürümü güvenlik açıkları nedeniyle kullanılmadı), `tsx`, `vitest`, `zod` (mevcut), `dotenv`.
 
 ---
 
