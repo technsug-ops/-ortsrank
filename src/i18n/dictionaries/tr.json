@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "title": "Ortsrank – Müşterin seni gerçekten nerede buluyor?",
+    "description": "Şehir şehir lokal Google görünürlüğü: sıralama, reklamlar, rakipler ve hizmet alanın için somut aksiyonlar."
+  },
+  "nav": { "language": "Dil", "status": "Geliştiriliyor" },
+  "hero": {
+    "eyebrow": "Almanya'daki işletmeler için lokal sıralama",
+    "title": "Müşterin seni gerçekten nerede buluyor?",
+    "lead": "Ortsrank, hizmet alanındaki her gerçek yerleşimde Google'ı tarar – tarla ve ormanlara düşen bir ızgarada değil. Kimin önünde olduğunu, kimin reklam verdiğini ve sırada ne yapman gerektiğini görürsün."
+  },
+  "features": {
+    "title": "Ortsrank neyi ölçer",
+    "items": [
+      { "title": "Gerçek yerleşimler", "text": "Resmi Gemeinde kaydı, konumun çevresinde yarıçap ve nüfus filtresi – uydurma ölçüm noktası yok." },
+      { "title": "Organik, reklam, Local Pack", "text": "Üç sonuç türü ayrı ayrı, şehir şehir ve keyword keyword kaydedilir." },
+      { "title": "Rakip matrisi", "text": "Kim kaç şehirde ilk 3'te – lokal işletmeler zincir ve portallardan ayrı." },
+      { "title": "Tablo değil aksiyon", "text": "Her şehir ve her rakip için öncelikli liste: web sitesi, Google profili, reklam." }
+    ]
+  },
+  "footer": {
+    "operator": "TechNS UG (haftungsbeschränkt), Oberursel tarafından sunulur",
+    "imprint": "Künye",
+    "privacy": "Gizlilik"
+  }
+}

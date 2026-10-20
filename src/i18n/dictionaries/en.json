@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "title": "Ortsrank – Where do your customers really find you?",
+    "description": "Local Google visibility town by town: rankings, ads, competitors and concrete actions for your service area."
+  },
+  "nav": { "language": "Language", "status": "In development" },
+  "hero": {
+    "eyebrow": "Local rankings for businesses in Germany",
+    "title": "Where do your customers really find you?",
+    "lead": "Ortsrank checks Google in every real town of your service area – not on a grid of fields and forests. See who ranks ahead of you, who runs ads and what to do next."
+  },
+  "features": {
+    "title": "What Ortsrank measures",
+    "items": [
+      { "title": "Real towns", "text": "Official municipality register, a radius around your location and a population filter – no invented measuring points." },
+      { "title": "Organic, ads, Local Pack", "text": "Three result types tracked separately, town by town and keyword by keyword." },
+      { "title": "Competitor matrix", "text": "In how many towns each competitor is top 3 – local businesses separated from chains and portals." },
+      { "title": "Actions, not tables", "text": "A prioritised list for every town and competitor: website, Google profile, ads." }
+    ]
+  },
+  "footer": {
+    "operator": "A service of TechNS UG (haftungsbeschränkt), Oberursel",
+    "imprint": "Imprint",
+    "privacy": "Privacy"
+  }
+}

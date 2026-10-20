@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "title": "Ortsrank – Wo findet dich dein Kunde wirklich?",
+    "description": "Lokale Google-Sichtbarkeit Ort für Ort: Ranking, Anzeigen, Wettbewerber und konkrete Maßnahmen für dein Einzugsgebiet."
+  },
+  "nav": { "language": "Sprache", "status": "Im Aufbau" },
+  "hero": {
+    "eyebrow": "Lokales Ranking für Betriebe in Deutschland",
+    "title": "Wo findet dich dein Kunde wirklich?",
+    "lead": "Ortsrank prüft Google in jedem echten Ort deines Einzugsgebiets – nicht auf einem Raster aus Feldern und Wäldern. Du siehst, wer vor dir steht, wer Anzeigen schaltet und was du als Nächstes tun solltest."
+  },
+  "features": {
+    "title": "Was Ortsrank misst",
+    "items": [
+      { "title": "Echte Orte", "text": "Amtliches Gemeindeverzeichnis, Radius um deinen Standort und Einwohnerfilter – keine erfundenen Messpunkte." },
+      { "title": "Organisch, Anzeigen, Local Pack", "text": "Drei Ergebnistypen getrennt erfasst, Ort für Ort und Keyword für Keyword." },
+      { "title": "Wettbewerber-Matrix", "text": "In wie vielen Orten steht wer in den Top 3 – lokale Betriebe getrennt von Ketten und Portalen." },
+      { "title": "Maßnahmen statt Tabellen", "text": "Für jeden Ort und jeden Wettbewerber eine priorisierte Liste: Website, Google-Profil, Anzeigen." }
+    ]
+  },
+  "footer": {
+    "operator": "Ein Angebot der TechNS UG (haftungsbeschränkt), Oberursel",
+    "imprint": "Impressum",
+    "privacy": "Datenschutz"
+  }
+}
