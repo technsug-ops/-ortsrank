@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 · Veri + talep pilotu · teknik uygulama başlıyor (VS Code)
+> **Şu an:** Aşama 1 · Veri + talep pilotu · yerel ortam hazır (build geçti, `.env.local` var); VS Code'da adım 1 başlıyor
 > **Son güncelleme:** 21.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.2) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2)
 
@@ -35,7 +35,8 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] Aşama 1 teknik planı sürüm 1.2 (21.10.2026, commit `612e3ad`)
 - [x] `CLAUDE.md` – VS Code için çalışma kuralları (21.10.2026)
 - [x] Neon Postgres `neon-erin-envelope` oluşturuldu, yalnızca `ortsrank` projesine bağlı; `DATABASE_URL` tüm ortamlarda (21.10.2026)
-- [ ] Neon bölgesinin Frankfurt olduğu doğrulandı; yerel `.env.local` hazır
+- [x] Yerel `.env.local` `vercel env pull` ile oluşturuldu; yerel klasör Vercel projesine bağlı (21.10.2026)
+- [ ] Neon bölgesinin Frankfurt olduğu doğrulandı
 - [ ] Migration uygulandı (Aşama 1 adım 11'deki şema değişikliğinden sonra)
 - [ ] Vercel ↔ GitHub bağlantısı (Settings → Git → Connect)
 - [ ] İlk production deploy; `https://ortsrank.foundercheck.de` açılıyor ve SSL geçerli
