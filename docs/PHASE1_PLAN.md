@@ -149,6 +149,7 @@ npx tsx scripts/import-settlements.ts --file <xlsx> [--as-of 2024-12-31] [--db]
 | `unknownPopulation` | Koordinatı var, yarıçap içinde, nüfusu bilinmiyor | Varsayılan hayır; `--include-unknown-population` ile evet, raporda işaretli |
 | `unlocatable` | Koordinatı yok; yarıçap içinde olup olmadığı hesaplanamıyor | Hayır; raporda "konumu belirlenemeyen kayıtlar" olarak listelenir |
 | `belowThreshold` | Yarıçap içinde, nüfus < eşik | Hayır; yalnızca sayısı raporlanır |
+| `overLimit` | `selected` şartlarını sağlıyor ama `limit` (`maxSettlements`) dolduğu için alınmadı; en uzaktakiler | Hayır; raporda sayısı ve adları gösterilir |
 
 Koordinatı olmayan bir belediye yarıçap listesine **konmaz**; bölgenin içinde olup olmadığı bilinemez.
 
