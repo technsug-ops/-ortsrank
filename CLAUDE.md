@@ -20,7 +20,10 @@ Bu repo Ortsrank'ın kodudur: bölgesel hizmet veren işletmelerin Google'da han
 5. **Aksiyonlar önce inceleme.** Rakipte sayfa bulunması tek başına "sayfa açın" demek değildir.
 6. **Vaat yok.** Doğruluk sınırı veya nedensellik iddiası yazılmaz.
 7. **Maliyet tavanı.** Canlı API çağrısı yalnızca `--live` ile ve `SCAN_MAX_USD` altında yapılır. Varsayılan her zaman dry-run.
-8. **Gizli bilgi yok.** Anahtarlar, gerçek işletme verileri ve `runs/`, `data/` çıktıları commit edilmez.
+8. **Kullanım kolaylığı.** Kullanıcı teknik bilgisi olmayan bir işletme sahibidir. Her ekran tek ana soruya cevap verir; ana bilgi en fazla üç tıklamada. Sade dil; boş, hata ve yükleme durumları açıklayıcı. Mobil uyumlu, WCAG 2.1 AA. Kullanımı zorlaştıran özellik eklenmez.
+9. **Tek yerden yönetim.** Birden fazla yerde kullanılan her şey (metinler, ayarlar, keyword setleri, rakip etiketleri, limitler, fiyatlar, durum etiketleri, e-posta şablonları) tek bir kaynakta tanımlanır ve oradan okunur. Kopyalama, sabit kodlanmış tekrar yok. Operasyonda değişmesi gerekenler admin panelinden düzenlenebilir olacak şekilde tasarlanır.
+10. **Admin paneli.** Platform yöneticisi rolü müşteri rollerinden ayrıdır; 2FA zorunlu; müşteri verisine her erişim audit log'a yazılır.
+11. **Gizli bilgi yok.** Anahtarlar, gerçek işletme verileri ve `runs/`, `data/` çıktıları commit edilmez.
 
 ## Kod kuralları
 

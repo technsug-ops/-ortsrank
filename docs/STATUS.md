@@ -2,7 +2,7 @@
 
 > **Şu an:** Aşama 1 · Veri + talep pilotu · teknik uygulama başlıyor (VS Code)
 > **Son güncelleme:** 21.10.2026
-> **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.1) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2)
+> **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.2) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2)
 
 Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncellenir: kutu işaretlenir, tarih ve commit eklenir, "Şu an" satırı değiştirilir. Hem Claude sohbeti hem VS Code bu dosyayı günceller.
 
@@ -101,12 +101,19 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 Ayrıntılı checklist, ilgili kapıya yaklaşıldığında eklenir (bkz. ROADMAP bölüm 7).
 
+Planlanmış başlıklar:
+
+- [ ] Aşama 2 · Admin paneli v1 (iç kullanım: müşteriler, taramalar, bütçe, rapor linkleri, pilot kayıtları, keyword setleri ve rakip etiketleri)
+- [ ] Aşama 2 · Kullanılabilirlik testi (en az 2 işletme sahibi raporu yardımsız anlıyor)
+- [ ] Aşama 3 · Admin paneli v2 (kullanıcılar, planlar ve kota, ödeme durumu, sistem sağlığı, içerik ve hukuk metinleri, audit log)
+
 ---
 
 ## Günlük
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
+| 21.10.2026 | Anayasaya eklendi: kullanım kolaylığı, tek yerden yönetim, admin paneli (ROADMAP 3.2) | bu commit |
 | 21.10.2026 | Aşama 1 planı 1.2; STATUS.md oluşturuldu | `612e3ad` |
 | 21.10.2026 | ROADMAP 3.1 (dış değerlendirme sonrası) | `0fa9446` |
 | 20.10.2026 | Repo, iskelet, şema, subdomain, Vercel projesi | `a4f05ac` |

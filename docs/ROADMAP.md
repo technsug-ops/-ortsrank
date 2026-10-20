@@ -2,7 +2,7 @@
 
 > Bölgesel hizmet veren işletmelerin Google'da hangi belediyelerde rekabetin gerisinde kaldığını ve önce nerede çalışması gerektiğini gösterir.
 > İşleten: TechNS UG (haftungsbeschränkt), Oberursel · Adres: https://ortsrank.foundercheck.de
-> Son güncelleme: 21.10.2026 (sürüm 3.1)
+> Son güncelleme: 21.10.2026 (sürüm 3.2)
 
 ---
 
@@ -53,6 +53,9 @@ Bu soru ürünün kapsamını belirler ve pilotta cevaplanmalıdır.
 | Nedensellik iddiası yok | "Sayfa yayınlandı → sıra yükseldi" etki kanıtı değildir. Ürün yalnızca yapılan işlemi ve sonrasındaki değişimi birlikte gösterir. |
 | Müşteri ayrımı | Her müşteri verisi `organization_id` taşır. İlk dış kullanıcı erişiminden önce, zorunlu kiracı filtreli sorgu katmanı ve izolasyon testi hazırdır. Postgres RLS, ilk SaaS sürümünde ek savunma katmanı olarak eklenir. |
 | Çok dillilik | Altyapı DE/EN/TR. Pilot arayüzü ve raporu Almanca. Arama dili her zaman Almanca. |
+| Kullanım kolaylığı | Hedef kullanıcı teknik bilgisi olmayan bir işletme sahibidir. Her ekran tek bir ana soruya cevap verir; ana bilgiye en fazla üç tıklamayla ulaşılır. Dil sade, terimler açıklanır; boş, hata ve yükleme durumları ne olduğunu ve ne yapılacağını söyler. Mobilde okunur, klavyeyle kullanılır (WCAG 2.1 AA). Bir özellik kullanımı zorlaştırıyorsa eklenmez veya sadeleştirilir. |
+| Tek yerden yönetim | Birden fazla sayfada geçen her şey tek bir kaynaktan gelir ve tek yerden değiştirilir: arayüz metinleri, hukuk metinleri, keyword setleri, rakip etiketleri, plan ve kota limitleri, fiyatlar, durum etiketleri, e-posta şablonları. Aynı bilgi iki yerde elle tutulmaz; bir değişiklik bütün sayfalara yansır. Operasyonel olarak değişmesi gerekenler admin panelinden düzenlenir. |
+| Admin paneli | TechNS için iç yönetim paneli. Yalnızca platform yöneticisi rolüyle erişilir (müşteri organizasyon rollerinden ayrı), 2FA zorunlu; müşteri verisine her erişim audit log'a yazılır. Aşamalı kurulur (bölüm 7). |
 
 ## 5. Kanıt seviyeleri
 
@@ -213,6 +216,17 @@ flowchart LR
 **Ürün**
 
 - [ ] Salt-okunur web raporu (Almanca): harita, belediye tablosu, rakip özeti
+- [ ] Kullanılabilirlik testi: en az 2 pilot işletme sahibi raporu yardımsız açıp ana bulguyu kendi cümlesiyle söyleyebiliyor
+
+**Admin paneli v1 (iç kullanım)**
+
+- [ ] Platform yöneticisi rolü ve girişi (2FA), müşteri rollerinden ayrı
+- [ ] Müşteri ve proje listesi; proje başına merkez, yarıçap, keywordler
+- [ ] Taramalar: durum, oturumlar, bütçe defteri (confirmed / uncertain / kalan), maliyet
+- [ ] Rapor yayınlama ve müşteri erişim linkleri (oluştur, süre ver, iptal et)
+- [ ] Pilot kayıtları (5 soru) ve açıklama süresi girişi
+- [ ] Keyword setleri ve rakip etiket listesi: tek yerden düzenleme
+- [ ] Müşteri verisine her erişim audit log'da
 - [ ] Belediye detayı ve rakip özeti; her öneride kanıt seviyesi ve kaynak
 - [ ] Planlı ikinci tarama ve önceki ölçümle karşılaştırma, dönem karşılaştırma şartlarına göre (bölüm 6)
 - [ ] Değişim gösterimi: "işlem + sonrasındaki değişim", nedensellik iddiası olmadan
@@ -245,6 +259,15 @@ flowchart LR
 - [ ] E-postalar (Almanca; EN/TR talep varsa): rapor hazır, değişim özeti, kota uyarısı
 - [ ] Gözlem: Sentry, çerezsiz analitik (Plausible), tarama hata oranı alarmı
 - [ ] Hesap silme ve veri dışa aktarma (DSGVO Art. 17 ve 20)
+
+**Admin paneli v2**
+
+- [ ] Kullanıcı ve organizasyon yönetimi (davet, rol, devre dışı bırakma)
+- [ ] Planlar, kota ve fiyatlar: tek yerden düzenleme, değişiklik geçmişiyle
+- [ ] Ödeme durumu (Stripe), başarısız ödemeler
+- [ ] Sistem sağlığı: tarama hata oranı, sağlayıcı maliyeti, kuyruk durumu
+- [ ] İçerik yönetimi: e-posta şablonları ve hukuk metinleri (sürümlü)
+- [ ] Audit log görüntüleme ve dışa aktarma
 
 **Kapı 3:** Müşteriler temel akışı yardımsız tamamlıyor ve ilk abonelik yenilemesi gerçekleşti.
 
@@ -310,6 +333,7 @@ Yalnızca mevcut müşterilerden doğrulanmış talep varsa:
 | --- | --- | --- |
 | 20.10.2026 | 1 | İlk sürüm (9 teknik faz) |
 | 20.10.2026 | 2 | Bağımlılıklar düzeltildi; koordinatla sorgu; `serp_raw`; Better Auth hizası; SCC/DPF; kötüye kullanım koruması |
+| 21.10.2026 | 3.2 | İlkelere eklendi: kullanım kolaylığı, tek yerden yönetim, admin paneli; admin paneli v1 (Aşama 2) ve v2 (Aşama 3) görevleri; Aşama 2'ye kullanılabilirlik testi |
 | 21.10.2026 | 3.1 | Başarı ölçütü ikiye ayrıldı (kayıt bütünlüğü, geçerli sonuç oranı); kanıt seviyesi tanımları düzeltildi (kaynak türü seviyeyi belirlemez); "rakipte var, sizde yok → sayfa açın" yerine önce inceleme; müşterinin kendi sitesi de kontrol edilir; dönem karşılaştırma şartları eklendi |
 | 20.10.2026 | 3 | Dış değerlendirmeye göre yeniden yapılandırıldı: ilk hedef "ödeme + somut karar"; 4 aşama; veri ve talep pilotu birleşti; kanıt seviyeleri ve aksiyon türleri; ölçüm ölçütleri (sistem doğruluğu ≠ değişkenlik); "±2 sıra" vaadi kaldırıldı; "her yerleşim" yerine "belediyeler" ve temsilî ölçüm noktası; tekrar ölçüm ilk ücretli sürüme alındı; erişim kontrolü ve pilot hukuku ilk dış erişimden önceye bağlandı; pilot kayıtları ve açıklama süresi; sinyaller ayrı kaydediliyor |
 
