@@ -2,7 +2,9 @@
 
 > Kapsam: ROADMAP sürüm 3.1, Aşama 1'in **teknik** kısmı (veri + tarama scriptleri).
 > Müşteri bulma, hesap açma, para yatırma ve işletme katılımı bu planın dışında; Halil tarafından ayrı takip edilir.
-> Hazırlanma: 21.10.2026 · Uygulama: VS Code'da
+> Hazırlanma: 21.10.2026 · Sürüm 1.1 · Uygulama: VS Code'da
+>
+> Sürüm 1.1: gerçek harcama tavanı (bütçe defteri), örnekleme oturumları, eksik koordinat ile eksik nüfusun ayrılması, deneme bazlı kayıt ve çakışmayan çalışma kimliği eklendi.
 
 ---
 
@@ -10,11 +12,13 @@
 
 Teslimat tamam sayılır, eğer:
 
-1. `import-settlements` scripti gerçek Destatis dosyasını okuyup belediye listesini üretiyor.
-2. `scan` scripti bir proje tanımından görev planı çıkarıyor, **maliyet tahmini** veriyor ve tavanı aşan taramayı başlatmıyor.
-3. Ayrıştırıcı ve plan mantığı **örnek yanıtlarla** test edilmiş; tüm testler geçiyor.
-4. Gerekli ortam değişkenlerinin adları belgelenmiş.
-5. **2 belediye × 2 keyword** küçük canlı deneme için maliyet tahmini hazır.
+1. `import-settlements` scripti **gerçek Destatis dosyasını** okuyup belediye listesini üretiyor; eksik koordinat ve eksik nüfus ayrı raporlanıyor.
+2. `scan` scripti bir proje tanımından görev planı çıkarıyor, **beklenen ve en kötü durum maliyetini** veriyor ve tavanı aşan taramayı başlatmıyor.
+3. Bütçe defteri, örnekleme oturumları ve deneme bazlı kayıt **testlerle** gösterilmiş (bölüm 5).
+4. Ayrıştırıcı ve plan mantığı **örnek yanıtlarla** test edilmiş; tüm testler geçiyor.
+5. Gerekli ortam değişkenlerinin adları belgelenmiş.
+
+**İlk teslimatta gösterilecekler:** test sonuçları, gerçek Destatis verisinden üretilmiş belediye listesinin özeti ve pilot projesinin dry-run çıktısı (belediye listesi, görev planı, maliyet tahmini).
 
 Canlı deneme bu teslimatın parçası değildir; anahtarlar gelince ayrı adım olarak yapılır (bölüm 8).
 
@@ -72,13 +76,16 @@ src/lib/
     client.ts               # HTTP istemcisi (Basic Auth, zaman aşımı, tekrar deneme)
     parse.ts                # yanıt → organic / ad / local_pack satırları
     types.ts                # yanıt tipleri (zod şemaları)
-  runlog.ts                 # görev durumu kaydı (JSONL)
+  runlog.ts                 # deneme ve görev kayıtları (JSONL)
+  budget.ts                 # bütçe defteri: reserved / confirmed / uncertain
 tests/
   fixtures/                 # örnek yanıtlar; dosya başında "sentetik, dokümandan" notu
   geo.test.ts
   plan.test.ts
   parse.test.ts
   runlog.test.ts
+  budget.test.ts
+  sessions.test.ts
   import.test.ts
 runs/                       # tarama çıktıları (gitignore)
 data/                       # üretilen belediye verisi (gitignore)
@@ -117,19 +124,34 @@ npx tsx scripts/import-settlements.ts --file <xlsx> [--as-of 2024-12-31] [--db]
 - Yalnızca belediye satırlarını alır (Satzart 60).
 - AGS = Land(2) + RB(1) + Kreis(2) + Gem(3) → 8 hane.
 - Almanca sayı biçimini doğru çevirir.
-- Koordinatı veya nüfusu eksik satırı **atlamaz, uydurmaz**: `scan_mode: "none"`, `scan_note: "koordinat yok"` ile kaydeder ve sayısını raporlar.
-- Çıktı: `data/settlements.de.json` + özet (toplam, eyalet başına sayı, eksik koordinat sayısı).
-- `--db`: `settlements` tablosuna AGS üzerinden upsert.
+- Eksik veriyi **atlamaz, uydurmaz**. Eksik koordinat ile eksik nüfus ayrı ele alınır:
 
-**Testler (`import.test.ts`):** küçük örnek XLSX fixture'ı ile başlık bulma, AGS oluşturma, sayı çevirme, eksik veri işaretleme, eksik sütunda hata.
+| Eksik bilgi | Kayıt | Sonuç |
+| --- | --- | --- |
+| Koordinat yok | `lat/lng = null`, `scan_mode: "none"`, `scan_note: "missing_coordinates"` | Konumdan tarama yapılamaz |
+| Nüfus yok, koordinat var | `population = null`, `scan_mode: "coordinate"`, `scan_note: "missing_population"` | Teknik olarak taranabilir; nüfus filtresine uygunluğu belirsiz |
+| İkisi de yok | `scan_mode: "none"`, `scan_note: "missing_coordinates,missing_population"` | Taranamaz |
+
+- Çıktı: `data/settlements.de.json` + özet (toplam belediye, eyalet başına sayı, eksik koordinat sayısı, eksik nüfus sayısı, ikisi birden eksik sayısı).
+- `--db`: `settlements` tablosuna AGS üzerinden upsert. Şemada `lat`, `lng`, `population` alanları bu durumlar için null kabul edecek şekilde güncellenir.
+
+**Testler (`import.test.ts`):** küçük örnek XLSX fixture'ı ile başlık bulma, AGS oluşturma, sayı çevirme, üç eksik veri durumunun ayrı işaretlenmesi, özet sayıları, eksik sütunda hata.
 
 ### 5.2 `geo.ts`
 
 - `haversineKm(a, b)`
-- `selectSettlements({ center, radiusKm, populationMin, limit? })` → mesafeye göre sıralı liste; merkez dahil.
-- `scan_mode = "none"` olanlar listede kalır ama "taranamadı" olarak işaretli döner.
+- `selectSettlements({ center, radiusKm, populationMin, limit? })` dört ayrı liste döndürür:
 
-**Testler:** bilinen iki nokta arası mesafe (ör. Frankfurt–Offenbach, kabaca 6–7 km; tolerans ±0,5 km), yarıçap sınırı, nüfus filtresi, sıralama.
+| Liste | İçerik | Taranır mı |
+| --- | --- | --- |
+| `selected` | Koordinatı var, yarıçap içinde, nüfus ≥ eşik; mesafeye göre sıralı, merkez dahil | Evet |
+| `unknownPopulation` | Koordinatı var, yarıçap içinde, nüfusu bilinmiyor | Varsayılan hayır; `--include-unknown-population` ile evet, raporda işaretli |
+| `unlocatable` | Koordinatı yok; yarıçap içinde olup olmadığı hesaplanamıyor | Hayır; raporda "konumu belirlenemeyen kayıtlar" olarak listelenir |
+| `belowThreshold` | Yarıçap içinde, nüfus < eşik | Hayır; yalnızca sayısı raporlanır |
+
+Koordinatı olmayan bir belediye yarıçap listesine **konmaz**; bölgenin içinde olup olmadığı bilinemez.
+
+**Testler:** bilinen iki nokta arası mesafe (ör. Frankfurt–Offenbach, kabaca 6–7 km; tolerans ±0,5 km), yarıçap sınırı, nüfus filtresi, sıralama, dört listenin doğru ayrılması, koordinatsız kaydın `selected`'a girmemesi.
 
 ### 5.3 `plan.ts`
 
@@ -153,22 +175,42 @@ Proje tanımı (`projects/*.json`):
 }
 ```
 
-- Görev = belediye × keyword × örneklem.
-- `serpsPerTask = ceil(depth / 10)`.
-- `estimateUsd = tasks × serpsPerTask × pricePerSerp × (1 + retryBuffer)`; `retryBuffer` varsayılan 0,2.
-- `SCAN_MAX_USD` aşılırsa plan reddedilir; script tahmini ve tavanı yazdırıp çıkar.
+- Görev = belediye × keyword × örneklem. Her örneklem ayrı bir **oturuma** aittir (bölüm 5.7).
+- `serpsPerTask = ceil(depth / 10)`; `costPerAttempt = serpsPerTask × pricePerSerp`.
+- `maxAttempts = 1 + maxRetries` (varsayılan `maxRetries = 2`, yani en fazla 3 deneme).
+- İki ayrı tahmin üretilir ve ikisi de yazdırılır:
+  - **Beklenen maliyet** = `tasks × costPerAttempt × (1 + expectedRetryRate)`; `expectedRetryRate` varsayılan 0,2. Bu, görevlerin yaklaşık %20'sinin bir kez tekrar edileceği varsayımıdır; tekrar sayısı sınırı değildir.
+  - **En kötü durum** = `tasks × costPerAttempt × maxAttempts`.
+- Başlangıç kuralı: beklenen maliyet `SCAN_MAX_USD`'yi aşarsa plan reddedilir. En kötü durum tavanı aşıyorsa uyarı verilir; tarama yine başlayabilir, çünkü tavan çalışma sırasında bütçe defteriyle zorlanır (5.4).
 - `--dry-run` her zaman çalışır ve API'ye istek atmaz.
 
-**Testler:** görev sayısı, SERP yuvarlama (depth 15 → 2), maliyet formülü, tavan aşımında red, örneklem sayısı.
+**Testler:** görev sayısı, SERP yuvarlama (depth 15 → 2), iki maliyet formülü, beklenen tavanı aşınca red, en kötü durum uyarısı, örneklem → oturum ataması.
 
 ### 5.4 `dataforseo/client.ts`
 
-- Basic Auth; istek başına zaman aşımı; ağ hatasında tanımlı sayıda tekrar deneme (varsayılan 2, artan bekleme).
+- Basic Auth; istek başına zaman aşımı; tanımlı sayıda tekrar deneme (varsayılan `maxRetries = 2`, artan bekleme).
 - Eşzamanlılık sınırı (varsayılan 5).
-- Her görev için ham yanıt `runs/<runId>/raw/<taskKey>.json` olarak saklanır.
-- Gerçek maliyet yanıttaki `cost` alanından toplanır; tahminle karşılaştırılır.
+- Her **deneme** ayrı saklanır: `runs/<runId>/raw/<taskKey>/attempt-<n>.json` (yanıt gelmediyse hata bilgisiyle birlikte boş gövde). Tekrar denemeler önceki dosyanın üzerine yazmaz.
 
-**Testler:** HTTP katmanı taklit edilerek (fetch mock): başarı, `status_code` ≠ 20000, zaman aşımı, tekrar denemeden sonra başarı.
+**Bütçe defteri (gerçek tavan)**
+
+Tavan yalnızca başlangıçta değil, **her istekten önce** uygulanır.
+
+| Kalem | Anlamı |
+| --- | --- |
+| `reserved` | Gönderilmiş, yanıtı beklenen denemeler için ayrılan tutar (`costPerAttempt` kadar) |
+| `confirmed` | Yanıttaki `cost` alanıyla doğrulanmış harcama |
+| `uncertain` | Zaman aşımı, bağlantı kopması veya yanıtta `cost` olmayan denemeler. **Ücretlendirilmiş sayılır** (`costPerAttempt`), çünkü sağlayıcı isteği işlemiş olabilir |
+| `remaining` | `SCAN_MAX_USD − confirmed − uncertain − reserved` |
+
+Kurallar:
+
+1. Bir deneme gönderilmeden önce `remaining ≥ costPerAttempt` kontrol edilir ve tutar `reserved`'a alınır. Eşzamanlı istekler bu ayırma üzerinden yarışmadan bütçe kullanır.
+2. Yanıt gelince ayrılan tutar `confirmed`'a (gerçek `cost` ile) veya `uncertain`'a taşınır.
+3. Bütçe yetmiyorsa yeni deneme gönderilmez. Kalan görevler `cancelled` durumuyla ve `reason: "budget_exhausted"` gerekçesiyle kaydedilir.
+4. Tarama sonunda `confirmed + uncertain ≤ SCAN_MAX_USD` her koşulda sağlanır.
+
+**Testler (`budget.test.ts`, mock'lu istemci):** HTTP katmanı taklit edilerek (fetch mock): başarı, `status_code` ≠ 20000, zaman aşımı, tekrar denemeden sonra başarı. Bütçe defteri için: eşzamanlı isteklerde tavanın aşılmaması, zaman aşımının `uncertain` sayılması, bütçe bitince kalan görevlerin gerekçeyle iptali, tekrar denemelerin ayrı dosyalara yazılması.
 
 ### 5.5 `dataforseo/parse.ts`
 
@@ -181,37 +223,72 @@ Proje tanımı (`projects/*.json`):
 
 ### 5.6 `runlog.ts` – kayıt bütünlüğü
 
-- Her görev için tek satır JSONL: `taskKey, ags, keyword, sample, status (success | error | cancelled), statusCode, attempts, costUsd, rawPath, startedAt, finishedAt`.
-- Tarama sonunda özet:
-  - **Kayıt bütünlüğü** = durumu kayıtlı görev / planlanan görev → **%100 olmalı**.
-  - **Geçerli sonuç oranı** = kullanılabilir sonuç üreten görev / planlanan görev → hedef ≥ %98.
-  - Tahmini maliyet ↔ gerçek maliyet.
+İki ayrı kayıt tutulur:
 
-**Testler:** eksik kayıt tespiti, oran hesapları, iptal edilen görevlerin sayılması.
+- `attempts.jsonl` – her deneme için bir satır: `attemptId, taskKey, attempt (1..n), sentAt, receivedAt, outcome (ok | api_error | timeout | network_error), statusCode, statusMessage, costUsd, costCertainty (confirmed | uncertain), rawPath`.
+- `tasks.jsonl` – her görev için bir satır: `taskKey, ags, keyword, sample, session, plannedAt, status (success | error | cancelled), reason, attemptIds[], finalAttemptId, totalCostUsd`.
 
-### 5.7 `scan.ts`
+Görev özeti denemelere `attemptIds` ile bağlanır; her denemenin maliyeti ve hatası ayrı görülür.
+
+Tarama sonunda özet:
+
+- **Kayıt bütünlüğü** = durumu kayıtlı görev / planlanan görev → **%100 olmalı**.
+- **Geçerli sonuç oranı** = kullanılabilir sonuç üreten görev / planlanan görev → hedef ≥ %98.
+- Maliyet: beklenen, en kötü durum, `confirmed`, `uncertain`, toplam deneme sayısı.
+
+**Testler:** eksik kayıt tespiti, oran hesapları, iptal edilen görevlerin gerekçesiyle sayılması, bir görevin birden fazla denemesinin doğru bağlanması, toplam maliyetin denemelerin toplamına eşit olması.
+
+### 5.7 Örnekleme oturumları
+
+`samples: 3`, aynı görevin üç kez peş peşe çalıştırılması anlamına gelmez. Her örneklem ayrı bir oturumdur ve ayrı çalıştırılır.
+
+- Proje tanımına oturum zamanları eklenir:
+
+```json
+"sessions": [
+  { "id": 1, "plannedAt": "09:00" },
+  { "id": 2, "plannedAt": "13:00" },
+  { "id": 3, "plannedAt": "18:00" }
+]
+```
+
+- `scan.ts --session <id>` yalnızca o oturuma ait görevleri çalıştırır. Örneklem 1 tüm keywordler için oturum 1'e, örneklem 2 ve 3 yalnızca ana keyword için oturum 2 ve 3'e düşer.
+- Her görevin `plannedAt` ve gerçek `sentAt` değeri kaydedilir. Planlanandan ±60 dakikadan fazla sapan oturum özette işaretlenir.
+- Bir oturumun tamamı aynı keyword, koordinat, cihaz, dil ve derinlikle çalışır (ROADMAP dönem karşılaştırma şartları).
+- Oturumlar elle veya zamanlanmış görevle başlatılabilir; Aşama 1'de elle başlatmak yeterli.
+
+**Küçük canlı denemede istisna:** Oturumlar peş peşe çalıştırılabilir (`--sessions all --back-to-back`). Bu durumda özete `samplingMode: "technical_validation"` yazılır ve sonuçlar **reklam görülme sıklığı olarak kullanılmaz**; yalnızca teknik doğrulamadır.
+
+**Testler:** örneklem → oturum ataması, `--session` filtresi, sapma işaretleme, `technical_validation` modunda sıklık hesabının yapılmaması.
+
+### 5.8 `scan.ts`
 
 ```
 npx tsx scripts/scan.ts --project projects/pilot-rhein-main.json --dry-run
-npx tsx scripts/scan.ts --project projects/pilot-rhein-main.json --limit-settlements 2 --limit-keywords 2 --live
+npx tsx scripts/scan.ts --project projects/pilot-rhein-main.json --session 1 --live
+npx tsx scripts/scan.ts --project projects/pilot-rhein-main.json --limit-settlements 2 --limit-keywords 2 --sessions all --back-to-back --live
 ```
 
 - Varsayılan dry-run; canlı istek için `--live` zorunlu.
-- Çıktılar `runs/<tarih>-<proje>/`: `plan.json`, `runlog.jsonl`, `raw/`, `results.csv`, `summary.json`.
+- **Çalışma kimliği** (`runId`) çakışmaz: `<YYYYMMDD-HHMMSS>-<proje>-<rastgele 6 karakter>`. Aynı gün aynı proje için yapılan iki tarama ayrı klasöre yazılır; klasör zaten varsa script durur.
+- Bir taramanın oturumları aynı `scanId` altında toplanır; her oturum çalıştırması kendi `runId`'sini alır.
+- Çıktılar `runs/<runId>/`: `plan.json`, `attempts.jsonl`, `tasks.jsonl`, `budget.json`, `raw/<taskKey>/attempt-<n>.json`, `results.csv`, `summary.json`.
 - Konsolda: belediye sayısı, görev sayısı, tahmini maliyet, gerçek maliyet, kayıt bütünlüğü, geçerli sonuç oranı, hedef domainlerin bulunduğu/bulunmadığı belediyeler.
 
 ---
 
 ## 6. Maliyet tahmini
 
-Varsayımlar: Live mod, 0,002 $ / SERP, depth 20 (= 2 SERP / görev), %20 tekrar deneme payı, ana keyword 3 örneklem, diğerleri 1.
+Varsayımlar: Live mod, 0,002 $ / SERP, depth 20 (= 2 SERP / deneme = 0,004 $), beklenen tekrar oranı %20, en fazla 3 deneme, ana keyword 3 örneklem, diğerleri 1. Fiyat doğrulanmış değil; ilk canlı yanıttaki `cost` ile karşılaştırılır.
 
-| Senaryo | Görev hesabı | Görev | SERP | Tahmin (payla) |
+| Senaryo | Görev hesabı | Görev | Beklenen | En kötü durum (3 deneme) |
 | --- | --- | --- | --- | --- |
-| Küçük canlı deneme | 2 belediye × (ana 3 + 1 diğer) | 8 | 16 | **≈ 0,04 $** |
-| Tek tam tarama | 30 belediye × (ana 3 + 4 diğer) | 210 | 420 | **≈ 1,01 $** |
-| Değişkenlik ölçümü | tam tarama × 3 gün | 630 | 1.260 | **≈ 3,02 $** |
-| İkinci ölçüm (karşılaştırma) | tam tarama × 1 | 210 | 420 | ≈ 1,01 $ |
+| Küçük canlı deneme | 2 belediye × (ana 3 + 1 diğer) | 8 | **≈ 0,04 $** (0,0384) | 0,096 $ |
+| Tek tam tarama | 30 belediye × (ana 3 + 4 diğer) | 210 | **≈ 1,01 $** (1,008) | 2,52 $ |
+| Değişkenlik ölçümü | tam tarama × 3 gün | 630 | ≈ 3,02 $ | 7,56 $ |
+| İkinci ölçüm (karşılaştırma) | tam tarama × 1 | 210 | ≈ 1,01 $ | 2,52 $ |
+
+Küçük canlı deneme için önerilen tavan: `SCAN_MAX_USD=0.20` (en kötü durumun üstünde). Tam tarama için: `SCAN_MAX_USD=3.00`.
 
 Notlar:
 
@@ -227,15 +304,17 @@ Notlar:
 1. `git pull`, `npm install`, paketleri ekle (`tsx`, `vitest`, `xlsx`, `dotenv`).
 2. `vitest` kurulumu, `npm test` scripti.
 3. `geo.ts` + testler.
-4. `plan.ts` + testler (dry-run maliyet tahmini burada çalışır hale gelir).
+4. `plan.ts` + testler (beklenen ve en kötü durum maliyeti, oturum ataması).
 5. Örnek yanıt fixture'ları (dokümandaki alanlara göre, "sentetik" notuyla).
 6. `parse.ts` + testler.
-7. `runlog.ts` + testler.
-8. `client.ts` + mock testler.
-9. `scan.ts` (dry-run uçtan uca).
-10. Gerçek Destatis dosyasını indir, sütun eşlemesini doğrula, `import-settlements.ts` + testler.
-11. `scan.ts --dry-run` ile pilot projesinin gerçek belediye listesi ve maliyet tahmini.
-12. Commit; testlerin ve dry-run çıktısının özeti.
+7. `runlog.ts` + testler (deneme ve görev kayıtları ayrı).
+8. Bütçe defteri + testler (eşzamanlılık, `uncertain`, bütçe bitince iptal).
+9. `client.ts` + mock testler (deneme başına ayrı ham dosya).
+10. `scan.ts` (dry-run uçtan uca; `runId` çakışmazlığı, `--session` filtresi).
+11. Şemada `lat`, `lng`, `population` alanlarını null kabul edecek şekilde güncelle; migration'ı yeniden üret.
+12. Gerçek Destatis dosyasını indir, sütun eşlemesini doğrula, `import-settlements.ts` + testler.
+13. `scan.ts --dry-run` ile pilot projesinin gerçek belediye listesi (dört liste) ve maliyet tahmini.
+14. Commit; testlerin, belediye listesi özetinin ve dry-run çıktısının özeti.
 
 Her adım ayrı commit. Testler geçmeden bir sonraki adıma geçilmez.
 
@@ -244,10 +323,12 @@ Her adım ayrı commit. Testler geçmeden bir sonraki adıma geçilmez.
 ## 8. Küçük canlı deneme (anahtarlar geldikten sonra)
 
 1. `.env.local`: `DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD`, `SCAN_MAX_USD=0.20`.
-2. `scan.ts --limit-settlements 2 --limit-keywords 2 --live`.
+2. `scan.ts --limit-settlements 2 --limit-keywords 2 --sessions all --back-to-back --live`.
 3. Kontrol listesi:
    - [ ] Gönderilen parametreler (koordinat, keyword, cihaz, dil, depth) ham yanıttaki `data` alanıyla aynı.
-   - [ ] Kayıt bütünlüğü %100.
+   - [ ] Kayıt bütünlüğü %100; her deneme ayrı dosyada.
+   - [ ] `confirmed + uncertain ≤ SCAN_MAX_USD`; bütçe defteri yanıtlardaki `cost` toplamıyla tutarlı.
+   - [ ] Özette `samplingMode: "technical_validation"` yazıyor; reklam sıklığı hesaplanmadı.
    - [ ] `local_pack` öğelerinin gerçek yapısı dokümanla uyumlu; değilse ayrıştırıcı düzeltilir.
    - [ ] Gerçek `cost` ile tahmin karşılaştırıldı; fiyat varsayımı güncellendi.
    - [ ] 5–10 sonuç ham yanıtla elle karşılaştırıldı.
