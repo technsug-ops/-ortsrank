@@ -28,13 +28,13 @@ Bir işletme domainini, sektörünü ve hizmet alanını girer; Ortsrank bu alan
 flowchart LR
     F0[Faz 0<br/>Altyapı]:::done --> F1[Faz 1<br/>Veri temeli]
     F1 --> F2[Faz 2<br/>Tarama motoru]
+    F1 --> F3[Faz 3<br/>Hesap ve kiracılar]
     F2 --> G1{Kapı 1<br/>Veri doğru mu?}
-    G1 --> F3[Faz 3<br/>Hesap ve kiracılar]
     G1 --> F4[Faz 4<br/>Rapor arayüzü]
-    F3 --> F5[Faz 5<br/>Analiz ve aksiyon]
-    F4 --> F5
-    F5 --> F6[Faz 6<br/>Hukuk ve ödeme]
-    F6 --> G2{Kapı 2<br/>Pilot onayı}
+    F4 --> F5[Faz 5<br/>Analiz ve aksiyon]
+    F3 --> F6[Faz 6<br/>Hukuk ve ödeme]
+    F5 --> G2{Kapı 2<br/>Pilot onayı}
+    F6 --> G2
     G2 --> F7[Faz 7<br/>Lansman]
     F7 --> G3{Kapı 3<br/>Ödeyen müşteri}
     G3 --> F8[Faz 8<br/>Büyüme]
@@ -44,16 +44,18 @@ flowchart LR
 | Faz | Odak | Tahmini süre | Bağımlılık | Durum |
 | --- | --- | --- | --- | --- |
 | 0 | Altyapı: domain, Vercel, repo, iskelet | 1 gün | – | Büyük ölçüde tamam |
-| 1 | Veri temeli: Neon, Destatis, lokasyon eşlemesi | 1 hafta | Faz 0 | Sırada |
-| 2 | Tarama motoru: DataForSEO, kuyruk, ham veri | 1–1,5 hafta | Faz 1 | – |
-| 3 | Hesap ve kiracılar: auth, organizasyon, roller | 1 hafta | Faz 1 | – |
-| 4 | Rapor arayüzü: harita, tablolar, detay ekranları | 1,5 hafta | Faz 2 | – |
-| 5 | Analiz ve aksiyon motoru | 1 hafta | Faz 2, 4 | – |
-| 6 | Hukuk, ödeme, planlar, kotalar | 1 hafta | Faz 3 | – |
-| 7 | Lansman: açılış sayfası, onboarding, PDF, e-posta | 1 hafta | Faz 5, 6 | – |
-| 8 | Büyüme: takip, uyarılar, white-label, API, AT/CH | sürekli | Faz 7 | – |
+| 1 | Veri temeli: Neon, Destatis, koordinat sorgusu | 1–1,5 hafta | Faz 0 | Sırada |
+| 2 | Tarama motoru: DataForSEO, kuyruk, ham veri | 1,5–2 hafta | Faz 1 | – |
+| 3 | Hesap ve kiracılar: auth, organizasyon, roller | 1,5 hafta | Faz 1 | – |
+| 4 | Rapor arayüzü: harita, tablolar, detay ekranları | 2–3 hafta | Faz 2 + Kapı 1 | – |
+| 5 | Analiz ve aksiyon motoru | 1,5 hafta | Faz 4 | – |
+| 6 | Hukuk, ödeme, planlar, kotalar | 2 hafta | Faz 3 | – |
+| 7 | Lansman: açılış sayfası, onboarding, PDF, e-posta | 1,5 hafta | Faz 5, 6 + Kapı 2 | – |
+| 8 | Büyüme: takip, uyarılar, white-label, API, AT/CH | sürekli | Faz 7 + Kapı 3 | – |
 
-Faz 3 ile Faz 4 paralel ilerleyebilir. Süreler akşam/hafta sonu temposuna göredir.
+İki paralel hat var: **veri hattı** (Faz 2 → 4 → 5) ve **hesap hattı** (Faz 3 → 6). İkisi Kapı 2'de birleşir.
+
+Süreler akşam/hafta sonu temposuna göre ve tampon payı dahil. Toplamda lansmana kadar **3–4 ay** gerçekçi; ilk taslaktaki 9–10 hafta iyimserdi. Faz 4 (arayüz) ve Faz 6 (ödeme + hukuk) tipik olarak tahminden uzun sürer.
 
 ---
 
@@ -67,6 +69,9 @@ Faz 3 ile Faz 4 paralel ilerleyebilir. Süreler akşam/hafta sonu temposuna gör
 - [x] İskelet: Next.js 16, React 19, Tailwind v4, TypeScript
 - [x] Çok dilli yönlendirme: `/de`, `/en`, `/tr`, `proxy.ts` + JSON sözlükler
 - [x] Çok kiracılı Drizzle şeması + ilk migration (`drizzle/0000_init.sql`)
+- [x] Kimlik tabloları Better Auth yapısına hizalandı (`user`, `session`, `account`, `verification`, `organization`, `member`, `invitation`)
+- [x] Ham sağlayıcı yanıtı için `serp_raw` tablosu; her sonuç satırı kaynağına bağlı
+- [x] Yerleşim bazında taranabilirlik durumu (`scan_mode`: coordinate / location_code / none)
 - [x] Fontlar self-host (Google Fonts'a istek yok)
 - [ ] Vercel ↔ GitHub bağlantısı (Settings → Git → Connect)
 - [ ] İlk production deploy ve SSL doğrulaması
@@ -79,16 +84,19 @@ Faz 3 ile Faz 4 paralel ilerleyebilir. Süreler akşam/hafta sonu temposuna gör
 
 ## Faz 1 – Veri temeli
 
-**Hedef:** Almanya'daki tüm yerleşimler, nüfus ve koordinatlarıyla veritabanında; yarıçap ve nüfus sorgusu çalışıyor.
+**Hedef:** Almanya'daki tüm yerleşimler, nüfus ve koordinatlarıyla veritabanında; yarıçap ve nüfus sorgusu çalışıyor; her yerleşim kendi koordinatıyla sorgulanabiliyor.
+
+**Temel karar:** Google sorguları her Gemeinde'nin **kendi merkez koordinatıyla** atılır. DataForSEO bunu `location_coordinate` parametresiyle (`enlem,boylam,yarıçap`) destekliyor. Böylece bir yerleşim, en yakın büyük şehrin kodu üzerinden "yaklaşık" taranmaz. Şehir kodu (`location_code`) yalnızca yedek yöntemdir ve kullanıldığı her yerde raporda mesafesiyle birlikte belirtilir.
 
 ```mermaid
 flowchart LR
     A[Destatis GV-ISys<br/>CSV/XLSX] --> B[Import scripti<br/>AGS, ad, eyalet, nüfus, koordinat]
-    B --> C[(settlements)]
-    D[DataForSEO<br/>Locations API] --> E[Eşleme scripti<br/>en yakın location_code]
-    C --> E
+    B --> C[(settlements<br/>scan_mode = coordinate)]
+    C --> G[Yarıçap + nüfus sorgusu<br/>haversine]
+    C --> T[Koordinat testi<br/>10 örnek yerleşim]
+    T -->|başarısız olanlar| E[Yedek: en yakın location_code<br/>mesafe kaydedilir]
     E --> F[(provider_locations)]
-    C --> G[Yarıçap + nüfus sorgusu<br/>haversine / PostGIS]
+    T -->|o da yoksa| N[scan_mode = none<br/>raporda 'taranamadı']
 ```
 
 - [ ] Neon Postgres projesi (bölge Frankfurt), `DATABASE_URL` Vercel env'e
@@ -96,9 +104,9 @@ flowchart LR
 - [ ] Destatis GV-ISys indirme ve import scripti (`scripts/import-settlements.ts`)
   - [ ] AGS 8 haneli anahtar, Bundesland, Kreis, nüfus, nüfus tarihi, koordinat
   - [ ] Koordinatı olmayan yerler için BKG verisinden tamamlama (uydurma yok)
-- [ ] Sağlayıcı lokasyon eşlemesi (`scripts/map-provider-locations.ts`)
-  - [ ] Her AGS için en yakın DataForSEO `location_code`, mesafe km olarak kaydedilir
-  - [ ] Eşik üstü mesafe → "taranamadı" olarak işaretlenir
+- [ ] `location_coordinate` doğrulaması: 10 yerleşimde koordinat sorgusu ile şehir kodu sorgusunu karşılaştırma; yarıçap değerinin seçimi
+- [ ] Yedek eşleme scripti (`scripts/map-provider-locations.ts`): yalnızca koordinatla sorgulanamayan yerler için
+- [ ] Hiçbir yöntemle sorgulanamayan yer → `scan_mode = none` + gerekçe (`scan_note`)
 - [ ] Yarıçap sorgusu: merkez AGS + km + min. nüfus → yerleşim listesi
 - [ ] Rakip etiket listesi (zincir, portal, dizin, üretici) – ilk 100 domain
 - [ ] Sektör keyword setleri v1: Terrassenüberdachung, Arbeitsbühnen Vermietung
@@ -122,9 +130,10 @@ sequenceDiagram
     U->>A: Taramayı başlat
     A->>DB: scan (queued) + kota kontrolü
     A->>Q: iş paketleri (100 sorgu/paket)
-    Q->>D: SERP görevleri (mobil, de-DE, location_code)
+    Q->>D: SERP görevleri (mobil, de-DE, Gemeinde koordinatı)
     D-->>Q: JSON sonuçlar
-    Q->>DB: serp_results (organik, reklam, local pack, task-id)
+    Q->>DB: serp_raw (ham yanıt, task-id, maliyet)
+    Q->>DB: serp_results (organik, reklam, local pack → raw_id)
     Q->>DB: maliyet + durum güncelle
     A-->>U: İlerleme ve bitiş bildirimi
 ```
@@ -134,13 +143,14 @@ sequenceDiagram
 - [ ] Inngest entegrasyonu: paketleme, yeniden deneme, hız sınırı
 - [ ] Sonuç ayrıştırma: organik top 20, üst/alt reklam blokları, Local Pack
 - [ ] Reklam sıklığı: ana keyword için 3 tekrar örnekleme
-- [ ] Ham JSON saklama (Vercel Blob veya Postgres JSONB, 12 ay)
+- [ ] Ham yanıt saklama: `serp_raw` tablosu (JSONB, sorgu parametresi, cihaz, maliyet); her `serp_results` satırı `raw_id` ile kaynağına bağlı
+- [ ] Saklama süresi işi: 12 aydan eski `serp_raw` kayıtlarının otomatik silinmesi
 - [ ] Maliyet takibi: tarama başına sorgu sayısı ve USD
 - [ ] Otomatik rakip etiketleme (şehir yüzdesine göre local/regional/national)
 - [ ] Doğrulama: sorguların %5'i ikinci yöntemle çapraz kontrol, sapma raporu
 - [ ] CLI/komut ile iç kullanım: `npm run scan -- --project <id>`
 
-**Kapı 1 – Veri doğru mu?** 5 şehirde manuel kontrol (inkognito + konum) ile sapma ≤ 2 sıra. Geçmezse Faz 4–5'e geçilmez.
+**Kapı 1 – Veri doğru mu?** 5 şehirde manuel kontrol (inkognito + Google'da konum ayarı) ile sapma ≤ 2 sıra. Geçmezse veri hattında Faz 4–5'e geçilmez. Hesap hattı (Faz 3 ve 6) bu kapıdan bağımsız ilerler.
 
 **Teslimat:** Terrassenüberdachung/Hessen pilotunun ham verisi veritabanında.
 
@@ -150,7 +160,8 @@ sequenceDiagram
 
 **Hedef:** Birden çok kullanıcı ve organizasyon güvenli şekilde ayrılmış.
 
-- [ ] Better Auth: e-posta + magic link, Google ile giriş
+- [ ] Better Auth kurulumu; tabloları CLI ile üretip mevcut şemayla karşılaştırma (şema Faz 0'da bu yapıya hizalandı, çift kullanıcı tablosu oluşmamalı)
+- [ ] E-posta + magic link, Google ile giriş; e-posta doğrulaması zorunlu
 - [ ] Organizasyon oluşturma, davet, roller (owner, admin, member, viewer)
 - [ ] Postgres Row Level Security veya sorgu katmanında zorunlu `organization_id`
 - [ ] Koltuk sayısı ve proje sayısı limitleri (plan tablosundan)
@@ -213,6 +224,8 @@ flowchart LR
 
 - [ ] Impressum (TechNS UG, Amtsgericht Bad Homburg HRB 16236, USt-IdNr.)
 - [ ] Datenschutzerklärung: alt işleyenler ve lokasyonları (Vercel, Neon, DataForSEO, Anthropic, Stripe, Resend, Sentry)
+- [ ] AB dışı aktarım dayanağı: her ABD'li alt işleyen için DPF sertifikası veya standart sözleşme maddeleri (SCC); her biriyle DPA imzalı
+- [ ] Alt işleyen listesi AVV ekinde de güncel tutulur
 - [ ] AGB: kullanım lisansı, veri sahipliği, "yalnızca yetkili olunan domainler", sorumluluk sınırı, fesih
 - [ ] AVV şablonu (ajans müşterileri için)
 - [ ] Widerrufsbelehrung (B2C ihtimaline karşı)
@@ -243,13 +256,18 @@ flowchart LR
 
 - [ ] Açılış sayfası v2 (DE/EN/TR): problem, örnek rapor, fiyatlar, SSS
 - [ ] Ücretsiz mini rapor: 5 şehir, 1 keyword, kayıt sonrası 3 dakikada
+- [ ] Kötüye kullanım koruması (her ücretsiz rapor gerçek sağlayıcı maliyeti doğurur):
+  - [ ] E-posta doğrulaması olmadan tarama yok
+  - [ ] Hesap ve IP başına hız sınırı; tek kullanımlık e-posta alan adlarının engellenmesi
+  - [ ] Ücretsiz raporlar için günlük toplam bütçe tavanı; aşılınca bekleme listesi
+  - [ ] Bot koruması (Vercel BotID veya Turnstile)
 - [ ] Onboarding: domain → kategori önerisi → ilk tarama
 - [ ] PDF rapor (Playwright), TechNS logosuyla
 - [ ] E-postalar (Resend + React Email, üç dil): kayıt, rapor hazır, kota uyarısı
 - [ ] foundercheck.de entegrasyonu: rapor sonunda ve ana sayfada Ortsrank bağlantısı
 - [ ] Gözlem: Sentry, Plausible, Vercel Analytics; tarama hata oranı alarmı
 - [ ] Durum sayfası ve destek e-postası
-- [ ] SEO: sektör × şehir açıklayıcı sayfalar (yalnızca gerçek veriyle)
+- [ ] SEO: az sayıda, elle yazılmış rehber içerik (ör. "Lokal Ranking prüfen", sektör başına bir sayfa)
 
 **Kapı 3 – Ödeyen müşteri:** 30 gün içinde 10 ödeyen (veya ödemeye hazır) kullanıcı.
 
@@ -270,6 +288,7 @@ flowchart LR
 - [ ] Ek sektör keyword setleri (Fenster, Zaun, Dachdecker, Gartenbau, Restaurant, Rechtsanwalt, Steuerberater …)
 - [ ] Avusturya ve İsviçre (Statistik Austria, BFS verisi)
 - [ ] AI arama görünürlüğü (Google AI Overviews, ChatGPT) – ayrı modül olarak değerlendirme
+- [ ] Sektör × şehir veri sayfaları – yalnızca her sayfa kendine özgü gerçek tarama verisi taşıyorsa ve sınırlı sayıda. Google seri üretilmiş ince içeriği spam sayıyor; şablonla binlerce sayfa üretilmez.
 
 ---
 
@@ -294,7 +313,7 @@ flowchart LR
 | Veritabanı | Neon Postgres (Frankfurt), Drizzle ORM |
 | Kimlik | Better Auth (organizasyon, roller, 2FA) |
 | Kuyruk | Inngest |
-| SERP verisi | DataForSEO (soyut sağlayıcı katmanı) |
+| SERP verisi | DataForSEO, Gemeinde koordinatıyla sorgu (soyut sağlayıcı katmanı) |
 | Analiz | Claude API, structured output |
 | Ödeme | Stripe Billing |
 | E-posta | Resend + React Email |
@@ -311,6 +330,13 @@ flowchart LR
 | İlk pilot için 2–3 işletme ve domain | Faz 2 sonu |
 | Ortsrank için ayrı marka tescili (DPMA) | Faz 7 öncesi |
 | İleride ayrı domain'e geçiş (ortsrank.de) | Faz 8 |
+
+## Değişiklik geçmişi
+
+| Tarih | Değişiklik |
+| --- | --- |
+| 20.10.2026 | İlk sürüm |
+| 20.10.2026 | Gözden geçirme: bağımlılıklar iki paralel hatta düzeltildi; Gemeinde koordinatıyla sorgu temel yöntem oldu; `serp_raw` ve taranabilirlik durumu şemaya eklendi; kimlik tabloları Better Auth'a hizalandı; AB dışı aktarım (SCC/DPF), ücretsiz rapor kötüye kullanım koruması eklendi; programatik SEO sayfaları Faz 8'e taşındı; süreler gerçekçi hale getirildi |
 
 ## İlgili belgeler
 
