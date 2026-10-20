@@ -1,6 +1,6 @@
 CREATE TYPE "public"."action_bucket" AS ENUM('website', 'google_profile', 'ads', 'monitoring');--> statement-breakpoint
 CREATE TYPE "public"."action_status" AS ENUM('open', 'done', 'dismissed');--> statement-breakpoint
-CREATE TYPE "public"."action_type" AS ENUM('improvement', 'verification');--> statement-breakpoint
+CREATE TYPE "public"."action_type" AS ENUM('review', 'improvement', 'verification');--> statement-breakpoint
 CREATE TYPE "public"."competitor_label" AS ENUM('local', 'regional', 'national', 'portal', 'directory', 'manufacturer');--> statement-breakpoint
 CREATE TYPE "public"."device" AS ENUM('mobile', 'desktop');--> statement-breakpoint
 CREATE TYPE "public"."evidence_level" AS ENUM('observation', 'inference', 'hypothesis');--> statement-breakpoint

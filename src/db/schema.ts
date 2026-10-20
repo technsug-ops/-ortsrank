@@ -317,11 +317,13 @@ export const competitorLabels = pgTable("competitor_labels", {
 // ── Findings & actions ────────────────────────────────────────────────────
 
 export const findingKind = pgEnum("finding_kind", ["opportunity", "threat", "action"]);
-// observation = seen directly in scanned data; inference = observation plus a
-// named extra source (page crawl, profile data); hypothesis = not yet backed.
+// observation = fact verified directly in a data source (SERP, page crawl,
+// profile); the source type does not change the level. inference = an
+// interpretation of observations. hypothesis = an untested cause/effect claim.
 export const evidenceLevel = pgEnum("evidence_level", ["observation", "inference", "hypothesis"]);
-// improvement rests on an observation/inference; verification tests a hypothesis.
-export const actionType = pgEnum("action_type", ["improvement", "verification"]);
+// review checks the customer's own situation first; improvement follows a
+// confirmed need; verification tests a hypothesis.
+export const actionType = pgEnum("action_type", ["review", "improvement", "verification"]);
 export const actionBucket = pgEnum("action_bucket", ["website", "google_profile", "ads", "monitoring"]);
 export const actionStatus = pgEnum("action_status", ["open", "done", "dismissed"]);
 

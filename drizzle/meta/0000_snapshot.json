@@ -1,5 +1,5 @@
 {
-  "id": "283815b0-1e23-48c6-ba1d-89a18fa9f84c",
+  "id": "6ef6ddb2-fc79-4c9e-b63d-19c51e9ab417",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1993,6 +1993,7 @@
       "name": "action_type",
       "schema": "public",
       "values": [
+        "review",
         "improvement",
         "verification"
       ]

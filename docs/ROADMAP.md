@@ -2,7 +2,7 @@
 
 > Bölgesel hizmet veren işletmelerin Google'da hangi belediyelerde rekabetin gerisinde kaldığını ve önce nerede çalışması gerektiğini gösterir.
 > İşleten: TechNS UG (haftungsbeschränkt), Oberursel · Adres: https://ortsrank.foundercheck.de
-> Son güncelleme: 20.10.2026 (sürüm 3)
+> Son güncelleme: 21.10.2026 (sürüm 3.1)
 
 ---
 
@@ -27,7 +27,7 @@ Harita, sıralama ve rakip tablosu tek başına fark yaratmaz; BrightLocal ve Lo
 
 | Sadece veri | Ortsrank'ın hedeflediği çıktı |
 | --- | --- |
-| "Hanau'da 12. sıradasınız." | "Hanau'da üç ticari aramada ilk 10 dışındasınız (gözlem). İlk 10'daki yerel rakiplerin ikisinin bu hizmet için ayrı sayfası var (çıkarım: sayfa taraması). Önce mevcut sayfanızın bu arama niyetini karşılayıp karşılamadığını inceleyin." |
+| "Hanau'da 12. sıradasınız." | "Hanau'da üç ticari aramada ilk 10 dışındasınız; ilk 10'daki iki yerel rakibin Hanau hizmet sayfası var ve bu aramalarda sıralanıyor (gözlem). Önce mevcut sayfanızın Hanau'daki hizmet ihtiyacını karşılayıp karşılamadığını inceleyin." |
 
 ## 3. Açık soru: raporu kim kullanıyor, işi kim yapıyor?
 
@@ -58,9 +58,11 @@ Bu soru ürünün kapsamını belirler ve pilotta cevaplanmalıdır.
 
 | Seviye | Tanım | Örnek | Raporda nasıl görünür |
 | --- | --- | --- | --- |
-| Gözlem | Taranan veride doğrudan görülen durum. Kapsamı tam olarak belirtilir. | "20.10.2026'da Hanau merkez noktasından, mobil, 3 örneklemede bu keyword için reklam görülmedi." | Doğrudan ifade + kaynak bağlantısı |
-| Çıkarım | Bir gözlem + **adı belirtilen ek veri** (ör. sayfa taraması, GBP verisi). Hangi ek veriye dayandığı gösterilir. | "İlk 10'daki iki yerel rakibin Hanau için ayrı hizmet sayfası var (sayfa taraması, 20.10.2026)." | İfade + dayandığı veri kaynakları |
-| Hipotez | Gerekli ek veri henüz yok. Doğrulanması gerekir. | "Rakibin bu belediyedeki görünürlüğü şehir sayfasından kaynaklanıyor olabilir." | "Doğrulanmalı" etiketiyle |
+| Gözlem | Bir veri kaynağında (SERP, sayfa taraması, GBP) doğrudan doğrulanmış olgu. Kaynak ve kapsam (tarih, nokta, cihaz, örneklem) belirtilir. Hangi kaynaktan geldiği seviyeyi değiştirmez. | "Rakibin Hanau hizmet sayfası var ve incelenen sorguda sıralanıyor." · "20.10.2026'da Hanau merkez noktasından, mobil, 3 örneklemede bu keyword için reklam görülmedi." | Doğrudan ifade + kaynak bağlantısı |
+| Çıkarım | Gözlemlerin değerlendirilmesi; bir yorum içerir. Dayandığı gözlemler gösterilir. | "Sayfa içeriği, bu sorgunun hizmet ve konum niyetiyle uyumlu görünüyor." | İfade + dayandığı gözlemler |
+| Hipotez | Henüz sınanmamış bir neden veya etki varsayımı. | "Benzer ihtiyacı karşılayan bir sayfa hazırlamak görünürlüğümüzü artırabilir." | "Doğrulanmalı" etiketiyle |
+
+"Sizde yok" gibi bir ifade, ancak müşterinin kendi sitesi de aynı yöntemle kontrol edildiyse gözlemdir.
 
 **Veriden çıkarılabilecek sonuçların sınırı**
 
@@ -75,8 +77,11 @@ Bu soru ürünün kapsamını belirler ve pilotta cevaplanmalıdır.
 
 | Tür | Dayandığı bulgu | Örnek |
 | --- | --- | --- |
-| İyileştirme | Gözlem veya çıkarım | "Hanau için hizmet sayfası oluşturun; ilk 10'daki iki yerel rakipte var, sizde yok." |
-| Doğrulama çalışması | Hipotez | "Rakibin Hanau sayfasını ve kendi sayfanızı arama niyeti açısından karşılaştırın; sonucu kaydedin." |
+| İnceleme | Gözlem | "Önce mevcut sayfanızın Hanau'daki hizmet ihtiyacını karşılayıp karşılamadığını inceleyin." |
+| İyileştirme | Gözlem + çıkarım, inceleme sonucuyla birlikte | "Ayrı ve yararlı içerik ihtiyacı doğrulandıysa mevcut sayfayı geliştirin veya yeni sayfa planlayın." |
+| Doğrulama çalışması | Hipotez | "Küçük bütçeli test kampanyasıyla bu keyword'deki reklam maliyetini ölçün; sonucu kaydedin." |
+
+Bir rakipte bir sayfanın bulunması, tek başına yeni sayfa açmayı gerekçelendirmez. Öneriler önce incelemeyle başlar; iyileştirme, ihtiyaç doğrulandıktan sonra gelir.
 
 Hipotezi sınamak da değerli bir aksiyondur; ancak doğrulanmış bulguya dayalı iyileştirmeyle karıştırılmaz.
 
@@ -86,13 +91,18 @@ Hipotezi sınamak da değerli bir aksiyondur; ancak doğrulanmış bulguya dayal
 
 | Alan | Ne ölçülür | Kabul ölçütü (ilk sürüm) |
 | --- | --- | --- |
-| Sistem doğruluğu | Tarama başarı oranı | ≥ %98 görev başarılı veya açık hata koduyla kaydedilmiş |
+| Sistem doğruluğu | Kayıt bütünlüğü | Görevlerin %100'ü başarı, hata veya iptal durumuyla kayıtlı |
+| | Geçerli sonuç oranı | Tanımlanan tekrar denemelerinden sonra görevlerin en az %98'i kullanılabilir sonuç üretmiş |
 | | Gönderilen parametre = kaydedilen parametre (koordinat, keyword, cihaz, dil) | %100, otomatik testle |
 | | Ayrıştırma doğruluğu: ham yanıt ↔ ayrıştırılmış sonuç | 50 rastgele yanıtta elle kontrol, hata yok |
 | Sonuç değişkenliği | Aynı sorgu, aynı nokta, farklı zamanlarda (ör. 3 gün) | İlk 10 örtüşmesi ve sıra farkı raporlanır; eşik değil, ölçülen değer olarak |
 | | Reklam görülme sıklığı | Örneklem sayısıyla birlikte yüzde olarak verilir |
 
 Değişkenlik ölçümünün sonucu, rapordaki ölçüm sınırı metnine olduğu gibi yazılır. Ürün vaadine dönüştürülmez.
+
+**Dönem karşılaştırma şartları**
+
+Dönem karşılaştırmaları aynı keyword, koordinat, cihaz, dil ve tarama derinliği üzerinden yapılır. Örnekleme saatleri mümkün olduğunca eşleştirilir. Ayar değişiklikleri işaretlenir; başarısız ölçümler sıralama kaybı sayılmaz.
 
 ## 7. Aşamalar
 
@@ -157,7 +167,7 @@ flowchart LR
 - [ ] Koordinatla sorgulanamayan belediye için yedek yöntem veya `scan_mode = none`
 - [ ] Tarama scripti: proje tanımı (domain, merkez, yarıçap, nüfus eşiği, keywordler) → `serp_raw` + `serp_results`
 - [ ] Reklam örneklemesi: ana keyword için 3 tekrar, farklı saatlerde
-- [ ] Sayfa taraması (sınırlı): ilk 10'daki yerel rakiplerin ilgili sayfası var mı? Çıkarım seviyesindeki bulgular için gerekli.
+- [ ] Sayfa taraması (sınırlı): ilk 10'daki yerel rakiplerin ve **müşterinin kendi sitesinin** ilgili sayfaları; "var/yok" ancak her iki taraf aynı yöntemle kontrol edildiyse gözlemdir
 - [ ] Kurallar v0 (5 kural), her bulgu kanıt seviyesiyle
 - [ ] Ölçüm ölçütleri (bölüm 6) için otomatik testler ve değişkenlik ölçümü
 - [ ] Rapor şablonu (Almanca PDF): durum, rakipler, kanıt seviyeli öneriler, ölçüm sınırları bölümü
@@ -204,7 +214,7 @@ flowchart LR
 
 - [ ] Salt-okunur web raporu (Almanca): harita, belediye tablosu, rakip özeti
 - [ ] Belediye detayı ve rakip özeti; her öneride kanıt seviyesi ve kaynak
-- [ ] Planlı ikinci tarama ve önceki ölçümle karşılaştırma
+- [ ] Planlı ikinci tarama ve önceki ölçümle karşılaştırma, dönem karşılaştırma şartlarına göre (bölüm 6)
 - [ ] Değişim gösterimi: "işlem + sonrasındaki değişim", nedensellik iddiası olmadan
 - [ ] Fiyat testi: tek rapor ve ikinci ölçüm için en az iki fiyat noktası
 
@@ -300,6 +310,7 @@ Yalnızca mevcut müşterilerden doğrulanmış talep varsa:
 | --- | --- | --- |
 | 20.10.2026 | 1 | İlk sürüm (9 teknik faz) |
 | 20.10.2026 | 2 | Bağımlılıklar düzeltildi; koordinatla sorgu; `serp_raw`; Better Auth hizası; SCC/DPF; kötüye kullanım koruması |
+| 21.10.2026 | 3.1 | Başarı ölçütü ikiye ayrıldı (kayıt bütünlüğü, geçerli sonuç oranı); kanıt seviyesi tanımları düzeltildi (kaynak türü seviyeyi belirlemez); "rakipte var, sizde yok → sayfa açın" yerine önce inceleme; müşterinin kendi sitesi de kontrol edilir; dönem karşılaştırma şartları eklendi |
 | 20.10.2026 | 3 | Dış değerlendirmeye göre yeniden yapılandırıldı: ilk hedef "ödeme + somut karar"; 4 aşama; veri ve talep pilotu birleşti; kanıt seviyeleri ve aksiyon türleri; ölçüm ölçütleri (sistem doğruluğu ≠ değişkenlik); "±2 sıra" vaadi kaldırıldı; "her yerleşim" yerine "belediyeler" ve temsilî ölçüm noktası; tekrar ölçüm ilk ücretli sürüme alındı; erişim kontrolü ve pilot hukuku ilk dış erişimden önceye bağlandı; pilot kayıtları ve açıklama süresi; sinyaller ayrı kaydediliyor |
 
 ## İlgili belgeler
