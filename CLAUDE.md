@@ -6,6 +6,7 @@ Bu repo Ortsrank'ın kodudur: bölgesel hizmet veren işletmelerin Google'da han
 
 ## Önce oku
 
+- `docs/STATUS.md` – **nerede olduğumuz ve checklist.** Her tamamlanan adımdan sonra güncelle: kutuyu işaretle, tarih ve commit ekle, "Şu an" satırını ve günlüğü güncelle. Güncellemeyi o adımın commit'ine dahil et.
 - `docs/ROADMAP.md` – aşamalar, ilkeler, kanıt seviyeleri, ölçüm ölçütleri (sürüm 3.1)
 - `docs/PHASE1_PLAN.md` – şu anki teknik iş: Aşama 1 scriptleri
 - `src/db/schema.ts` – veri modeli
