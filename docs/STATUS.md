@@ -116,7 +116,7 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Neon veritabanı Vercel üzerinden oluşturuldu ve bağlandı | bu commit |
+| 21.10.2026 | Neon veritabanı Vercel üzerinden oluşturuldu ve bağlandı | `93f65ec` |
 | 21.10.2026 | Anayasaya eklendi: kullanım kolaylığı, tek yerden yönetim, admin paneli (ROADMAP 3.2) | `4e9e12d` |
 | 21.10.2026 | Aşama 1 planı 1.2; STATUS.md oluşturuldu | `612e3ad` |
 | 21.10.2026 | ROADMAP 3.1 (dış değerlendirme sonrası) | `0fa9446` |
