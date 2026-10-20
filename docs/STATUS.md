@@ -34,6 +34,9 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] ROADMAP sürüm 3.1, dış değerlendirmeden geçti (21.10.2026)
 - [x] Aşama 1 teknik planı sürüm 1.2 (21.10.2026, commit `612e3ad`)
 - [x] `CLAUDE.md` – VS Code için çalışma kuralları (21.10.2026)
+- [x] Neon Postgres `neon-erin-envelope` oluşturuldu, yalnızca `ortsrank` projesine bağlı; `DATABASE_URL` tüm ortamlarda (21.10.2026)
+- [ ] Neon bölgesinin Frankfurt olduğu doğrulandı; yerel `.env.local` hazır
+- [ ] Migration uygulandı (Aşama 1 adım 11'deki şema değişikliğinden sonra)
 - [ ] Vercel ↔ GitHub bağlantısı (Settings → Git → Connect)
 - [ ] İlk production deploy; `https://ortsrank.foundercheck.de` açılıyor ve SSL geçerli
 - [ ] Repo adı `ortsrank` olarak düzeltildi (isteğe bağlı)
@@ -113,6 +116,7 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
+| 21.10.2026 | Neon veritabanı Vercel üzerinden oluşturuldu ve bağlandı | bu commit |
 | 21.10.2026 | Anayasaya eklendi: kullanım kolaylığı, tek yerden yönetim, admin paneli (ROADMAP 3.2) | `4e9e12d` |
 | 21.10.2026 | Aşama 1 planı 1.2; STATUS.md oluşturuldu | `612e3ad` |
 | 21.10.2026 | ROADMAP 3.1 (dış değerlendirme sonrası) | `0fa9446` |
