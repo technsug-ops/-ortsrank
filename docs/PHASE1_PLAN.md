@@ -2,8 +2,9 @@
 
 > Kapsam: ROADMAP sürüm 3.1, Aşama 1'in **teknik** kısmı (veri + tarama scriptleri).
 > Müşteri bulma, hesap açma, para yatırma ve işletme katılımı bu planın dışında; Halil tarafından ayrı takip edilir.
-> Hazırlanma: 21.10.2026 · Sürüm 1.1 · Uygulama: VS Code'da
+> Hazırlanma: 21.10.2026 · Sürüm 1.2 · Uygulama: VS Code'da
 >
+> Sürüm 1.2: bütçe tüm oturumlarda ortak ve kalıcı; beklenenden yüksek ücret davranışı ve testi; ilk teslimat raporu şablonu.
 > Sürüm 1.1: gerçek harcama tavanı (bütçe defteri), örnekleme oturumları, eksik koordinat ile eksik nüfusun ayrılması, deneme bazlı kayıt ve çakışmayan çalışma kimliği eklendi.
 
 ---
@@ -20,7 +21,7 @@ Teslimat tamam sayılır, eğer:
 
 **İlk teslimatta gösterilecekler:** test sonuçları, gerçek Destatis verisinden üretilmiş belediye listesinin özeti ve pilot projesinin dry-run çıktısı (belediye listesi, görev planı, maliyet tahmini).
 
-Canlı deneme bu teslimatın parçası değildir; anahtarlar gelince ayrı adım olarak yapılır (bölüm 8).
+Canlı deneme bu teslimatın parçası değildir; anahtarlar gelince ayrı adım olarak yapılır (bölüm 9). Teslimat raporunun biçimi bölüm 8'de.
 
 ---
 
@@ -208,9 +209,24 @@ Kurallar:
 1. Bir deneme gönderilmeden önce `remaining ≥ costPerAttempt` kontrol edilir ve tutar `reserved`'a alınır. Eşzamanlı istekler bu ayırma üzerinden yarışmadan bütçe kullanır.
 2. Yanıt gelince ayrılan tutar `confirmed`'a (gerçek `cost` ile) veya `uncertain`'a taşınır.
 3. Bütçe yetmiyorsa yeni deneme gönderilmez. Kalan görevler `cancelled` durumuyla ve `reason: "budget_exhausted"` gerekçesiyle kaydedilir.
-4. Tarama sonunda `confirmed + uncertain ≤ SCAN_MAX_USD` her koşulda sağlanır.
+4. **Bütçe tarama bazındadır, çalıştırma bazında değil.** Aynı `scanId` altındaki tüm oturumlar (sabah, öğle, akşam) tek bir kalıcı defteri paylaşır: `runs/scans/<scanId>/budget.json`. Her oturum başlarken önceki oturumların `confirmed` ve `uncertain` tutarlarını bu dosyadan okur; `runId` başına bütçe sıfırlanmaz. Yarıda kesilip yeniden başlatılan bir çalıştırma da önceki harcamayı okur. Defter dosyası her deneme sonucundan hemen sonra yazılır (önce geçici dosya, sonra atomik yeniden adlandırma).
+5. **Tavan, tahmini fiyata dayalı ayırmayla korunur; mutlak garanti değildir.** Sağlayıcının döndürdüğü gerçek `cost`, ayrılan tutardan yüksekse yapılmış harcama geri alınamaz. Bu durumda:
+   - gerçek maliyet eksiksiz `confirmed`'a yazılır,
+   - fark `priceDeviation` olarak kaydedilir (deneme başına ayrılan ↔ gerçek),
+   - yeni istek gönderilmez; kalan görevler `reason: "price_above_estimate"` ile iptal edilir,
+   - özet, tavanın ne kadar aşıldığını ve nedenini açıkça yazar.
 
-**Testler (`budget.test.ts`, mock'lu istemci):** HTTP katmanı taklit edilerek (fetch mock): başarı, `status_code` ≠ 20000, zaman aşımı, tekrar denemeden sonra başarı. Bütçe defteri için: eşzamanlı isteklerde tavanın aşılmaması, zaman aşımının `uncertain` sayılması, bütçe bitince kalan görevlerin gerekçeyle iptali, tekrar denemelerin ayrı dosyalara yazılması.
+   Yeniden başlatmak için `SCAN_PRICE_PER_SERP_USD` güncellenmeli ve plan yeniden onaylanmalıdır.
+
+**Testler (`budget.test.ts`, mock'lu istemci):** HTTP katmanı taklit edilerek (fetch mock): başarı, `status_code` ≠ 20000, zaman aşımı, tekrar denemeden sonra başarı. Bütçe defteri için:
+
+- eşzamanlı isteklerde ayırmanın tavanı aşmaması,
+- zaman aşımının `uncertain` sayılması,
+- bütçe bitince kalan görevlerin `budget_exhausted` gerekçesiyle iptali,
+- tekrar denemelerin ayrı dosyalara yazılması,
+- **oturumlar arası koruma:** oturum 1 bütçenin bir kısmını harcar; oturum 2 aynı `scanId` ile başlar ve yalnızca kalanı kullanabilir,
+- **yeniden başlatma:** çalıştırma yarıda kesilir; yeniden başladığında önceki `confirmed` ve `uncertain` okunur,
+- **beklenenden yüksek ücret:** mock yanıt `cost`'u ayrılan tutarın iki katı döndürür; gerçek maliyet eksiksiz kaydedilir, `priceDeviation` yazılır, yeni istek gönderilmez, kalanlar `price_above_estimate` ile iptal edilir, özet tavan aşımını raporlar.
 
 ### 5.5 `dataforseo/parse.ts`
 
@@ -272,7 +288,7 @@ npx tsx scripts/scan.ts --project projects/pilot-rhein-main.json --limit-settlem
 - Varsayılan dry-run; canlı istek için `--live` zorunlu.
 - **Çalışma kimliği** (`runId`) çakışmaz: `<YYYYMMDD-HHMMSS>-<proje>-<rastgele 6 karakter>`. Aynı gün aynı proje için yapılan iki tarama ayrı klasöre yazılır; klasör zaten varsa script durur.
 - Bir taramanın oturumları aynı `scanId` altında toplanır; her oturum çalıştırması kendi `runId`'sini alır.
-- Çıktılar `runs/<runId>/`: `plan.json`, `attempts.jsonl`, `tasks.jsonl`, `budget.json`, `raw/<taskKey>/attempt-<n>.json`, `results.csv`, `summary.json`.
+- Çıktılar `runs/<runId>/`: `plan.json`, `attempts.jsonl`, `tasks.jsonl`, `raw/<taskKey>/attempt-<n>.json`, `results.csv`, `summary.json`. Bütçe defteri çalıştırmada değil taramada tutulur: `runs/scans/<scanId>/budget.json` (5.4).
 - Konsolda: belediye sayısı, görev sayısı, tahmini maliyet, gerçek maliyet, kayıt bütünlüğü, geçerli sonuç oranı, hedef domainlerin bulunduğu/bulunmadığı belediyeler.
 
 ---
@@ -314,20 +330,31 @@ Notlar:
 11. Şemada `lat`, `lng`, `population` alanlarını null kabul edecek şekilde güncelle; migration'ı yeniden üret.
 12. Gerçek Destatis dosyasını indir, sütun eşlemesini doğrula, `import-settlements.ts` + testler.
 13. `scan.ts --dry-run` ile pilot projesinin gerçek belediye listesi (dört liste) ve maliyet tahmini.
-14. Commit; testlerin, belediye listesi özetinin ve dry-run çıktısının özeti.
+14. `docs/reports/phase1-delivery.md` teslimat raporunu bölüm 8'e göre yaz ve commit et.
 
 Her adım ayrı commit. Testler geçmeden bir sonraki adıma geçilmez.
 
 ---
 
-## 8. Küçük canlı deneme (anahtarlar geldikten sonra)
+## 8. İlk teslimat raporu
+
+Uygulama tamamlanınca `docs/reports/phase1-delivery.md` dosyası şu dört bölümle yazılır ve commit edilir:
+
+1. **Test özeti:** toplam / geçen / başarısız test sayısı; özellikle şu senaryoların adı ve sonucu: eşzamanlı bütçe kullanımı, oturumlar arası bütçe koruması, yeniden başlatma, beklenenden yüksek ücret.
+2. **Destatis verisi:** kullanılan dosyanın adı, yayın tarihi ve nüfus referans tarihi; içe aktarılan belediye sayısı; eksik koordinat, eksik nüfus ve ikisi birden eksik sayıları; sütun eşlemesinin nasıl doğrulandığı.
+3. **Dry-run çıktısı (pilot):** merkez, yarıçap, nüfus eşiği; seçilen belediyeler (ad, AGS, mesafe, nüfus); `unknownPopulation`, `unlocatable`, `belowThreshold` sayıları; keywordler ve oturumlar; görev sayısı; beklenen ve en kötü durum maliyeti; tavan.
+4. **Değişen dosyalar ve commitler:** dosya listesi, commit hash'leri ve mesajları.
+
+Rapordaki her rakam gerçek komut çıktısından alınır; tahmin veya örnek değer yazılmaz.
+
+## 9. Küçük canlı deneme (anahtarlar geldikten sonra)
 
 1. `.env.local`: `DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD`, `SCAN_MAX_USD=0.20`.
 2. `scan.ts --limit-settlements 2 --limit-keywords 2 --sessions all --back-to-back --live`.
 3. Kontrol listesi:
    - [ ] Gönderilen parametreler (koordinat, keyword, cihaz, dil, depth) ham yanıttaki `data` alanıyla aynı.
    - [ ] Kayıt bütünlüğü %100; her deneme ayrı dosyada.
-   - [ ] `confirmed + uncertain ≤ SCAN_MAX_USD`; bütçe defteri yanıtlardaki `cost` toplamıyla tutarlı.
+   - [ ] Bütçe defteri yanıtlardaki `cost` toplamıyla tutarlı; tavan aşıldıysa `priceDeviation` raporlandı.
    - [ ] Özette `samplingMode: "technical_validation"` yazıyor; reklam sıklığı hesaplanmadı.
    - [ ] `local_pack` öğelerinin gerçek yapısı dokümanla uyumlu; değilse ayrıştırıcı düzeltilir.
    - [ ] Gerçek `cost` ile tahmin karşılaştırıldı; fiyat varsayımı güncellendi.
@@ -337,7 +364,7 @@ Her adım ayrı commit. Testler geçmeden bir sonraki adıma geçilmez.
 
 ---
 
-## 9. Bu planın dışında kalanlar (Halil)
+## 10. Bu planın dışında kalanlar (Halil)
 
 - Pilot işletmelerle görüşme ve katılım (UG-ALU dahil adayların netleştirilmesi)
 - DataForSEO hesabı, deposit ve panel harcama limiti
