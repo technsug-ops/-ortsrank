@@ -1,5 +1,5 @@
 {
-  "id": "80a93961-d722-42f1-ab06-4e496c679bfb",
+  "id": "283815b0-1e23-48c6-ba1d-89a18fa9f84c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -149,6 +149,13 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "action_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
         },
         "bucket": {
           "name": "bucket",
@@ -415,6 +422,19 @@
         "score": {
           "name": "score",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evidence_level": {
+          "name": "evidence_level",
+          "type": "evidence_level",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data_sources": {
+          "name": "data_sources",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true
         },
@@ -1969,6 +1989,14 @@
         "dismissed"
       ]
     },
+    "public.action_type": {
+      "name": "action_type",
+      "schema": "public",
+      "values": [
+        "improvement",
+        "verification"
+      ]
+    },
     "public.competitor_label": {
       "name": "competitor_label",
       "schema": "public",
@@ -1987,6 +2015,15 @@
       "values": [
         "mobile",
         "desktop"
+      ]
+    },
+    "public.evidence_level": {
+      "name": "evidence_level",
+      "schema": "public",
+      "values": [
+        "observation",
+        "inference",
+        "hypothesis"
       ]
     },
     "public.finding_kind": {

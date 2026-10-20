@@ -1,21 +1,36 @@
 {
   "meta": {
-    "title": "Ortsrank – Müşterin seni gerçekten nerede buluyor?",
-    "description": "Şehir şehir lokal Google görünürlüğü: sıralama, reklamlar, rakipler ve hizmet alanın için somut aksiyonlar."
+    "title": "Ortsrank – Hangi belediyelerde rakiplerinin gerisindesin?",
+    "description": "Bölgesel hizmet veren işletmeler için: belediye belediye Google görünürlüğü, rakipler ve önce nereden başlaman gerektiğini gösteren kanıtlı öncelikler."
   },
-  "nav": { "language": "Dil", "status": "Geliştiriliyor" },
+  "nav": {
+    "language": "Dil",
+    "status": "Geliştiriliyor"
+  },
   "hero": {
-    "eyebrow": "Almanya'daki işletmeler için lokal sıralama",
-    "title": "Müşterin seni gerçekten nerede buluyor?",
-    "lead": "Ortsrank, hizmet alanındaki her gerçek yerleşimde Google'ı tarar – tarla ve ormanlara düşen bir ızgarada değil. Kimin önünde olduğunu, kimin reklam verdiğini ve sırada ne yapman gerektiğini görürsün."
+    "eyebrow": "Bölgesel hizmet veren işletmeler için",
+    "title": "Hangi belediyelerde rakiplerinin gerisindesin?",
+    "lead": "Ortsrank, hizmet alanındaki belediyelerde Google görünürlüğünü ölçer ve önce nereden başlaman gerektiğini gösterir – her önerinin kanıtıyla birlikte."
   },
   "features": {
     "title": "Ortsrank neyi ölçer",
     "items": [
-      { "title": "Gerçek yerleşimler", "text": "Resmi Gemeinde kaydı, konumun çevresinde yarıçap ve nüfus filtresi – uydurma ölçüm noktası yok." },
-      { "title": "Organik, reklam, Local Pack", "text": "Üç sonuç türü ayrı ayrı, şehir şehir ve keyword keyword kaydedilir." },
-      { "title": "Rakip matrisi", "text": "Kim kaç şehirde ilk 3'te – lokal işletmeler zincir ve portallardan ayrı." },
-      { "title": "Tablo değil aksiyon", "text": "Her şehir ve her rakip için öncelikli liste: web sitesi, Google profili, reklam." }
+      {
+        "title": "Resmi kayıttan belediyeler",
+        "text": "Temel, Destatis'in belediye kaydıdır. Her belediye temsilî bir ölçüm noktasından ölçülür; ölçemediğimiz belediyeler açıkça belirtilir."
+      },
+      {
+        "title": "Organik, reklam, Local Pack",
+        "text": "Üç sonuç türü ayrı ayrı kaydedilir – her sayı için zaman, cihaz ve ölçüm noktasıyla."
+      },
+      {
+        "title": "Hizmet alanını kim kaplıyor",
+        "text": "Hangi rakip kaç belediyede önde – yerel işletmeler zincir ve portallardan ayrı."
+      },
+      {
+        "title": "Kanıtlı öncelikler",
+        "text": "Her öneri neye dayandığını gösterir: gözlem, çıkarım ya da doğrulanması gereken hipotez."
+      }
     ]
   },
   "footer": {

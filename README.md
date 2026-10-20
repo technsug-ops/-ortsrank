@@ -1,6 +1,6 @@
 # Ortsrank
 
-Lokales Google-Ranking für Betriebe in Deutschland – Ort für Ort, auf Basis des amtlichen Gemeindeverzeichnisses.
+Zeigt Betrieben mit regionalem Einzugsgebiet, in welchen Gemeinden sie bei Google hinter der Konkurrenz liegen und wo sie zuerst ansetzen sollten.
 Ein Angebot der TechNS UG (haftungsbeschränkt). Live: https://ortsrank.foundercheck.de
 
 ## Stack
@@ -13,10 +13,13 @@ Ein Angebot der TechNS UG (haftungsbeschränkt). Live: https://ortsrank.founderc
 
 ## Grundsätze
 
-1. **Nur echte Daten.** Orte kommen ausschließlich aus Destatis GV-ISys (AGS). Ein Ort ohne Provider-Mapping wird als „nicht scanbar“ markiert, nie ersetzt.
-2. **Nachvollziehbar.** Jede Zahl im Report verweist auf Abruf, Ort, Gerät und Provider-Task.
-3. **Mandantenfähig.** Jede Kundentabelle trägt `organization_id`.
-4. **Mehrsprachig.** Keine Texte im Code – alles in `src/i18n/dictionaries`.
+1. **Nur echte Daten.** Messeinheit sind die Gemeinden aus Destatis GV-ISys (AGS), gemessen von einem repräsentativen Mittelpunkt. Nicht messbare Gemeinden werden als solche ausgewiesen, nie ersetzt.
+2. **Nachvollziehbar.** Jede Zahl im Report verweist auf die Rohantwort (`serp_raw`), Zeitpunkt, Messpunkt und Gerät.
+3. **Evidenzstufen.** Jede Erkenntnis ist Beobachtung, Ableitung oder Hypothese; keine Genauigkeits- oder Kausalitätsversprechen.
+4. **Mandantenfähig.** Jede Kundentabelle trägt `organization_id`.
+5. **Mehrsprachig.** Keine Texte im Code – alles in `src/i18n/dictionaries`.
+
+Roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md)
 
 ## Entwicklung
 

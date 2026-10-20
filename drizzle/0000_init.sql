@@ -1,7 +1,9 @@
 CREATE TYPE "public"."action_bucket" AS ENUM('website', 'google_profile', 'ads', 'monitoring');--> statement-breakpoint
 CREATE TYPE "public"."action_status" AS ENUM('open', 'done', 'dismissed');--> statement-breakpoint
+CREATE TYPE "public"."action_type" AS ENUM('improvement', 'verification');--> statement-breakpoint
 CREATE TYPE "public"."competitor_label" AS ENUM('local', 'regional', 'national', 'portal', 'directory', 'manufacturer');--> statement-breakpoint
 CREATE TYPE "public"."device" AS ENUM('mobile', 'desktop');--> statement-breakpoint
+CREATE TYPE "public"."evidence_level" AS ENUM('observation', 'inference', 'hypothesis');--> statement-breakpoint
 CREATE TYPE "public"."finding_kind" AS ENUM('opportunity', 'threat', 'action');--> statement-breakpoint
 CREATE TYPE "public"."keyword_type" AS ENUM('main', 'variant', 'intent', 'local');--> statement-breakpoint
 CREATE TYPE "public"."result_type" AS ENUM('organic', 'ad', 'local_pack');--> statement-breakpoint
@@ -29,6 +31,7 @@ CREATE TABLE "actions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"organization_id" text NOT NULL,
 	"finding_id" uuid,
+	"type" "action_type" NOT NULL,
 	"bucket" "action_bucket" NOT NULL,
 	"text" text NOT NULL,
 	"locale" "ui_locale" NOT NULL,
@@ -58,6 +61,8 @@ CREATE TABLE "findings" (
 	"rule" text NOT NULL,
 	"kind" "finding_kind" NOT NULL,
 	"score" integer NOT NULL,
+	"evidence_level" "evidence_level" NOT NULL,
+	"data_sources" jsonb NOT NULL,
 	"ags" text,
 	"keyword_id" uuid,
 	"competitor_domain" text,

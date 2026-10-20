@@ -1,345 +1,309 @@
 # Ortsrank – Yol Haritası
 
-> Lokal Google görünürlüğü, yerleşim yerleşim: sıralama, reklam verenler, rakipler ve somut aksiyonlar.
+> Bölgesel hizmet veren işletmelerin Google'da hangi belediyelerde rekabetin gerisinde kaldığını ve önce nerede çalışması gerektiğini gösterir.
 > İşleten: TechNS UG (haftungsbeschränkt), Oberursel · Adres: https://ortsrank.foundercheck.de
-> Son güncelleme: 20.10.2026
+> Son güncelleme: 20.10.2026 (sürüm 3)
 
 ---
 
-## 1. Ürün tek cümlede
+## 1. İlk hedef
 
-Bir işletme domainini, sektörünü ve hizmet alanını girer; Ortsrank bu alandaki **her gerçek yerleşimde** (Destatis Gemeindeverzeichnis) Google'ı tarar. Organik sırayı, reklam verenleri ve Local Pack'i ayrı ayrı ölçer, bir rakip matrisi çıkarır ve her şehir ile her rakip için **öncelikli aksiyon listesi** üretir.
+İlk hedef "SaaS hazır" değildir. İlk hedef şudur:
 
-## 2. Değişmez ilkeler
+> **Bir müşteri, rapor sayesinde somut bir karar aldı ve devamı için ödeme yaptı.**
 
-| İlke | Anlamı | Nerede uygulanır |
+Otomasyona, hesap sistemine ve plan yönetimine yapılacak yatırım bu kanıttan sonra gelir. Mimari SaaS'a hazır kurulur (çok kiracılı şema, çok dilli altyapı); ekranlar ve özellikler ise talep geldikçe eklenir.
+
+## 2. Müşteri ne satın alıyor?
+
+Müşteri sıralama verisi değil, **öncelik** satın alır:
+
+- Hangi çevre belediyelerde görünürüm, hangilerinde görünmüyorum?
+- Hangi rakip hizmet bölgemin çoğunu kaplıyor?
+- Önce hangi belediye ve hangi hizmet için çalışmalıyım?
+- Reklam bütçemi ve içerik çalışmamı nereye yönlendirmeliyim?
+
+Harita, sıralama ve rakip tablosu tek başına fark yaratmaz; BrightLocal ve Local Falcon bunları zaten coğrafi nokta bazında sunuyor. Ortsrank'ın farkı, Almanya'daki belirli hizmet sektörleri için **anlaşılır ve kanıtı gösterilen çalışma öncelikleri** üretmesidir.
+
+| Sadece veri | Ortsrank'ın hedeflediği çıktı |
+| --- | --- |
+| "Hanau'da 12. sıradasınız." | "Hanau'da üç ticari aramada ilk 10 dışındasınız (gözlem). İlk 10'daki yerel rakiplerin ikisinin bu hizmet için ayrı sayfası var (çıkarım: sayfa taraması). Önce mevcut sayfanızın bu arama niyetini karşılayıp karşılamadığını inceleyin." |
+
+## 3. Açık soru: raporu kim kullanıyor, işi kim yapıyor?
+
+Bu soru ürünün kapsamını belirler ve pilotta cevaplanmalıdır.
+
+| İlk müşteri tipi | Üründen beklediği temel değer | Ürün kapsamına etkisi |
 | --- | --- | --- |
-| Gerçek veri | Yerleşimler yalnızca Destatis GV-ISys'ten (AGS anahtarı). Eşleşmeyen yer "taranamadı" olarak işaretlenir, başka bir yerle doldurulmaz. | Faz 1, 2 |
-| İzlenebilirlik | Rapordaki her sayı tarama zamanına, yerleşime, cihaza ve sağlayıcı task-id'sine bağlıdır. | Faz 2, 4 |
-| Uydurma yok | LLM sayı üretmez; yalnızca kural bulgularını metne çevirir. Her aksiyon bir bulguya bağlıdır. | Faz 5 |
-| Çok dillilik | Arayüz ve rapor DE/EN/TR. Kodda sabit metin yok. Arama dili her zaman Almanca. | Tüm fazlar |
-| Çok kiracılı yapı | Müşteriye ait her satırda `organization_id` var; izolasyon veritabanı seviyesinde. | Faz 3 |
-| Hukuka uygunluk | DSGVO, AGB, AVV, Impressum ve E-Rechnung lansmandan önce hazır. | Faz 6 |
-| SaaS'a hazır | Planlar, kotalar ve maliyet takibi baştan veri modelinde. | Faz 3, 6 |
+| İşletme sahibi | Sorunu anlamak, önceliği görmek, işi birine aktarabilmek | Sade dil, az teknik detay, devredilebilir görev listesi |
+| Ajans / pazarlamacı | Analiz süresini azaltmak, müşteriye gerekçeli öneri sunmak, değişimi takip etmek | Detaylı veri, dışa aktarma, çoklu müşteri, white-label |
+| TechNS'nin kendi ekibi | Danışmanlık ve uygulama hizmetini daha hızlı hazırlamak | Rapor + uygulama paketi; yazılım değil hizmet satışı |
 
-## 3. Genel harita
+**Çalışma hipotezi:** İlk pilot, tek bir sektörde, **işletme sahibi ile onun pazarlama işini yapan kişinin birlikte incelediği** raporlarla yapılır. Böylece "rapor anlaşılır mı?" ve "öneri uygulanabilir mi?" soruları aynı anda test edilir.
+
+## 4. Değişmez ilkeler
+
+| İlke | Anlamı |
+| --- | --- |
+| Gerçek veri | Ölçüm birimi, Destatis GV-ISys'teki **siyasi olarak bağımsız belediyelerdir** (Gemeinden, AGS anahtarı). Köy ve mahalleler ayrı birim değildir. Taranamayan belediye "taranamadı" olarak gösterilir, başka bir yerle doldurulmaz. |
+| Temsilî ölçüm noktası | İlk sürümde her belediye **tek bir merkez koordinatından** ölçülür. Rapor bunun temsilî bir nokta olduğunu açıkça söyler. Büyük şehirlerde çok noktalı ölçüm daha sonra gelir. |
+| İzlenebilirlik | Rapordaki her sayı ham sağlayıcı yanıtına, tarama zamanına, koordinata ve cihaza bağlıdır (`serp_raw`). |
+| Kanıt seviyesi | Her bulgu *gözlem*, *çıkarım* veya *hipotez* olarak işaretlenir (bölüm 5). LLM sayı üretmez; yalnızca işaretlenmiş bulguları metne çevirir. |
+| Doğruluk vaadi yok | Doğrulanmamış bir sapma sınırı ("±2 sıra" gibi) ürün vaadi olarak kullanılmaz. Ölçüm sınırları raporda açıkça yazılır. |
+| Nedensellik iddiası yok | "Sayfa yayınlandı → sıra yükseldi" etki kanıtı değildir. Ürün yalnızca yapılan işlemi ve sonrasındaki değişimi birlikte gösterir. |
+| Müşteri ayrımı | Her müşteri verisi `organization_id` taşır. İlk dış kullanıcı erişiminden önce, zorunlu kiracı filtreli sorgu katmanı ve izolasyon testi hazırdır. Postgres RLS, ilk SaaS sürümünde ek savunma katmanı olarak eklenir. |
+| Çok dillilik | Altyapı DE/EN/TR. Pilot arayüzü ve raporu Almanca. Arama dili her zaman Almanca. |
+
+## 5. Kanıt seviyeleri
+
+| Seviye | Tanım | Örnek | Raporda nasıl görünür |
+| --- | --- | --- | --- |
+| Gözlem | Taranan veride doğrudan görülen durum. Kapsamı tam olarak belirtilir. | "20.10.2026'da Hanau merkez noktasından, mobil, 3 örneklemede bu keyword için reklam görülmedi." | Doğrudan ifade + kaynak bağlantısı |
+| Çıkarım | Bir gözlem + **adı belirtilen ek veri** (ör. sayfa taraması, GBP verisi). Hangi ek veriye dayandığı gösterilir. | "İlk 10'daki iki yerel rakibin Hanau için ayrı hizmet sayfası var (sayfa taraması, 20.10.2026)." | İfade + dayandığı veri kaynakları |
+| Hipotez | Gerekli ek veri henüz yok. Doğrulanması gerekir. | "Rakibin bu belediyedeki görünürlüğü şehir sayfasından kaynaklanıyor olabilir." | "Doğrulanmalı" etiketiyle |
+
+**Veriden çıkarılabilecek sonuçların sınırı**
+
+| Toplanan veri | Destekleyebileceği sonuç | Tek başına desteklemediği sonuç |
+| --- | --- | --- |
+| Üç taramada reklam görülmemesi | Bu örneklerde reklam gözlenmedi | Bölgede reklam rekabeti yok |
+| Rakibin ilk üçte olması | Rakip bu sorguda görünür | Rakibin SEO'su kolayca geçilebilir |
+| Şehir sayfasının sonuçlarda görünmesi | Sayfa ilgili sorguda sıralanıyor | Başarının nedeni şehir sayfası |
+| İşletmenin ilk 20'de bulunmaması | Taranan ilk 20 sonuçta bulunamadı | Google'da hiç görünmüyor |
+
+**Aksiyon türleri**
+
+| Tür | Dayandığı bulgu | Örnek |
+| --- | --- | --- |
+| İyileştirme | Gözlem veya çıkarım | "Hanau için hizmet sayfası oluşturun; ilk 10'daki iki yerel rakipte var, sizde yok." |
+| Doğrulama çalışması | Hipotez | "Rakibin Hanau sayfasını ve kendi sayfanızı arama niyeti açısından karşılaştırın; sonucu kaydedin." |
+
+Hipotezi sınamak da değerli bir aksiyondur; ancak doğrulanmış bulguya dayalı iyileştirmeyle karıştırılmaz.
+
+## 6. Ölçüm ölçütleri
+
+İki ayrı şey ölçülür ve ayrı kabul ölçütleriyle değerlendirilir.
+
+| Alan | Ne ölçülür | Kabul ölçütü (ilk sürüm) |
+| --- | --- | --- |
+| Sistem doğruluğu | Tarama başarı oranı | ≥ %98 görev başarılı veya açık hata koduyla kaydedilmiş |
+| | Gönderilen parametre = kaydedilen parametre (koordinat, keyword, cihaz, dil) | %100, otomatik testle |
+| | Ayrıştırma doğruluğu: ham yanıt ↔ ayrıştırılmış sonuç | 50 rastgele yanıtta elle kontrol, hata yok |
+| Sonuç değişkenliği | Aynı sorgu, aynı nokta, farklı zamanlarda (ör. 3 gün) | İlk 10 örtüşmesi ve sıra farkı raporlanır; eşik değil, ölçülen değer olarak |
+| | Reklam görülme sıklığı | Örneklem sayısıyla birlikte yüzde olarak verilir |
+
+Değişkenlik ölçümünün sonucu, rapordaki ölçüm sınırı metnine olduğu gibi yazılır. Ürün vaadine dönüştürülmez.
+
+## 7. Aşamalar
 
 ```mermaid
 flowchart LR
-    F0[Faz 0<br/>Altyapı]:::done --> F1[Faz 1<br/>Veri temeli]
-    F1 --> F2[Faz 2<br/>Tarama motoru]
-    F1 --> F3[Faz 3<br/>Hesap ve kiracılar]
-    F2 --> G1{Kapı 1<br/>Veri doğru mu?}
-    G1 --> F4[Faz 4<br/>Rapor arayüzü]
-    F4 --> F5[Faz 5<br/>Analiz ve aksiyon]
-    F3 --> F6[Faz 6<br/>Hukuk ve ödeme]
-    F5 --> G2{Kapı 2<br/>Pilot onayı}
-    F6 --> G2
-    G2 --> F7[Faz 7<br/>Lansman]
-    F7 --> G3{Kapı 3<br/>Ödeyen müşteri}
-    G3 --> F8[Faz 8<br/>Büyüme]
+    A0[Aşama 0<br/>Altyapı]:::done --> A1[Aşama 1<br/>Veri + talep pilotu]
+    A1 --> K1{Kapı 1<br/>Karar alındı mı?}
+    K1 --> A2[Aşama 2<br/>Ücretli pilot]
+    A2 --> K2{Kapı 2<br/>Ödeme + tekrar}
+    K2 --> A3[Aşama 3<br/>İlk SaaS sürümü]
+    A3 --> K3{Kapı 3<br/>Yardımsız kullanım}
+    K3 --> A4[Aşama 4<br/>Genişleme]
     classDef done fill:#dcefe8,stroke:#1f6f5c
 ```
 
-| Faz | Odak | Tahmini süre | Bağımlılık | Durum |
-| --- | --- | --- | --- | --- |
-| 0 | Altyapı: domain, Vercel, repo, iskelet | 1 gün | – | Büyük ölçüde tamam |
-| 1 | Veri temeli: Neon, Destatis, koordinat sorgusu | 1–1,5 hafta | Faz 0 | Sırada |
-| 2 | Tarama motoru: DataForSEO, kuyruk, ham veri | 1,5–2 hafta | Faz 1 | – |
-| 3 | Hesap ve kiracılar: auth, organizasyon, roller | 1,5 hafta | Faz 1 | – |
-| 4 | Rapor arayüzü: harita, tablolar, detay ekranları | 2–3 hafta | Faz 2 + Kapı 1 | – |
-| 5 | Analiz ve aksiyon motoru | 1,5 hafta | Faz 4 | – |
-| 6 | Hukuk, ödeme, planlar, kotalar | 2 hafta | Faz 3 | – |
-| 7 | Lansman: açılış sayfası, onboarding, PDF, e-posta | 1,5 hafta | Faz 5, 6 + Kapı 2 | – |
-| 8 | Büyüme: takip, uyarılar, white-label, API, AT/CH | sürekli | Faz 7 + Kapı 3 | – |
+| Aşama | Kapsam | Geçiş ölçütü | Tahmini süre |
+| --- | --- | --- | --- |
+| 0. Altyapı | Domain, Vercel, repo, iskelet, şema | – | Tamamlanıyor |
+| 1. Veri + talep pilotu | Script ile tarama; 1 sektör; 20–30 belediye, 3–5 keyword; 3–5 işletmeye Almanca rapor | Ölçüm ölçütleri karşılandı; pilot kayıtlarında en az 2 işletme rapor nedeniyle önceliğini değiştirdi | Teknik: 2–3 hafta · Müşteri bulma ve görüşmeler: 3–4 hafta (paralel) |
+| 2. Ücretli pilot | Salt-okunur web raporu; kanıt seviyeli öneriler; ikinci tarama ve karşılaştırma | Gerçek ödeme alındı; en az 2 müşteri **ücretli** ikinci ölçüm aldı | 4–6 hafta |
+| 3. İlk SaaS sürümü | Hesap, organizasyon, ödeme, kota, planlı yeniden tarama, tam hukuk metinleri | Müşteri temel akışı yardımsız tamamlıyor; ilk abonelik yenilemesi | 6–8 hafta |
+| 4. Genişleme | Ajans özellikleri, white-label, ek sektörler, çok noktalı ölçüm, API, AT/CH | Mevcut müşterilerden doğrulanmış talep | sürekli |
 
-İki paralel hat var: **veri hattı** (Faz 2 → 4 → 5) ve **hesap hattı** (Faz 3 → 6). İkisi Kapı 2'de birleşir.
-
-Süreler akşam/hafta sonu temposuna göre ve tampon payı dahil. Toplamda lansmana kadar **3–4 ay** gerçekçi; ilk taslaktaki 9–10 hafta iyimserdi. Faz 4 (arayüz) ve Faz 6 (ödeme + hukuk) tipik olarak tahminden uzun sürer.
+Süreler akşam/hafta sonu temposuna göredir. Veri üretimi ile müşteri bulma, görüşme ve geri bildirim ayrı planlanır; ikincisi genellikle daha uzun sürer.
 
 ---
 
-## Faz 0 – Altyapı
-
-**Hedef:** Kodun yaşadığı ve yayına çıktığı yer hazır.
+### Aşama 0 – Altyapı
 
 - [x] Subdomain `ortsrank.foundercheck.de` (KAS DNS'te CNAME → `cname.vercel-dns.com`)
 - [x] Vercel projesi `ortsrank` (Next.js, bölge `fra1`)
-- [x] GitHub reposu `technsug-ops/-ortsrank`, `main` dalı
-- [x] İskelet: Next.js 16, React 19, Tailwind v4, TypeScript
-- [x] Çok dilli yönlendirme: `/de`, `/en`, `/tr`, `proxy.ts` + JSON sözlükler
-- [x] Çok kiracılı Drizzle şeması + ilk migration (`drizzle/0000_init.sql`)
-- [x] Kimlik tabloları Better Auth yapısına hizalandı (`user`, `session`, `account`, `verification`, `organization`, `member`, `invitation`)
-- [x] Ham sağlayıcı yanıtı için `serp_raw` tablosu; her sonuç satırı kaynağına bağlı
-- [x] Yerleşim bazında taranabilirlik durumu (`scan_mode`: coordinate / location_code / none)
+- [x] GitHub reposu `technsug-ops/-ortsrank`
+- [x] İskelet: Next.js 16, React 19, Tailwind v4, TypeScript; çok dilli yönlendirme (`/de`, `/en`, `/tr`)
+- [x] Çok kiracılı şema; kimlik tabloları Better Auth yapısında; `serp_raw` ve `scan_mode`
 - [x] Fontlar self-host (Google Fonts'a istek yok)
-- [ ] Vercel ↔ GitHub bağlantısı (Settings → Git → Connect)
-- [ ] İlk production deploy ve SSL doğrulaması
+- [ ] Vercel ↔ GitHub bağlantısı ve ilk production deploy
+- [ ] Neon Postgres (Frankfurt), migration uygulaması
 - [ ] Repo adını `ortsrank` olarak düzeltmek (isteğe bağlı)
-- [ ] Claude'un Vercel bağlantısına takım erişimi (deploy/log kontrolü için)
-
-**Teslimat:** Açılış sayfası üç dilde canlı.
 
 ---
 
-## Faz 1 – Veri temeli
+### Aşama 1 – Veri + talep pilotu
 
-**Hedef:** Almanya'daki tüm yerleşimler, nüfus ve koordinatlarıyla veritabanında; yarıçap ve nüfus sorgusu çalışıyor; her yerleşim kendi koordinatıyla sorgulanabiliyor.
+**Hedef:** Gerçek verilerle, yarı manuel olarak 3–5 işletmeye rapor hazırlamak. Bu hem ölçümü hem müşterinin ilgisini sınar. Web arayüzü yok; tarama ve rapor script ile üretilir.
 
-**Temel karar:** Google sorguları her Gemeinde'nin **kendi merkez koordinatıyla** atılır. DataForSEO bunu `location_coordinate` parametresiyle (`enlem,boylam,yarıçap`) destekliyor. Böylece bir yerleşim, en yakın büyük şehrin kodu üzerinden "yaklaşık" taranmaz. Şehir kodu (`location_code`) yalnızca yedek yöntemdir ve kullanıldığı her yerde raporda mesafesiyle birlikte belirtilir.
+**Veri**
 
 ```mermaid
 flowchart LR
-    A[Destatis GV-ISys<br/>CSV/XLSX] --> B[Import scripti<br/>AGS, ad, eyalet, nüfus, koordinat]
-    B --> C[(settlements<br/>scan_mode = coordinate)]
-    C --> G[Yarıçap + nüfus sorgusu<br/>haversine]
-    C --> T[Koordinat testi<br/>10 örnek yerleşim]
-    T -->|başarısız olanlar| E[Yedek: en yakın location_code<br/>mesafe kaydedilir]
-    E --> F[(provider_locations)]
-    T -->|o da yoksa| N[scan_mode = none<br/>raporda 'taranamadı']
+    A[Destatis GV-ISys] --> B[(settlements<br/>belediye, nüfus, koordinat)]
+    B --> C[Yarıçap + nüfus seçimi]
+    C --> D[DataForSEO<br/>belediye merkez koordinatı]
+    D --> E[(serp_raw)]
+    E --> F[(serp_results)]
+    F --> G[Kurallar v0<br/>kanıt seviyesiyle]
+    G --> H[Almanca PDF rapor<br/>elle gözden geçirilmiş]
 ```
 
-- [ ] Neon Postgres projesi (bölge Frankfurt), `DATABASE_URL` Vercel env'e
-- [ ] Migration'ı Neon'a uygulama (`drizzle-kit migrate`)
-- [ ] Destatis GV-ISys indirme ve import scripti (`scripts/import-settlements.ts`)
-  - [ ] AGS 8 haneli anahtar, Bundesland, Kreis, nüfus, nüfus tarihi, koordinat
-  - [ ] Koordinatı olmayan yerler için BKG verisinden tamamlama (uydurma yok)
-- [ ] `location_coordinate` doğrulaması: 10 yerleşimde koordinat sorgusu ile şehir kodu sorgusunu karşılaştırma; yarıçap değerinin seçimi
-- [ ] Yedek eşleme scripti (`scripts/map-provider-locations.ts`): yalnızca koordinatla sorgulanamayan yerler için
-- [ ] Hiçbir yöntemle sorgulanamayan yer → `scan_mode = none` + gerekçe (`scan_note`)
-- [ ] Yarıçap sorgusu: merkez AGS + km + min. nüfus → yerleşim listesi
-- [ ] Rakip etiket listesi (zincir, portal, dizin, üretici) – ilk 100 domain
-- [ ] Sektör keyword setleri v1: Terrassenüberdachung, Arbeitsbühnen Vermietung
-- [ ] Birim testleri: mesafe hesabı, filtre, eşleme
+- [ ] Destatis GV-ISys import scripti: AGS, belediye adı, Bundesland, Kreis, nüfus, nüfus tarihi, koordinat
+- [ ] `location_coordinate` testi: 10 belediyede koordinat sorgusu ile şehir kodu sorgusunun karşılaştırılması
+  - [ ] Not: DataForSEO'daki bu yarıçap, ölçüm noktasının hassasiyetidir. Hizmet alanı yarıçapıyla (km) ilgisi yoktur; kodda ayrı adlandırılır.
+- [ ] Koordinatla sorgulanamayan belediye için yedek yöntem veya `scan_mode = none`
+- [ ] Tarama scripti: proje tanımı (domain, merkez, yarıçap, nüfus eşiği, keywordler) → `serp_raw` + `serp_results`
+- [ ] Reklam örneklemesi: ana keyword için 3 tekrar, farklı saatlerde
+- [ ] Sayfa taraması (sınırlı): ilk 10'daki yerel rakiplerin ilgili sayfası var mı? Çıkarım seviyesindeki bulgular için gerekli.
+- [ ] Kurallar v0 (5 kural), her bulgu kanıt seviyesiyle
+- [ ] Ölçüm ölçütleri (bölüm 6) için otomatik testler ve değişkenlik ölçümü
+- [ ] Rapor şablonu (Almanca PDF): durum, rakipler, kanıt seviyeli öneriler, ölçüm sınırları bölümü
+- [ ] Gerçek maliyet kaydı: SERP, tekrar denemeler, kontrol sorguları, sayfa taraması, LLM, depolama
 
-**Teslimat:** "Frankfurt + 30 km + ≥10.000 nüfus" sorgusu gerçek yerleşim listesini döndürüyor; her birinin taranabilir olup olmadığı belli.
+**Talep**
+
+- [ ] Sektör seçimi: Terrassenüberdachung (alternatif: Arbeitsbühnen Vermietung)
+- [ ] 3–5 pilot işletme; tercihen her birinde işletme sahibi + pazarlamacısı birlikte
+- [ ] Pilot anlaşması (kısa): ücretsiz/ücretli, veri kullanımı, gizlilik (bkz. Aşama 2 hukuk)
+- [ ] Rapor teslimi ve açıklama görüşmesi
+
+**Her pilot için kayıt (zorunlu)**
+
+| # | Soru | Kayıt biçimi |
+| --- | --- | --- |
+| 1 | Müşteri rapordan hangi yeni bilgiyi öğrendi? | Müşterinin kendi cümlesiyle |
+| 2 | Bu bilgi nedeniyle hangi önceliğini değiştirdi? | Somut karar veya "değişmedi" |
+| 3 | Yapılacak işi kim üstlendi? | İşletme sahibi / mevcut ajans / TechNS / kimse |
+| 4 | İkinci ölçüm için ödeme yaptı mı? | Ücretsiz tekrar istedi / ücretli ikinci ölçüm aldı / hayır |
+| 5 | Raporu hazırlamak ve açıklamak toplam kaç saat sürdü? | Saat; hazırlık ve açıklama ayrı |
+
+5. madde fiyatlandırmayı belirler: API maliyeti düşük olsa bile her müşteriye iki saat açıklama gerekiyorsa, ürün ve fiyat modeli buna göre kurulur.
+
+**Kapı 1:** Ölçüm ölçütleri karşılandı ve pilot kayıtlarında en az 2 işletme rapor nedeniyle önceliğini değiştirdi (madde 2).
 
 ---
 
-## Faz 2 – Tarama motoru
+### Aşama 2 – Ücretli pilot
 
-**Hedef:** Bir proje için tüm yerleşim × keyword kombinasyonları taranıyor, ham veri izlenebilir şekilde saklanıyor.
+**Hedef:** Gerçek ödeme ve tekrar kullanım kanıtı.
 
-```mermaid
-sequenceDiagram
-    participant U as Kullanıcı
-    participant A as Uygulama
-    participant Q as Kuyruk (Inngest)
-    participant D as DataForSEO
-    participant DB as Postgres
-    U->>A: Taramayı başlat
-    A->>DB: scan (queued) + kota kontrolü
-    A->>Q: iş paketleri (100 sorgu/paket)
-    Q->>D: SERP görevleri (mobil, de-DE, Gemeinde koordinatı)
-    D-->>Q: JSON sonuçlar
-    Q->>DB: serp_raw (ham yanıt, task-id, maliyet)
-    Q->>DB: serp_results (organik, reklam, local pack → raw_id)
-    Q->>DB: maliyet + durum güncelle
-    A-->>U: İlerleme ve bitiş bildirimi
-```
+**İlk dış erişimden önce zorunlu**
 
-- [ ] DataForSEO hesabı ve kimlik bilgileri (Vercel env, şifreli)
-- [ ] Sağlayıcı katmanı (soyut arayüz; ileride SerpApi'ye geçilebilir)
-- [ ] Inngest entegrasyonu: paketleme, yeniden deneme, hız sınırı
-- [ ] Sonuç ayrıştırma: organik top 20, üst/alt reklam blokları, Local Pack
-- [ ] Reklam sıklığı: ana keyword için 3 tekrar örnekleme
-- [ ] Ham yanıt saklama: `serp_raw` tablosu (JSONB, sorgu parametresi, cihaz, maliyet); her `serp_results` satırı `raw_id` ile kaynağına bağlı
-- [ ] Saklama süresi işi: 12 aydan eski `serp_raw` kayıtlarının otomatik silinmesi
-- [ ] Maliyet takibi: tarama başına sorgu sayısı ve USD
-- [ ] Otomatik rakip etiketleme (şehir yüzdesine göre local/regional/national)
-- [ ] Doğrulama: sorguların %5'i ikinci yöntemle çapraz kontrol, sapma raporu
-- [ ] CLI/komut ile iç kullanım: `npm run scan -- --project <id>`
+- [ ] Erişim kontrolü: müşteri yalnızca kendi raporunu görür (imzalı, süreli link veya basit giriş)
+- [ ] Zorunlu kiracı filtreli sorgu katmanı + izolasyon testi
+- [ ] Pilot sözleşmesi: kapsam, fiyat, süre, veri kullanımı, sorumluluk sınırı
+- [ ] Datenschutzerklärung (pilot sürümü): alt işleyenler (Vercel, Neon, DataForSEO, Anthropic), AB dışı aktarım dayanağı (DPF veya SCC)
+- [ ] AVV (müşteri adına veri işleniyorsa, ör. ajans müşterileri)
+- [ ] Faturalama: E-Rechnung uyumlu fatura (lexoffice veya sevDesk); bu aşamada Stripe şart değil
+- [ ] Impressum
 
-**Kapı 1 – Veri doğru mu?** 5 şehirde manuel kontrol (inkognito + Google'da konum ayarı) ile sapma ≤ 2 sıra. Geçmezse veri hattında Faz 4–5'e geçilmez. Hesap hattı (Faz 3 ve 6) bu kapıdan bağımsız ilerler.
+**Ürün**
 
-**Teslimat:** Terrassenüberdachung/Hessen pilotunun ham verisi veritabanında.
+- [ ] Salt-okunur web raporu (Almanca): harita, belediye tablosu, rakip özeti
+- [ ] Belediye detayı ve rakip özeti; her öneride kanıt seviyesi ve kaynak
+- [ ] Planlı ikinci tarama ve önceki ölçümle karşılaştırma
+- [ ] Değişim gösterimi: "işlem + sonrasındaki değişim", nedensellik iddiası olmadan
+- [ ] Fiyat testi: tek rapor ve ikinci ölçüm için en az iki fiyat noktası
+
+**Ayrı kaydedilecek sinyaller**
+
+| Sinyal | Gücü |
+| --- | --- |
+| Ücretsiz tekrar isteği | Zayıf: ilgi var |
+| Ücretli ikinci ölçüm | Orta: değer görüyor |
+| Abonelik yenilemesi | Güçlü: düzenli kullanım |
+
+**Kapı 2:** Gerçek ödeme alındı ve en az 2 müşteri **ücretli** ikinci ölçüm aldı.
 
 ---
 
-## Faz 3 – Hesap ve kiracılar
+### Aşama 3 – İlk SaaS sürümü
 
-**Hedef:** Birden çok kullanıcı ve organizasyon güvenli şekilde ayrılmış.
+**Hedef:** Müşteri temel akışı yardımsız tamamlıyor.
 
-- [ ] Better Auth kurulumu; tabloları CLI ile üretip mevcut şemayla karşılaştırma (şema Faz 0'da bu yapıya hizalandı, çift kullanıcı tablosu oluşmamalı)
-- [ ] E-posta + magic link, Google ile giriş; e-posta doğrulaması zorunlu
-- [ ] Organizasyon oluşturma, davet, roller (owner, admin, member, viewer)
-- [ ] Postgres Row Level Security veya sorgu katmanında zorunlu `organization_id`
-- [ ] Koltuk sayısı ve proje sayısı limitleri (plan tablosundan)
-- [ ] Audit log: tarama başlatma, aksiyon tamamlama, üye değişiklikleri
-- [ ] Kullanıcı dil tercihi (arayüz) ve organizasyon rapor dili
+- [ ] Better Auth: e-posta doğrulamalı giriş, organizasyon, davet; roller pilot bulgularına göre (başlangıçta owner + member)
+- [ ] Postgres RLS (ek savunma katmanı)
+- [ ] Proje oluşturma akışı: domain → sektör → merkez → yarıçap → nüfus → keywordler
+- [ ] Planlı yeniden tarama (aylık) ve trend görünümü
+- [ ] Planlar ve kota: plan sayısı ve sınırları Aşama 2 fiyat testine göre; maliyet tavanı
+- [ ] Stripe Billing, Customer Portal, webhook ile plan senkronu
+- [ ] Tam hukuk metinleri: AGB, Widerrufsbelehrung (B2C ihtimali), veri saklama politikası (ham SERP 12 ay)
+- [ ] Ücretsiz deneme varsa kötüye kullanım koruması: e-posta doğrulaması, hız sınırı, günlük bütçe tavanı, bot koruması
+- [ ] E-postalar (Almanca; EN/TR talep varsa): rapor hazır, değişim özeti, kota uyarısı
+- [ ] Gözlem: Sentry, çerezsiz analitik (Plausible), tarama hata oranı alarmı
 - [ ] Hesap silme ve veri dışa aktarma (DSGVO Art. 17 ve 20)
-- [ ] 2FA (Agency planı için)
 
-**Teslimat:** İki ayrı organizasyon birbirinin verisini göremiyor; testle kanıtlanmış.
-
----
-
-## Faz 4 – Rapor arayüzü
-
-**Hedef:** Tarama sonucu harita ve tablolarla okunabiliyor; şehre ve rakibe tıklanabiliyor.
-
-- [ ] Proje oluşturma sihirbazı: domain → sektör → merkez → yarıçap → nüfus → keywordler
-- [ ] Harita (MapLibre GL + OSM): yerleşim noktaları, renk kodu (1–3 / 4–10 / 10+ / yok)
-- [ ] Şehir tablosu: yerleşim × keyword × sıra, Local Pack, reklam sayısı
-- [ ] Rakip matrisi: top 3 / top 10 / reklam şehir sayıları, etiket filtresi
-- [ ] Şehir detayı: durum özeti, ilk 10, Local Pack, reklam verenler
-- [ ] Rakip profili: kapsama karşılaştırması, keyword profili, reklam stratejisi, sayfa yapısı
-- [ ] Lokal görünürlük skoru (0–100, hizmet alanı ağırlıklı)
-- [ ] Her sayıdan kaynağa tıklama (tarih, yer, cihaz, task-id)
-- [ ] Erişilebilirlik: WCAG 2.1 AA, klavye ile kullanım, kontrast
-
-**Teslimat:** Pilot verisi tarayıcıda tam olarak incelenebiliyor.
+**Kapı 3:** Müşteriler temel akışı yardımsız tamamlıyor ve ilk abonelik yenilemesi gerçekleşti.
 
 ---
 
-## Faz 5 – Analiz ve aksiyon motoru
+### Aşama 4 – Genişleme
 
-**Hedef:** Veriden öncelikli, kanıtlı ve çok dilli aksiyon listesi.
+Yalnızca mevcut müşterilerden doğrulanmış talep varsa:
 
-```mermaid
-flowchart LR
-    S[(serp_results)] --> R[Kural motoru<br/>reklam boşluğu, Local Pack boşluğu,<br/>kategori boşluğu, yenilebilir rakip,<br/>düşüş, yeni rakip, portal baskısı]
-    R --> F[(findings<br/>puan + kanıt)]
-    F --> L[Claude API<br/>yalnızca bulgulardan metin<br/>DE / EN / TR]
-    L --> A[(actions<br/>Website · GBP · Ads · İzleme)]
-```
-
-- [ ] Kural motoru: 10 kural, her biri birim testli
-- [ ] Puanlama: şehir × keyword bazında fırsat/tehdit skoru
-- [ ] LLM katmanı: structured output, her aksiyon bir `finding_id`'ye bağlı
-- [ ] Ton kılavuzu: dürüst, kısa, somut; rakip hakkında değer yargısı yok (UWG)
-- [ ] Dil başına örnek raporlarla kalite kontrolü
-- [ ] Aksiyon kovaları: Website/İçerik, Google Business Profile, Google Ads, İzleme
-- [ ] Aksiyon durumu: açık / tamamlandı / reddedildi
-
-**Teslimat:** Hanau şehir detayı ve terrassendach-xyz rakip profili, proje dokümanındaki örneklerle aynı kalitede otomatik üretiliyor.
+- [ ] Ajans çalışma alanları, çoklu müşteri, white-label PDF
+- [ ] Çok noktalı ölçüm (büyük şehirler için belediye içinde birden fazla nokta)
+- [ ] Ek sektör keyword setleri
+- [ ] Arayüz ve rapor için EN/TR
+- [ ] REST API
+- [ ] Avusturya ve İsviçre (Statistik Austria, BFS)
+- [ ] AI arama görünürlüğü – ayrı modül olarak değerlendirme
+- [ ] Sektör × belediye veri sayfaları – yalnızca kendine özgü gerçek veri taşıyorsa ve sınırlı sayıda
 
 ---
 
-## Faz 6 – Hukuk, ödeme ve SaaS katmanı
-
-**Hedef:** Para alınabilir ve hukuken savunulabilir bir ürün.
-
-**Hukuk**
-
-- [ ] Impressum (TechNS UG, Amtsgericht Bad Homburg HRB 16236, USt-IdNr.)
-- [ ] Datenschutzerklärung: alt işleyenler ve lokasyonları (Vercel, Neon, DataForSEO, Anthropic, Stripe, Resend, Sentry)
-- [ ] AB dışı aktarım dayanağı: her ABD'li alt işleyen için DPF sertifikası veya standart sözleşme maddeleri (SCC); her biriyle DPA imzalı
-- [ ] Alt işleyen listesi AVV ekinde de güncel tutulur
-- [ ] AGB: kullanım lisansı, veri sahipliği, "yalnızca yetkili olunan domainler", sorumluluk sınırı, fesih
-- [ ] AVV şablonu (ajans müşterileri için)
-- [ ] Widerrufsbelehrung (B2C ihtimaline karşı)
-- [ ] Veri saklama politikası: ham SERP 12 ay, ardından silme
-- [ ] Rapor uyarı metni: "Simüle edilmiş konum, gerçek kullanıcıdan ±2 sıra sapabilir"
-- [ ] Google adı/logosu kullanılmıyor; veri kaynağı açıkça belirtiliyor
-- [ ] Çerezsiz analitik (Plausible) → cookie banner gerekmiyor
-- [ ] Barrierefreiheit beyanı (BFSG)
-
-**Ödeme ve planlar**
-
-- [ ] Plan tablosu: Free, Starter, Pro, Agency (kota, proje, koltuk, white-label)
-- [ ] Stripe Billing: abonelik, tek seferlik rapor, ek kredi paketi
-- [ ] Stripe webhook → plan senkronu; başarısız ödeme akışı
-- [ ] Customer Portal (fatura, plan değişikliği, iptal)
-- [ ] E-Rechnung uyumlu fatura (ZUGFeRD/XRechnung; lexoffice veya sevDesk)
-- [ ] Kota aşımında taramanın durması ve kullanıcıya bildirim
-
-**Kapı 2 – Pilot onayı:** 3 gerçek işletme raporu inceledi; hukuk metinleri kontrol edildi.
-
-**Teslimat:** Ödeme alan, yasal metinleri tam bir ürün.
-
----
-
-## Faz 7 – Lansman
-
-**Hedef:** Dışarıdan biri kayıt olup rapor alabiliyor.
-
-- [ ] Açılış sayfası v2 (DE/EN/TR): problem, örnek rapor, fiyatlar, SSS
-- [ ] Ücretsiz mini rapor: 5 şehir, 1 keyword, kayıt sonrası 3 dakikada
-- [ ] Kötüye kullanım koruması (her ücretsiz rapor gerçek sağlayıcı maliyeti doğurur):
-  - [ ] E-posta doğrulaması olmadan tarama yok
-  - [ ] Hesap ve IP başına hız sınırı; tek kullanımlık e-posta alan adlarının engellenmesi
-  - [ ] Ücretsiz raporlar için günlük toplam bütçe tavanı; aşılınca bekleme listesi
-  - [ ] Bot koruması (Vercel BotID veya Turnstile)
-- [ ] Onboarding: domain → kategori önerisi → ilk tarama
-- [ ] PDF rapor (Playwright), TechNS logosuyla
-- [ ] E-postalar (Resend + React Email, üç dil): kayıt, rapor hazır, kota uyarısı
-- [ ] foundercheck.de entegrasyonu: rapor sonunda ve ana sayfada Ortsrank bağlantısı
-- [ ] Gözlem: Sentry, Plausible, Vercel Analytics; tarama hata oranı alarmı
-- [ ] Durum sayfası ve destek e-postası
-- [ ] SEO: az sayıda, elle yazılmış rehber içerik (ör. "Lokal Ranking prüfen", sektör başına bir sayfa)
-
-**Kapı 3 – Ödeyen müşteri:** 30 gün içinde 10 ödeyen (veya ödemeye hazır) kullanıcı.
-
-**Teslimat:** Herkese açık ürün.
-
----
-
-## Faz 8 – Büyüme
-
-**Hedef:** Tek seferlik rapordan sürekli kullanılan araca geçiş.
-
-- [ ] Aylık otomatik tarama ve trend grafikleri
-- [ ] Uyarılar: sıra düşüşü, yeni rakip, rakibin yeni şehir sayfası
-- [ ] Aksiyon etkisi ölçümü: "Hanau sayfası yayınlandı → lokal sıra 20+ → 8"
-- [ ] White-label PDF ve ajans çalışma alanları (çoklu müşteri)
-- [ ] Müşteriye salt-okunur rapor linki
-- [ ] REST API (organizasyon başına API anahtarı)
-- [ ] Ek sektör keyword setleri (Fenster, Zaun, Dachdecker, Gartenbau, Restaurant, Rechtsanwalt, Steuerberater …)
-- [ ] Avusturya ve İsviçre (Statistik Austria, BFS verisi)
-- [ ] AI arama görünürlüğü (Google AI Overviews, ChatGPT) – ayrı modül olarak değerlendirme
-- [ ] Sektör × şehir veri sayfaları – yalnızca her sayfa kendine özgü gerçek tarama verisi taşıyorsa ve sınırlı sayıda. Google seri üretilmiş ince içeriği spam sayıyor; şablonla binlerce sayfa üretilmez.
-
----
-
-## Tüm fazlar boyunca
+## 8. Tüm aşamalar boyunca
 
 | Konu | Uygulama |
 | --- | --- |
-| Çok dillilik | Her yeni ekran ve e-posta üç dilde; eksik çeviri CI'da hata verir |
-| Test | Vitest (kurallar, hesaplar), Playwright e2e (kritik akışlar), her PR'da Vercel preview |
-| Güvenlik | Gizli anahtarlar Vercel env'de; hız sınırı; CSP; bağımlılık taraması |
-| Maliyet | Her tarama maliyeti kaydedilir; aylık sağlayıcı harcaması panelde |
+| Maliyet | Her tarama ve rapor için SERP, tekrar denemeler, kontrol sorguları, sayfa taraması, LLM, depolama ve **açıklama süresi** kaydedilir |
+| Test | Vitest (kurallar, hesaplar, izolasyon), ölçüm ölçütü testleri; Playwright e2e Aşama 3'ten itibaren |
+| Güvenlik | Gizli anahtarlar Vercel env'de; hız sınırı; bağımlılık taraması |
 | Yedek | Neon point-in-time recovery; migration'lar repoda |
 | Sahiplik | Kod, marka ve domain TechNS UG adına; ortak girerse IP devri yazılı |
 
-## Teknik yığın
+## 9. Teknik yığın
 
-| Katman | Seçim |
-| --- | --- |
-| Uygulama | Next.js 16 (App Router, Cache Components), React 19, TypeScript |
-| Arayüz | Tailwind CSS v4, shadcn/ui, MapLibre GL |
-| i18n | `src/app/[lang]` + `proxy.ts` + JSON sözlükler (de, en, tr) |
-| Veritabanı | Neon Postgres (Frankfurt), Drizzle ORM |
-| Kimlik | Better Auth (organizasyon, roller, 2FA) |
-| Kuyruk | Inngest |
-| SERP verisi | DataForSEO, Gemeinde koordinatıyla sorgu (soyut sağlayıcı katmanı) |
-| Analiz | Claude API, structured output |
-| Ödeme | Stripe Billing |
-| E-posta | Resend + React Email |
-| PDF | Playwright |
-| Gözlem | Sentry, Plausible, Vercel Analytics |
-| Barındırma | Vercel (`fra1`), DNS KAS'ta |
+| Katman | Seçim | Ne zaman |
+| --- | --- | --- |
+| Uygulama | Next.js 16, React 19, TypeScript | Aşama 0 |
+| Arayüz | Tailwind CSS v4, MapLibre GL | Aşama 2 |
+| i18n | `src/app/[lang]` + `proxy.ts` + JSON sözlükler | Aşama 0 |
+| Veritabanı | Neon Postgres (Frankfurt), Drizzle ORM | Aşama 1 |
+| SERP verisi | DataForSEO, belediye merkez koordinatıyla | Aşama 1 |
+| Analiz metni | Claude API, structured output, yalnızca işaretli bulgulardan | Aşama 1 |
+| PDF | Playwright | Aşama 1 |
+| Kuyruk | Script (Aşama 1), Inngest (Aşama 3) | Aşama 3 |
+| Kimlik | Better Auth | Aşama 3 |
+| Ödeme | Fatura programı (Aşama 2), Stripe Billing (Aşama 3) | Aşama 2–3 |
+| E-posta | Resend + React Email | Aşama 3 |
+| Gözlem | Sentry, Plausible | Aşama 3 |
 
-## Açık kararlar
+## 10. Açık kararlar
 
 | Karar | Ne zaman gerekli |
 | --- | --- |
-| DataForSEO hesabı ve bütçe limiti | Faz 2 başı |
-| Plan fiyatları ve ücretsiz kotanın boyutu | Faz 6 başı |
-| İlk pilot için 2–3 işletme ve domain | Faz 2 sonu |
-| Ortsrank için ayrı marka tescili (DPMA) | Faz 7 öncesi |
-| İleride ayrı domain'e geçiş (ortsrank.de) | Faz 8 |
+| Pilot sektörü ve ilk 3–5 işletme | Aşama 1 başı |
+| İlk müşteri tipi (sahip / ajans / TechNS hizmeti) | Aşama 1 sonu, pilot kayıtlarına göre |
+| DataForSEO hesabı ve aylık bütçe limiti | Aşama 1 başı |
+| Pilot fiyatı (tek rapor, ikinci ölçüm) | Aşama 2 başı |
+| Plan yapısı ve abonelik fiyatı | Aşama 3 başı, fiyat testine göre |
+| Ortsrank marka tescili (DPMA) | Aşama 3 öncesi |
+| Ayrı domain (ortsrank.de) | Aşama 4 |
 
-## Değişiklik geçmişi
+## 11. Değişiklik geçmişi
 
-| Tarih | Değişiklik |
-| --- | --- |
-| 20.10.2026 | İlk sürüm |
-| 20.10.2026 | Gözden geçirme: bağımlılıklar iki paralel hatta düzeltildi; Gemeinde koordinatıyla sorgu temel yöntem oldu; `serp_raw` ve taranabilirlik durumu şemaya eklendi; kimlik tabloları Better Auth'a hizalandı; AB dışı aktarım (SCC/DPF), ücretsiz rapor kötüye kullanım koruması eklendi; programatik SEO sayfaları Faz 8'e taşındı; süreler gerçekçi hale getirildi |
+| Tarih | Sürüm | Değişiklik |
+| --- | --- | --- |
+| 20.10.2026 | 1 | İlk sürüm (9 teknik faz) |
+| 20.10.2026 | 2 | Bağımlılıklar düzeltildi; koordinatla sorgu; `serp_raw`; Better Auth hizası; SCC/DPF; kötüye kullanım koruması |
+| 20.10.2026 | 3 | Dış değerlendirmeye göre yeniden yapılandırıldı: ilk hedef "ödeme + somut karar"; 4 aşama; veri ve talep pilotu birleşti; kanıt seviyeleri ve aksiyon türleri; ölçüm ölçütleri (sistem doğruluğu ≠ değişkenlik); "±2 sıra" vaadi kaldırıldı; "her yerleşim" yerine "belediyeler" ve temsilî ölçüm noktası; tekrar ölçüm ilk ücretli sürüme alındı; erişim kontrolü ve pilot hukuku ilk dış erişimden önceye bağlandı; pilot kayıtları ve açıklama süresi; sinyaller ayrı kaydediliyor |
 
 ## İlgili belgeler
 
-- Proje dokümanı (senaryolar, rakip analizleri, özellik matrisi): https://claude.ai/code/artifact/f682b20a-5ad9-4b55-9f46-ec5a13133c32
+- Proje dokümanı (senaryolar, rakip analizleri): https://claude.ai/code/artifact/f682b20a-5ad9-4b55-9f46-ec5a13133c32
 - Veri modeli: `src/db/schema.ts`
 - Kurulum: `README.md`

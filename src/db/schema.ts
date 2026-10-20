@@ -317,6 +317,11 @@ export const competitorLabels = pgTable("competitor_labels", {
 // ── Findings & actions ────────────────────────────────────────────────────
 
 export const findingKind = pgEnum("finding_kind", ["opportunity", "threat", "action"]);
+// observation = seen directly in scanned data; inference = observation plus a
+// named extra source (page crawl, profile data); hypothesis = not yet backed.
+export const evidenceLevel = pgEnum("evidence_level", ["observation", "inference", "hypothesis"]);
+// improvement rests on an observation/inference; verification tests a hypothesis.
+export const actionType = pgEnum("action_type", ["improvement", "verification"]);
 export const actionBucket = pgEnum("action_bucket", ["website", "google_profile", "ads", "monitoring"]);
 export const actionStatus = pgEnum("action_status", ["open", "done", "dismissed"]);
 
@@ -328,6 +333,9 @@ export const findings = pgTable(
     rule: text("rule").notNull(), // e.g. "ad_gap", "local_pack_gap"
     kind: findingKind("kind").notNull(),
     score: integer("score").notNull(),
+    evidenceLevel: evidenceLevel("evidence_level").notNull(),
+    // Names of the data the finding rests on, e.g. ["serp_raw", "page_crawl"].
+    dataSources: jsonb("data_sources").notNull(),
     ags: text("ags").references(() => settlements.ags),
     keywordId: uuid("keyword_id").references(() => keywords.id),
     competitorDomain: text("competitor_domain"),
@@ -342,6 +350,7 @@ export const actions = pgTable(
     id: uid(),
     organizationId: text("organization_id").references(() => organization.id, { onDelete: "cascade" }).notNull(),
     findingId: uuid("finding_id").references(() => findings.id, { onDelete: "set null" }),
+    type: actionType("type").notNull(),
     bucket: actionBucket("bucket").notNull(),
     text: text("text").notNull(),
     locale: uiLocale("locale").notNull(),

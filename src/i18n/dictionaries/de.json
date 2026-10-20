@@ -1,21 +1,36 @@
 {
   "meta": {
-    "title": "Ortsrank – Wo findet dich dein Kunde wirklich?",
-    "description": "Lokale Google-Sichtbarkeit Ort für Ort: Ranking, Anzeigen, Wettbewerber und konkrete Maßnahmen für dein Einzugsgebiet."
+    "title": "Ortsrank – In welchen Gemeinden liegst du hinter deiner Konkurrenz?",
+    "description": "Für Betriebe mit regionalem Einzugsgebiet: Google-Sichtbarkeit Gemeinde für Gemeinde, Wettbewerber und belegte Prioritäten, wo du zuerst ansetzen solltest."
   },
-  "nav": { "language": "Sprache", "status": "Im Aufbau" },
+  "nav": {
+    "language": "Sprache",
+    "status": "Im Aufbau"
+  },
   "hero": {
-    "eyebrow": "Lokales Ranking für Betriebe in Deutschland",
-    "title": "Wo findet dich dein Kunde wirklich?",
-    "lead": "Ortsrank prüft Google in jedem echten Ort deines Einzugsgebiets – nicht auf einem Raster aus Feldern und Wäldern. Du siehst, wer vor dir steht, wer Anzeigen schaltet und was du als Nächstes tun solltest."
+    "eyebrow": "Für Betriebe mit regionalem Einzugsgebiet",
+    "title": "In welchen Gemeinden liegst du hinter deiner Konkurrenz?",
+    "lead": "Ortsrank misst deine Google-Sichtbarkeit in den Gemeinden deines Einzugsgebiets und zeigt, wo du zuerst ansetzen solltest – mit Belegen für jede Empfehlung."
   },
   "features": {
     "title": "Was Ortsrank misst",
     "items": [
-      { "title": "Echte Orte", "text": "Amtliches Gemeindeverzeichnis, Radius um deinen Standort und Einwohnerfilter – keine erfundenen Messpunkte." },
-      { "title": "Organisch, Anzeigen, Local Pack", "text": "Drei Ergebnistypen getrennt erfasst, Ort für Ort und Keyword für Keyword." },
-      { "title": "Wettbewerber-Matrix", "text": "In wie vielen Orten steht wer in den Top 3 – lokale Betriebe getrennt von Ketten und Portalen." },
-      { "title": "Maßnahmen statt Tabellen", "text": "Für jeden Ort und jeden Wettbewerber eine priorisierte Liste: Website, Google-Profil, Anzeigen." }
+      {
+        "title": "Gemeinden aus dem amtlichen Verzeichnis",
+        "text": "Grundlage ist das Gemeindeverzeichnis von Destatis. Jede Gemeinde wird von einem repräsentativen Messpunkt aus gemessen; Gemeinden, die wir nicht messen können, werden als solche ausgewiesen."
+      },
+      {
+        "title": "Organisch, Anzeigen, Local Pack",
+        "text": "Drei Ergebnistypen getrennt erfasst – mit Zeitpunkt, Gerät und Messpunkt für jede Zahl."
+      },
+      {
+        "title": "Wer dein Einzugsgebiet abdeckt",
+        "text": "In wie vielen Gemeinden welcher Wettbewerber vorne liegt – lokale Betriebe getrennt von Ketten und Portalen."
+      },
+      {
+        "title": "Prioritäten mit Belegen",
+        "text": "Jede Empfehlung zeigt, worauf sie beruht: Beobachtung, Ableitung oder zu prüfende Hypothese."
+      }
     ]
   },
   "footer": {

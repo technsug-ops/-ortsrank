@@ -1,21 +1,36 @@
 {
   "meta": {
-    "title": "Ortsrank – Where do your customers really find you?",
-    "description": "Local Google visibility town by town: rankings, ads, competitors and concrete actions for your service area."
+    "title": "Ortsrank – In which municipalities are you behind your competitors?",
+    "description": "For businesses serving a region: Google visibility municipality by municipality, competitors and evidence-backed priorities for where to start."
   },
-  "nav": { "language": "Language", "status": "In development" },
+  "nav": {
+    "language": "Language",
+    "status": "In development"
+  },
   "hero": {
-    "eyebrow": "Local rankings for businesses in Germany",
-    "title": "Where do your customers really find you?",
-    "lead": "Ortsrank checks Google in every real town of your service area – not on a grid of fields and forests. See who ranks ahead of you, who runs ads and what to do next."
+    "eyebrow": "For businesses serving a region",
+    "title": "In which municipalities are you behind your competitors?",
+    "lead": "Ortsrank measures your Google visibility in the municipalities of your service area and shows where to start – with evidence for every recommendation."
   },
   "features": {
     "title": "What Ortsrank measures",
     "items": [
-      { "title": "Real towns", "text": "Official municipality register, a radius around your location and a population filter – no invented measuring points." },
-      { "title": "Organic, ads, Local Pack", "text": "Three result types tracked separately, town by town and keyword by keyword." },
-      { "title": "Competitor matrix", "text": "In how many towns each competitor is top 3 – local businesses separated from chains and portals." },
-      { "title": "Actions, not tables", "text": "A prioritised list for every town and competitor: website, Google profile, ads." }
+      {
+        "title": "Municipalities from the official register",
+        "text": "Based on the Destatis municipality register. Each municipality is measured from one representative point; municipalities we cannot measure are marked as such."
+      },
+      {
+        "title": "Organic, ads, Local Pack",
+        "text": "Three result types tracked separately – with time, device and measuring point for every number."
+      },
+      {
+        "title": "Who covers your service area",
+        "text": "In how many municipalities each competitor ranks ahead – local businesses separated from chains and portals."
+      },
+      {
+        "title": "Priorities with evidence",
+        "text": "Every recommendation shows what it rests on: observation, inference or a hypothesis to verify."
+      }
     ]
   },
   "footer": {
