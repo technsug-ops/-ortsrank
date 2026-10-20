@@ -1,0 +1,16 @@
+{
+  "_fixture": {
+    "synthetic": true,
+    "source": "https://docs.dataforseo.com/v3/serp/google/organic/live/advanced.md",
+    "note": "Sentetik örnek, dokümandaki alanlara göre hazırlandı (21.10.2026). Gerçek yanıt değildir; ilk canlı denemede gerçek yanıtla karşılaştırılacak. Domainler kurgusal (.example).",
+    "scenario": "Üst seviye hata: kimlik doğrulama başarısız (40100), tasks yok, cost 0."
+  },
+  "version": "0.1.20261001",
+  "status_code": 40100,
+  "status_message": "You are not authorized to access this resource.",
+  "time": "6.0215 sec.",
+  "cost": 0,
+  "tasks_count": 0,
+  "tasks_error": 0,
+  "tasks": null
+}

@@ -1,0 +1,62 @@
+{
+  "_fixture": {
+    "synthetic": true,
+    "source": "https://docs.dataforseo.com/v3/serp/google/organic/live/advanced.md",
+    "note": "Sentetik örnek, dokümandaki alanlara göre hazırlandı (21.10.2026). Gerçek yanıt değildir; ilk canlı denemede gerçek yanıtla karşılaştırılacak. Domainler kurgusal (.example).",
+    "scenario": "Başarılı yanıt ama sonuç listesi boş (items: [])."
+  },
+  "version": "0.1.20261001",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "6.0215 sec.",
+  "cost": 0.002,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "10211007-0000-0066-0000-000000000003",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "5.8122 sec.",
+      "cost": 0.002,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "serp",
+        "google",
+        "organic",
+        "live",
+        "advanced"
+      ],
+      "data": {
+        "api": "serp",
+        "function": "live",
+        "se": "google",
+        "se_type": "organic",
+        "keyword": "Terrassenüberdachung Kleinstadt",
+        "location_coordinate": "50.0001,8.0001,200",
+        "language_code": "de",
+        "device": "mobile",
+        "os": "android",
+        "depth": 10
+      },
+      "result": [
+        {
+          "keyword": "Terrassenüberdachung Kleinstadt",
+          "type": "organic",
+          "se_domain": "google.de",
+          "location_code": null,
+          "language_code": "de",
+          "check_url": "https://www.google.de/search?q=Terrassenüberdachung+Kleinstadt&hl=de&gl=DE",
+          "datetime": "2026-10-21 07:00:12 +00:00",
+          "spell": null,
+          "refinement_chips": null,
+          "item_types": [],
+          "se_results_count": 1240000,
+          "items_count": 0,
+          "items": []
+        }
+      ]
+    }
+  ]
+}
