@@ -40,6 +40,6 @@ Bu repo Ortsrank'ın kodudur: bölgesel hizmet veren işletmelerin Google'da han
 npm run dev        # geliştirme sunucusu
 npm run build      # production build
 npm run lint
-npm test           # vitest (Aşama 1'de eklenecek)
+npm test           # vitest (tek sefer); npm run test:watch izleme modu
 npx drizzle-kit generate
 ```

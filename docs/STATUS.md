@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 1 tamam; sıradaki adım 2 (vitest kurulumu, `npm test`)
+> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 2 tamam; sıradaki adım 3 (`geo.ts` + testler)
 > **Son güncelleme:** 21.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.2) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2)
 
@@ -49,7 +49,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 ### Teknik hat (VS Code) – [PHASE1_PLAN.md](PHASE1_PLAN.md) bölüm 7
 
 - [x] 1. Bağımlılıklar: `tsx`, `vitest`, `dotenv`, `exceljs` (21.10.2026, commit `4874f4d` + bu commit). `xlsx` yerine `exceljs`: npm'deki `xlsx` 0.18.5 yamanmamış açıklar içeriyor. `@types/node` ^24 (vitest 5 şartı, yerel Node 24)
-- [ ] 2. Vitest kurulumu, `npm test`
+- [x] 2. Vitest kurulumu, `npm test` (21.10.2026, bu commit). `vitest.config.ts` (`@/` kısayolu, `tests/**/*.test.ts`); ilk test: de/en/tr sözlüklerinin anahtarları aynı
 - [ ] 3. `geo.ts` + testler (dört liste)
 - [ ] 4. `plan.ts` + testler (beklenen / en kötü durum, oturum ataması)
 - [ ] 5. Sentetik örnek yanıt fixture'ları
@@ -117,7 +117,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Adım 1 tamam: `exceljs` eklendi (`xlsx` yerine) | bu commit |
+| 21.10.2026 | Adım 2: vitest kurulumu, `npm test`, sözlük anahtar testi (2/2 geçti) | bu commit |
+| 21.10.2026 | Adım 1 tamam: `exceljs` eklendi (`xlsx` yerine) | `23b8618` |
 | 21.10.2026 | Adım 1 (kısmi): `tsx`, `vitest`, `dotenv` eklendi, `@types/node` ^24 | `4874f4d` |
 | 21.10.2026 | Neon veritabanı Vercel üzerinden oluşturuldu ve bağlandı | `93f65ec` |
 | 21.10.2026 | Anayasaya eklendi: kullanım kolaylığı, tek yerden yönetim, admin paneli (ROADMAP 3.2) | `4e9e12d` |
