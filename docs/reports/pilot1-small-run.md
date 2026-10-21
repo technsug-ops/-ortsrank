@@ -79,6 +79,30 @@ Aynı belediye/keyword/koordinat için aynı saniyede gönderilen ölçümlerde 
 
 **Doğrulanamadı:** organik boşluk (etiket onayı yok), Local Pack'teki marka kayıtlarının hangi şubeye ait olduğu (kayıtlarda doğrulanmış kimlik veya tam adres yok), `/g/` kimliğinin kalıcılığı, reklam gözlemi ve gün içi değişkenlik (planlı oturum yok).
 
+## Teslim notu (22.10.2026)
+
+**Pilot 1 değerlendirmesi bu haliyle teslim edilebilir.**
+
+**Sonuçların sınırları:**
+
+- Heidenheim kesin: hedef iki ölçümde ilk 10'da.
+- Steinheim koşullu: bir işletmenin konum envanterine ilişkin kayda özgü değerlendirmeye bağlı.
+- Aalen, Ulm ve Babenhausen incelenen kaynaklarla açık kalıyor.
+
+**İşletme açısından anlamı:**
+
+- Bu teknik pilot bazı aramalardaki görünürlüğü belgeliyor.
+- Üç belediyede karar vermeye yetecek rakip bilgisi yok.
+- Otomatik organik boşluk bulgusu oluşmaması, görünürlük sorunu ya da ticari fırsat olmadığını göstermez.
+
+**Son kod değişikliğinin doğrulaması** (`5ac0ce1`, konum kaydındaki `operational` alanı, `operation_not_verified` gerekçesi ve testi):
+
+- Tüm testler 407/407 geçti (16 test dosyası). Bunların 36'sı rakip kaydı testleri; yeni durum için bir test eklendi.
+- TypeScript tip kontrolü (`tsc --noEmit`) 0 hata.
+- ESLint 0 hata, 0 uyarı.
+
+Rakip kayıtları ve etiketler onaylanmadı. Yeni ücretli istek yapılmadı.
+
 ## Sonraki adım (bu işin dışında)
 
 Planlı saatlerde (09:00 / 13:00 / 18:00) aynı 5 belediye: 30 görev, beklenen ≈ 0,14 $, en kötü durum 0,36 $; reklam gözlemi ve gün içi değişkenlik için gerekli. Önce etiket onayı ve Heidenheim profil bağlantısı.
