@@ -35,7 +35,19 @@
   },
   "footer": {
     "operator": "TechNS UG (haftungsbeschränkt), Oberursel tarafından sunulur",
-    "imprint": "Künye",
-    "privacy": "Gizlilik"
+    "imprint": "Künye"
+  },
+  "imprint": {
+    "title": "Künye (Impressum)",
+    "legalBasis": "§ 5 DDG uyarınca bilgiler (Almanya Dijital Hizmetler Kanunu)",
+    "representedBy": "Şirketi temsilen yönetici",
+    "register": "Ticaret sicili",
+    "registerCourt": "Sicil mahkemesi",
+    "registerNumber": "Sicil numarası",
+    "vat": "§ 27a UStG uyarınca KDV kimlik numarası",
+    "contact": "İletişim",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "back": "Ana sayfaya dön"
   }
 }

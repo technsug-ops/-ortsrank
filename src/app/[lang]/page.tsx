@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { localeLabels, locales } from "@/i18n/config";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 
 export default async function Home() {
@@ -7,27 +7,7 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
-        <span className="text-lg font-semibold tracking-tight">
-          Ortsrank
-          <span className="ml-2 rounded-full bg-accent-soft px-2 py-0.5 align-middle text-xs font-medium text-accent">
-            {dict.nav.status}
-          </span>
-        </span>
-        <nav aria-label={dict.nav.language} className="flex gap-1 text-sm">
-          {locales.map((l) => (
-            <Link
-              key={l}
-              href={`/${l}`}
-              hrefLang={l}
-              aria-current={l === locale ? "true" : undefined}
-              className="rounded-md px-2 py-1 text-muted hover:text-foreground aria-[current]:bg-surface aria-[current]:text-foreground"
-            >
-              {localeLabels[l]}
-            </Link>
-          ))}
-        </nav>
-      </header>
+      <SiteHeader dict={dict} locale={locale} />
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 sm:px-6">
         <section className="py-16 sm:py-24">
@@ -53,19 +33,7 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-line">
-        <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-sm text-muted sm:px-6">
-          <span>{dict.footer.operator}</span>
-          <span className="flex gap-4">
-            <a href="https://foundercheck.de/impressum" className="hover:text-foreground">
-              {dict.footer.imprint}
-            </a>
-            <a href="https://foundercheck.de/datenschutz" className="hover:text-foreground">
-              {dict.footer.privacy}
-            </a>
-          </span>
-        </div>
-      </footer>
+      <SiteFooter dict={dict} locale={locale} />
     </div>
   );
 }

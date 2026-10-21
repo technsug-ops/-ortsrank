@@ -35,7 +35,19 @@
   },
   "footer": {
     "operator": "Ein Angebot der TechNS UG (haftungsbeschränkt), Oberursel",
-    "imprint": "Impressum",
-    "privacy": "Datenschutz"
+    "imprint": "Impressum"
+  },
+  "imprint": {
+    "title": "Impressum",
+    "legalBasis": "Angaben gemäß § 5 DDG",
+    "representedBy": "Vertreten durch den Geschäftsführer",
+    "register": "Registereintrag",
+    "registerCourt": "Registergericht",
+    "registerNumber": "Registernummer",
+    "vat": "Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG",
+    "contact": "Kontakt",
+    "phone": "Telefon",
+    "email": "E-Mail",
+    "back": "Zur Startseite"
   }
 }

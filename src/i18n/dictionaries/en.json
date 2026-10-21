@@ -35,7 +35,19 @@
   },
   "footer": {
     "operator": "A service of TechNS UG (haftungsbeschränkt), Oberursel",
-    "imprint": "Imprint",
-    "privacy": "Privacy"
+    "imprint": "Imprint"
+  },
+  "imprint": {
+    "title": "Legal notice (Impressum)",
+    "legalBasis": "Information pursuant to § 5 DDG (German Digital Services Act)",
+    "representedBy": "Represented by the managing director",
+    "register": "Commercial register",
+    "registerCourt": "Register court",
+    "registerNumber": "Register number",
+    "vat": "VAT identification number pursuant to § 27a UStG",
+    "contact": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "back": "Back to home"
   }
 }
