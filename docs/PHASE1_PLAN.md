@@ -57,7 +57,8 @@ Kaynak: [DataForSEO fiyat sayfası](https://dataforseo.com/pricing/serp/google-o
 ### Destatis Gemeindeverzeichnis
 
 - Kaynak: [Statistikportal – Gemeindeverzeichnis](https://www.statistikportal.de/de/gemeindeverzeichnis) ("Alle politisch selbständigen Gemeinden mit ausgewählten Merkmalen", XLSX).
-- **Doğrulanmadı:** Sayfa adı, başlık satırı ve sütun sırası. Script başlık metnine göre sütun bulmalı, sabit sütun numarasına güvenmemeli. Gerçek dosya indirildikten sonra ilk iş, sütun eşlemesini doğrulamak.
+- **Doğrulandı (21.10.2026):** `31122025_Auszug_GV.xlsx` (Gebietsstand 31.12.2025, Erscheinungsmonat August 2026), [destatis.de GVAuszugJ](https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122025_Auszug_GV.html). Sayfa `Onlineprodukt_Gemeinden31122025`; başlık 3–5. satırlara yayılır (üst başlık + `Land | RB | Kreis | VB | Gem`, `insgesamt`, `Längengrad | Breitengrad`) ve etiketlerde dipnot rakamları vardır (`Zensus 20222)`). Script sütunları başlık metniyle bulur. Nüfus 31.12.2025, Zensus 2022 temelli. Koordinatlar Almanca ondalık metin (`"9,43751"`).
+- **Gemeindefreie Gebiete:** `Satzart 60` satırlarında `Textkennzeichen` 65 (bewohnter gemeindefreier Bezirk, ör. Lohheide) ve 66 (unbewohntes gemeindefreies Gebiet: orman, göl, kıyı suyu) belediye değildir; içe aktarılmaz, özette adlarıyla raporlanır. 2025 dosyasında 202 satır (65: 2, 66: 200).
 - Beklenen alanlar: Satzart (belediye satırları için `60`), Land/RB/Kreis/VB/Gem kodları (AGS bunlardan oluşur), Gemeindename, Bevölkerung insgesamt, Längengrad, Breitengrad. Sayılar Almanca biçimde olabilir (`8,6821`, `1.234`).
 
 ---

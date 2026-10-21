@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 11 tamam, migration Neon'a uygulandı; sıradaki adım 12 (gerçek Destatis dosyası + `import-settlements.ts`)
+> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 12 tamam (10.751 belediye, Neon'da); sıradaki adım 13 (pilot dry-run: gerçek belediye listesi + maliyet)
 > **Son güncelleme:** 21.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.3) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2) · [Veri ihtiyacı WUA](Datenbedarf_Werbe_Umsatzanalyse.md) (sürüm 1.1)
 
@@ -61,7 +61,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] 9. `client.ts` + mock testler (21.10.2026, `0209348`). Her deneme: bütçe ayır → gönder → ham yanıtı değiştirmeden ayrı dosyaya yaz → bütçeyi kapat → kaydet. Tekrar: zaman aşımı, ağ hatası, HTTP 429/5xx, DataForSEO 5xxxx; 4xxxx tekrar edilmez. Ek: gönderilen parametre ↔ yanıttaki `data` karşılaştırması (ROADMAP 6), farklıysa `parameter_mismatch`
 - [x] 10. `scan.ts` dry-run uçtan uca (21.10.2026, `0bd7d5c`). Mantık `src/lib/scan-run.ts`, CLI `scripts/scan.ts`; belediye dosyası biçimi `src/lib/settlements.ts` (adım 12 buna yazacak); örnek proje `projects/pilot-rhein-main.json`. `scanId` varsayılanı `<YYYYMMDD>-<proje>` (aynı günün oturumları bütçeyi paylaşır, `--scan-id` ile değiştirilir). Canlıda `--session` veya `--sessions all --back-to-back` zorunlu
 - [x] 11. Şema: `lat`, `lng`, `population`, `population_as_of` ve `serp_results.domain` null kabul eder; migration `drizzle/0001_nullable_settlement_data.sql` (21.10.2026, `931d900`); Neon'a uygulandı
-- [ ] 12. Gerçek Destatis dosyası indirildi, sütun eşlemesi doğrulandı, `import-settlements.ts`
+- [x] 12. Gerçek Destatis dosyası indirildi, sütun eşlemesi doğrulandı, `import-settlements.ts` (21.10.2026, bu commit). `31122025_Auszug_GV.xlsx` (sha256 `5bfb8b7a5ce0…`): 10.751 belediye, eksik koordinat 0, eksik nüfus 0; gemeindefrei 202 alan (Textkennzeichen 65/66) hariç ve raporlu. `--db` ile Neon `settlements` tablosuna yazıldı (tekrar çalıştırma çoğaltmıyor)
 - [ ] 13. Pilot dry-run: gerçek belediye listesi + maliyet
 - [ ] 14. Teslimat raporu `docs/reports/phase1-delivery.md`
 - [ ] Teslimat raporu bu sohbette değerlendirildi
@@ -132,7 +132,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Neon Frankfurt doğrulandı; migration 0000 + 0001 uygulandı (19 tablo); `npm run db:migrate` | bu commit |
+| 21.10.2026 | Adım 12: Destatis GV 31.12.2025 içe aktarıldı (10.751 belediye, JSON + Neon), `destatis.ts` + `import-settlements.ts`, 41 test; toplam 229/229 | bu commit |
+| 21.10.2026 | Neon Frankfurt doğrulandı; migration 0000 + 0001 uygulandı (19 tablo); `npm run db:migrate` | `75739d4` |
 | 21.10.2026 | Adım 11: şemada null alanlar + migration 0001, şema testi; toplam 188/188 | `931d900` |
 | 21.10.2026 | Adım 10: `scan.ts` (dry-run varsayılan, `--live`, oturum filtresi, runId, plan/summary/results.csv, teknik deneme modu), 35 test; toplam 185/185 | `0bd7d5c` |
 | 21.10.2026 | Adım 9: `client.ts` (Basic Auth, zaman aşımı, artan bekleme, eşzamanlılık 5, deneme başına ham dosya, parametre eşleşme kontrolü), 16 test; toplam 150/150 | `0209348` |

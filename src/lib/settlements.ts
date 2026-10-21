@@ -27,6 +27,8 @@ export const settlementSchema = z.object({
 export const settlementFileSchema = z.object({
   source: z.string().min(1),
   sourceFile: z.string().min(1),
+  /** SHA-256 of the source file, so the list can be traced to the exact download. */
+  sourceSha256: z.string().regex(/^[0-9a-f]{64}$/).optional(),
   asOf: z.string().nullable(),
   generatedAt: z.string(),
   settlements: z.array(settlementSchema),
