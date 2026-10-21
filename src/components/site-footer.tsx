@@ -11,6 +11,9 @@ export function SiteFooter({ dict, locale }: { dict: Dictionary; locale: Locale 
           <Link href={`/${locale}/impressum`} className="hover:text-foreground">
             {dict.footer.imprint}
           </Link>
+          <Link href={`/${locale}/datenschutz`} className="hover:text-foreground">
+            {dict.footer.privacy}
+          </Link>
         </span>
       </div>
     </footer>

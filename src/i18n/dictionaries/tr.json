@@ -35,7 +35,8 @@
   },
   "footer": {
     "operator": "TechNS UG (haftungsbeschränkt), Oberursel tarafından sunulur",
-    "imprint": "Künye"
+    "imprint": "Künye",
+    "privacy": "Gizlilik"
   },
   "imprint": {
     "title": "Künye (Impressum)",
@@ -49,5 +50,11 @@
     "phone": "Telefon",
     "email": "E-posta",
     "back": "Ana sayfaya dön"
+  },
+  "privacy": {
+    "title": "Gizlilik politikası (Datenschutz)",
+    "languageNote": "Bu gizlilik politikası Almancadır. Bağlayıcı olan Almanca metindir.",
+    "version": "Sürüm",
+    "updated": "Güncelleme"
   }
 }

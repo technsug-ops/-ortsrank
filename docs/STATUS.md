@@ -41,7 +41,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] Vercel ↔ GitHub bağlantısı (Settings → Git → Connect) (21.10.2026)
 - [x] İlk production deploy; `https://ortsrank.foundercheck.de` açılıyor ve SSL geçerli (21.10.2026, `2874124`; `/` → `/de`, `/de` `/en` `/tr` 200)
 - [x] Impressum `/{de,en,tr}/impressum`; bilgiler foundercheck.de Impressum'undan, tek kaynak `src/config/operator.ts` (21.10.2026, `a58d027`)
-- [ ] Datenschutzerklärung (site için; footer'daki eski link foundercheck.de'de 404 verdiği için kaldırıldı)
+- [~] Datenschutzerklärung `/{de,en,tr}/datenschutz` sürüm 1.0, tek kaynak `src/content/legal/privacy.ts` (21.10.2026, yerel commit; Halil onayından sonra push edilecek)
 - [ ] Repo adı `ortsrank` olarak düzeltildi (isteğe bağlı)
 
 ---
@@ -63,7 +63,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] 11. Şema: `lat`, `lng`, `population`, `population_as_of` ve `serp_results.domain` null kabul eder; migration `drizzle/0001_nullable_settlement_data.sql` (21.10.2026, `931d900`); Neon'a uygulandı
 - [x] 12. Gerçek Destatis dosyası indirildi, sütun eşlemesi doğrulandı, `import-settlements.ts` (21.10.2026, `10be488`). `31122025_Auszug_GV.xlsx` (sha256 `5bfb8b7a5ce0…`): 10.751 belediye, eksik koordinat 0, eksik nüfus 0; gemeindefrei 202 alan (Textkennzeichen 65/66) hariç ve raporlu. `--db` ile Neon `settlements` tablosuna yazıldı (tekrar çalıştırma çoğaltmıyor)
 - [x] 13. Pilot dry-run: gerçek belediye listesi + maliyet (21.10.2026). `pilot-rhein-main` (Frankfurt, 30 km, ≥10.000, en fazla 30): 66 uygun belediye → en yakın 30 seçildi (Frankfurt … Rodgau 17,4 km), 36 `overLimit` (Darmstadt 26,6 km, Rüsselsheim 23,3 km dahil), 23 eşik altı, 0 nüfusu bilinmeyen, 0 konumsuz. Mevcut 2 keyword ile 120 görev: beklenen 0,576 $, en kötü 1,44 $; 5 keyword ile 210 görev ≈ 1,01 $ / 2,52 $
-- [x] 14. Teslimat raporu `docs/reports/phase1-delivery.md` (21.10.2026, bu commit): 229/229 test, Destatis 10.751 belediye, pilot dry-run 30 belediye / 120 görev / 0,576 $
+- [x] 14. Teslimat raporu `docs/reports/phase1-delivery.md` (21.10.2026, `d713c87`): 229/229 test, Destatis 10.751 belediye, pilot dry-run 30 belediye / 120 görev / 0,576 $
 - [ ] Teslimat raporu bu sohbette değerlendirildi
 
 ### Canlı doğrulama
@@ -133,7 +133,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Adım 14: Aşama 1 ilk teknik teslimat raporu | bu commit |
+| 21.10.2026 | Datenschutzerklärung taslağı (sitenin gerçek durumuna göre: çerez yok, izleyici yok, Vercel hosting, e-posta iletişimi); onay bekliyor | bu commit |
+| 21.10.2026 | Adım 14: Aşama 1 ilk teknik teslimat raporu | `d713c87` |
 | 21.10.2026 | Adım 13: pilot dry-run gerçek veriyle (30 belediye, 120 görev, 0,576 $ beklenen); pilot alanı kararı açık | `aaa3398` |
 | 21.10.2026 | Adım 12: Destatis GV 31.12.2025 içe aktarıldı (10.751 belediye, JSON + Neon), `destatis.ts` + `import-settlements.ts`, 41 test; toplam 229/229 | `10be488` |
 | 21.10.2026 | Neon Frankfurt doğrulandı; migration 0000 + 0001 uygulandı (19 tablo); `npm run db:migrate` | `75739d4` |

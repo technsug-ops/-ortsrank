@@ -35,7 +35,8 @@
   },
   "footer": {
     "operator": "A service of TechNS UG (haftungsbeschränkt), Oberursel",
-    "imprint": "Imprint"
+    "imprint": "Imprint",
+    "privacy": "Privacy"
   },
   "imprint": {
     "title": "Legal notice (Impressum)",
@@ -49,5 +50,11 @@
     "phone": "Phone",
     "email": "Email",
     "back": "Back to home"
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "languageNote": "This privacy policy is provided in German. The German text is authoritative.",
+    "version": "Version",
+    "updated": "Last updated"
   }
 }

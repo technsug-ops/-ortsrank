@@ -35,7 +35,8 @@
   },
   "footer": {
     "operator": "Ein Angebot der TechNS UG (haftungsbeschränkt), Oberursel",
-    "imprint": "Impressum"
+    "imprint": "Impressum",
+    "privacy": "Datenschutz"
   },
   "imprint": {
     "title": "Impressum",
@@ -49,5 +50,11 @@
     "phone": "Telefon",
     "email": "E-Mail",
     "back": "Zur Startseite"
+  },
+  "privacy": {
+    "title": "Datenschutzerklärung",
+    "languageNote": "",
+    "version": "Version",
+    "updated": "Stand"
   }
 }
