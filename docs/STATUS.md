@@ -78,7 +78,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 ### Rapor
 
-- [ ] Kurallar v0 (kanıt seviyeli)
+- [~] Kurallar v0 (kanıt seviyeli) – tasarım taslağı [RULES_V0.md](RULES_V0.md) sürüm 0.1, onay bekliyor (21.10.2026)
 - [ ] Sayfa taraması (rakip + müşteri sitesi)
 - [ ] Almanca PDF rapor şablonu
 - [ ] İlk rapor elle gözden geçirildi
@@ -133,6 +133,7 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
+| 21.10.2026 | Kurallar v0 tasarım taslağı (5 kural, kanıt seviyeleri, yasaklı ifadeler, test planı) | bu commit |
 | 21.10.2026 | Datenschutzerklärung taslağı (sitenin gerçek durumuna göre: çerez yok, izleyici yok, Vercel hosting, e-posta iletişimi); Halil onayıyla yayında | `8caf246` |
 | 21.10.2026 | Adım 14: Aşama 1 ilk teknik teslimat raporu | `d713c87` |
 | 21.10.2026 | Adım 13: pilot dry-run gerçek veriyle (30 belediye, 120 görev, 0,576 $ beklenen); pilot alanı kararı açık | `aaa3398` |
