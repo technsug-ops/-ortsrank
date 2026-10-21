@@ -151,7 +151,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 22.10.2026 | Pilot 1 iş paketi kapandı; rakip kayıtlarının ve etiketlerin onayı Halil'de açık madde | bu commit |
+| 22.10.2026 | Rapor formatı (Halil): `docs/templates/ortsrank-report-template.html` (TR/DE/EN, düzenlenebilir, yazdır/kaydet); JS isteğe bağlı dizilerle genişletildi (tablo satırları, birden çok rakip kartı, öneri adımları, kanıt kayıtları), dizisiz halde şablon aynı. Pilot 1 raporu bu formatta DE + TR üretildi (git dışı `data/reports/pilot1-bericht-20261022.html`); tarayıcıda denetlendi: 0 konsol hatası, yer tutucu yok | bu commit |
+| 22.10.2026 | Pilot 1 iş paketi kapandı; rakip kayıtlarının ve etiketlerin onayı Halil'de açık madde | `6ad033e` |
 | 22.10.2026 | Pilot 1 teslim notu (anonim özet): sonuçların sınırları, işletme açısından anlamı, son kod değişikliğinin doğrulaması (`5ac0ce1`: 407/407 test, tsc ve ESLint temiz); kod değişmedi | `82cf218` |
 | 22.10.2026 | Sonuçların sunumu (geri bildirim): Steinheim koşullu (kayda özgü konum envanteri değerlendirmesi, genel kural değil), Aalen/Ulm/Babenhausen „incelenen kaynaklarla değerlendirilemedi"; konum için `operational` alanı (faal olduğu kaynakla gösterilmeli; yoksa açık); faal kanıtı zayıf bir konum açık bırakıldı (Ulm sonucu değişmedi); toplam 407/407 | `5ac0ce1` |
 | 22.10.2026 | Karar odaklı ücretsiz kaynak kontrolü (yalnızca sonucu değiştirebilecek 3 işletme + 1 erişilemeyen site): 1 işletmenin konum envanteri kendi sayı beyanı ve adlandırılmış konumlarıyla kapandı → Steinheim „koşul sağlanmadı"; 2 işletmenin konum listesi yok, 1 site hâlâ 503 → Aalen, Ulm, Babenhausen açık; kod değişmedi | `3768915` |
