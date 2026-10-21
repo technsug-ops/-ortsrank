@@ -116,7 +116,26 @@ describe("selectSettlements", () => {
   it("rejects invalid options", () => {
     expect(() => selectSettlements(all, { ...options, radiusKm: 0 })).toThrow(/radiusKm/);
     expect(() => selectSettlements(all, { ...options, populationMin: -1 })).toThrow(/populationMin/);
-    expect(() => selectSettlements(all, { ...options, limit: 0 })).toThrow(/limit/);
+    expect(() => selectSettlements(all, { ...options, limit: -1 })).toThrow(/limit/);
+    expect(() => selectSettlements(all, { ...options, populationMax: 5_000 })).toThrow(/populationMax/);
     expect(() => selectSettlements(all, { ...options, limit: 1.5 })).toThrow(/limit/);
+  });
+});
+
+describe("selectSettlements: population maximum and zero limit", () => {
+  const center = { lat: 50.110644, lng: 8.682092 };
+  const north = (km: number) => ({ lat: center.lat + km / 111.19508, lng: center.lng });
+  const s = (ags: string, km: number, population: number) => ({ ags, name: ags, ...north(km), population });
+
+  it("moves settlements above the maximum into aboveMaximum (inclusive bound)", () => {
+    const r = selectSettlements([s("a", 1, 140_000), s("b", 2, 140_001), s("c", 3, 6_000)], { center, radiusKm: 30, populationMin: 5_000, populationMax: 140_000 });
+    expect(r.selected.map((x) => x.ags)).toEqual(["a", "c"]);
+    expect(r.aboveMaximum.map((x) => x.ags)).toEqual(["b"]);
+  });
+
+  it("allows a limit of 0 (all qualified go to overLimit)", () => {
+    const r = selectSettlements([s("a", 1, 10_000)], { center, radiusKm: 30, populationMin: 5_000, limit: 0 });
+    expect(r.selected).toEqual([]);
+    expect(r.overLimit.map((x) => x.ags)).toEqual(["a"]);
   });
 });

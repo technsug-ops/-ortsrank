@@ -26,6 +26,8 @@ export interface SelectionOptions {
   center: LatLng;
   radiusKm: number;
   populationMin: number;
+  /** Optional upper bound (inclusive); larger settlements go to `aboveMaximum`. */
+  populationMax?: number;
   /** Maximum size of `selected`; the nearest ones are kept. */
   limit?: number;
 }
@@ -39,6 +41,8 @@ export interface Selection<T extends SettlementGeo> {
   unlocatable: T[];
   /** Located, inside the radius, population < threshold; nearest first. */
   belowThreshold: WithDistance<T>[];
+  /** Located, inside the radius, population > populationMax; nearest first. */
+  aboveMaximum: WithDistance<T>[];
   /** Settlements that qualified for `selected` but were cut by `limit`. */
   overLimit: WithDistance<T>[];
 }
@@ -69,17 +73,21 @@ export function selectSettlements<T extends SettlementGeo>(
   settlements: readonly T[],
   options: SelectionOptions,
 ): Selection<T> {
-  const { center, radiusKm, populationMin, limit } = options;
+  const { center, radiusKm, populationMin, populationMax, limit } = options;
   if (!(radiusKm > 0)) throw new Error(`radiusKm must be > 0, got ${radiusKm}`);
   if (!(populationMin >= 0)) throw new Error(`populationMin must be >= 0, got ${populationMin}`);
-  if (limit !== undefined && !(Number.isInteger(limit) && limit > 0)) {
-    throw new Error(`limit must be a positive integer, got ${limit}`);
+  if (populationMax !== undefined && !(populationMax >= populationMin)) {
+    throw new Error(`populationMax must be >= populationMin, got ${populationMax}`);
+  }
+  if (limit !== undefined && !(Number.isInteger(limit) && limit >= 0)) {
+    throw new Error(`limit must be a non-negative integer, got ${limit}`);
   }
 
   const qualified: WithDistance<T>[] = [];
   const unknownPopulation: WithDistance<T>[] = [];
   const unlocatable: T[] = [];
   const belowThreshold: WithDistance<T>[] = [];
+  const aboveMaximum: WithDistance<T>[] = [];
 
   for (const s of settlements) {
     const location = locationOf(s);
@@ -92,6 +100,7 @@ export function selectSettlements<T extends SettlementGeo>(
 
     const entry = { ...s, distanceKm };
     if (s.population === null) unknownPopulation.push(entry);
+    else if (populationMax !== undefined && s.population > populationMax) aboveMaximum.push(entry);
     else if (s.population >= populationMin) qualified.push(entry);
     else belowThreshold.push(entry);
   }
@@ -99,6 +108,7 @@ export function selectSettlements<T extends SettlementGeo>(
   qualified.sort(byDistance);
   unknownPopulation.sort(byDistance);
   belowThreshold.sort(byDistance);
+  aboveMaximum.sort(byDistance);
 
   const cut = limit ?? qualified.length;
   return {
@@ -106,6 +116,7 @@ export function selectSettlements<T extends SettlementGeo>(
     unknownPopulation,
     unlocatable,
     belowThreshold,
+    aboveMaximum,
     overLimit: qualified.slice(cut),
   };
 }

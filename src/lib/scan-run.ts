@@ -205,12 +205,17 @@ export function prepareScan(projectInput: unknown, settlementFile: SettlementFil
   }
   const center = { ags: centerRow.ags, name: centerRow.name, lat: centerRow.lat, lng: centerRow.lng };
 
-  const selection = selectSettlements(settlementFile.settlements, {
+  // With includeCenter the centre takes the first slot whatever its population;
+  // the remaining slots are filled by the usual selection without it.
+  const candidates = project.includeCenter ? settlementFile.settlements.filter((s) => s.ags !== centerRow.ags) : settlementFile.settlements;
+  const selection = selectSettlements(candidates, {
     center,
     radiusKm: project.radiusKm,
     populationMin: project.populationMin,
-    limit: project.maxSettlements,
+    populationMax: project.populationMax,
+    limit: project.includeCenter ? project.maxSettlements - 1 : project.maxSettlements,
   });
+  if (project.includeCenter) selection.selected.unshift({ ...centerRow, distanceKm: 0 });
 
   const toScanned = (s: Selection<Settlement>["selected"][number], unknownPopulation: boolean): ScannedSettlement => ({
     ags: s.ags,
@@ -261,6 +266,9 @@ export function planDocument(p: PreparedScan, meta: { runId: string; scanId: str
     center: p.center,
     radiusKm: p.project.radiusKm,
     populationMin: p.project.populationMin,
+    populationMax: p.project.populationMax ?? null,
+    includeCenter: p.project.includeCenter,
+    brandNames: p.project.brandNames,
     maxSettlements: p.project.maxSettlements,
     device: p.project.device,
     depth: p.project.depth,
@@ -277,6 +285,7 @@ export function planDocument(p: PreparedScan, meta: { runId: string; scanId: str
       unknownPopulation: p.selection.unknownPopulation.map((s) => ({ ...brief(s), distanceKm: s.distanceKm })),
       unlocatable: p.selection.unlocatable.map((s) => ({ ...brief(s), scanNote: s.scanNote })),
       belowThreshold: p.selection.belowThreshold.length,
+      aboveMaximum: p.selection.aboveMaximum.map((s) => ({ ...brief(s), distanceKm: s.distanceKm })),
       overLimit: p.selection.overLimit.map((s) => ({ ...brief(s), distanceKm: s.distanceKm })),
     },
     tasksPerSession: Object.fromEntries(p.project.sessions.map((s) => [s.id, tasksForSession(p.allTasks, s.id).length])),
@@ -482,12 +491,18 @@ const pct = (n: number | null) => (n === null ? "n/a" : `${(n * 100).toFixed(1)}
 export function formatPlan(p: PreparedScan, runId: string, scanId: string, live: boolean): string {
   const lines = [
     `${live ? "LIVE" : "DRY-RUN (no requests sent)"} · run ${runId} · scan ${scanId}`,
-    `Project ${p.project.name}: centre ${p.center.name} (${p.center.ags}), radius ${p.project.radiusKm} km, population ≥ ${p.project.populationMin}, max ${p.project.maxSettlements}`,
-    `Settlements: ${p.selection.selected.length} selected · ${p.selection.unknownPopulation.length} unknown population · ${p.selection.unlocatable.length} unlocatable · ${p.selection.belowThreshold.length} below threshold · ${p.selection.overLimit.length} over limit`,
+    `Project ${p.project.name}: centre ${p.center.name} (${p.center.ags})${p.project.includeCenter ? " always included" : ""}, radius ${p.project.radiusKm} km, population ≥ ${p.project.populationMin}${p.project.populationMax !== undefined ? ` and ≤ ${p.project.populationMax}` : ""}, max ${p.project.maxSettlements}`,
+    `Settlements: ${p.selection.selected.length} selected · ${p.selection.unknownPopulation.length} unknown population · ${p.selection.unlocatable.length} unlocatable · ${p.selection.belowThreshold.length} below threshold · ${p.selection.aboveMaximum.length} above maximum · ${p.selection.overLimit.length} over limit`,
     `Scanned: ${p.scanned.length}${p.scanned.some((s) => s.unknownPopulation) ? " (incl. unknown population, flagged)" : ""}`,
     ...p.scanned.map((s) => `  ${s.ags}  ${s.name.padEnd(28)} ${s.distanceKm.toFixed(1).padStart(5)} km  ${s.population ?? "population unknown"}`),
     `Keywords: ${p.keywords.map((k) => `${k.term} (${k.type}, ${k.samples}×)`).join(" · ")}`,
     `Sessions: ${p.project.sessions.map((s) => `${s.id} @ ${s.plannedAt}: ${tasksForSession(p.allTasks, s.id).length} tasks`).join(" · ")}`,
+    `Tasks = settlements × keyword samples (one sample per session):`,
+    ...p.keywords.map((k) => {
+      const n = p.allTasks.filter((t) => t.keyword === k.term).length;
+      return `  ${k.term} (${k.type}): ${p.scanned.length} × ${k.samples} = ${n}`;
+    }),
+    `  total ${p.allTasks.length}`,
     `This run: ${p.session === null ? "all sessions" : `session ${p.session}`}, ${p.tasks.length} tasks, sampling ${p.samplingMode}`,
     `Cost: expected ${usd(p.estimate.expectedUsd)} · worst case ${usd(p.estimate.worstCaseUsd)} (${p.estimate.maxAttempts} attempts × ${usd(p.estimate.costPerAttemptUsd)})`,
     p.cap === null

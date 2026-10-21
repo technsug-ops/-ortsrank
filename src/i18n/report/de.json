@@ -15,7 +15,8 @@
     "noOrganic": "keine organischen Ergebnisse angezeigt",
     "lpMatchedName": "im Local Pack, Platz {rank} (Abgleich über den Profilnamen)",
     "lpNameNotFound": "im angezeigten Local Pack kein Eintrag mit dem Profilnamen gefunden",
-    "lpNotMeasurable": "Local Pack nicht auswertbar"
+    "lpNotMeasurable": "Local Pack nicht auswertbar",
+    "lpBrandOther": "Eintrag der Marke im Local Pack (Platz {rank}: {title}), nicht dem Zielstandort zugeordnet"
   },
   "organicGap": {
     "text": "In {settlement} war {target} bei „{keyword}“ {measurements} nicht unter den ersten 10 organischen Ergebnissen ({status}). In jeder dieser Messungen waren mindestens 2 lokale oder regionale Wettbewerber unter den ersten 10 – {perMeasurement}.",

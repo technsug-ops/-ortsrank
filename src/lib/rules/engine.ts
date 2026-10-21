@@ -33,7 +33,7 @@ export type Labels = ReadonlyMap<string, CompetitorLabel>;
  * without matching identity) · not_found_in_pack (pack shown, no entry with
  * the profile name) · no_local_pack · not_measurable (items without name).
  */
-export type LocalPackStatus = "matched" | "match_unverified" | "not_found_in_pack" | "no_local_pack" | "not_measurable";
+export type LocalPackStatus = "matched" | "brand_other_location" | "match_unverified" | "not_found_in_pack" | "no_local_pack" | "not_measurable";
 export type LocalPackMethod = "cid" | "profile_name_exact" | null;
 
 export interface LocalPackResult {
@@ -49,6 +49,14 @@ export interface TargetIdentity {
   domains: readonly string[];
   cids: readonly string[];
   profileNames: readonly string[];
+  /** Brand words; entries carrying them but not the profile name are other locations of the brand. */
+  brandNames?: readonly string[];
+}
+
+/** True if the brand appears as a whole word (or word sequence) in the name. */
+export function hasBrand(name: string, brand: string): boolean {
+  const spaced = (s: string) => ` ${normalizeBusinessName(s).replace(/[^\p{L}\p{N}]+/gu, " ").trim()} `;
+  return spaced(name).includes(spaced(brand));
 }
 
 export interface EvidenceRef {
@@ -175,16 +183,20 @@ export function localPackStatus(m: Measurement, target: TargetIdentity): LocalPa
   const byCid = items.find((r) => r.cid && target.cids.includes(r.cid));
   if (byCid) return result("matched", { rank: byCid.rank, method: "cid", rawTitle: byCid.title });
 
+  const wanted = target.profileNames.map(normalizeBusinessName);
+  const exact = items.filter((r) => r.title && wanted.includes(normalizeBusinessName(r.title)));
+  if (exact.length > 1) return result("match_unverified", { reason: "duplicate_name", rawTitle: exact[0].title });
+  if (exact.length === 1) return result("matched", { rank: exact[0].rank, method: "profile_name_exact", rawTitle: exact[0].title });
+
+  // Another location of the same brand: shown on its own, never matched to the target location.
+  const brand = items.find((r) => r.title && (target.brandNames ?? []).some((b) => hasBrand(r.title!, b)));
+  if (brand) return result("brand_other_location", { rank: brand.rank, rawTitle: brand.title, reason: "brand_without_profile_name" });
+
   if (target.profileNames.length === 0) {
     return result("match_unverified", { reason: target.cids.length ? "no_cid_in_response" : "no_verified_identity" });
   }
   const untitled = items.filter((r) => !r.title || !r.title.trim());
   if (untitled.length) return result("not_measurable", { reason: "items_without_name" });
-
-  const wanted = target.profileNames.map(normalizeBusinessName);
-  const exact = items.filter((r) => wanted.includes(normalizeBusinessName(r.title!)));
-  if (exact.length > 1) return result("match_unverified", { reason: "duplicate_name", rawTitle: exact[0].title });
-  if (exact.length === 1) return result("matched", { rank: exact[0].rank, method: "profile_name_exact", rawTitle: exact[0].title });
 
   // Similar but different names only downgrade to "unverified", they never match.
   const similar = items.find((r) => wanted.some((w) => isSimilarName(normalizeBusinessName(r.title!), w)));
@@ -255,7 +267,12 @@ export interface EvaluateOptions {
 
 export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOptions = {}): Evaluation {
   const localPackGapEnabled = options.localPackGap ?? LOCAL_PACK_GAP_ENABLED;
-  const identity: TargetIdentity = { domains: scan.targetDomains.map(normalizeDomain), cids: scan.targetCids, profileNames: scan.targetProfileNames };
+  const identity: TargetIdentity = {
+    domains: scan.targetDomains.map(normalizeDomain),
+    cids: scan.targetCids,
+    profileNames: scan.targetProfileNames,
+    brandNames: scan.brandNames,
+  };
   const targets = scan.targetDomains.map(normalizeDomain);
   // Without a target domain nothing can be "not found": organic findings about the target are skipped.
   const hasTarget = targets.length > 0;
@@ -297,6 +314,11 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
         const matched = lp.filter((x) => x.status === "matched").sort((a, b) => a.rank! - b.rank!);
         localPack = matched.length
           ? fill(matched[0].method === "cid" ? T.status.lpMatched : T.status.lpMatchedName, { rank: matched[0].rank! })
+          : lp.some((x) => x.status === "brand_other_location")
+            ? fill(T.status.lpBrandOther, {
+                rank: lp.find((x) => x.status === "brand_other_location")!.rank!,
+                title: lp.find((x) => x.status === "brand_other_location")!.rawTitle ?? "",
+              })
           : lp.some((x) => x.status === "match_unverified")
             ? T.status.lpUnverified
             : lp.some((x) => x.status === "not_measurable")

@@ -88,6 +88,13 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 ### İş hattı (Halil)
 
 - [x] Pilot çerçevesi: Terrassenüberdachung, Frankfurt/Rhein-Main, 20–30 belediye (21.10.2026)
+- [x] **Pilot 1: Arbeitsbühnenvermietung, Heidenheim çevresi** (Halil'in kararı, 21.10.2026); Terrassenüberdachung sonraki pilot. Ayarlar ve taslaklar: [PILOT_SETUP.md](PILOT_SETUP.md)
+- [x] Pilot 1 keyword keşfi: 4 sorgu Heidenheim'dan, 0,016 $ (tarama `discovery-laggner-20261021`)
+- [ ] Pilot 1 kesin keyword seti (öneri: Arbeitsbühne mieten ×3, Hubarbeitsbühne mieten, Scherenbühne mieten, Arbeitsbühne mieten in der Nähe)
+- [ ] Pilot 1 alt nüfus eşiği (5.000'de seçim 27,8 km'de kesiliyor; 7.500 / 10.000 seçenekleri)
+- [ ] Pilot 1 Heidenheim şubesinin Google profili (tam ad, adres, bağlantı, kimlik) doğrulanmış kaynaktan
+- [ ] Pilot 1 rakip etiket taslağı onayı (`data/competitor-labels.laggner.draft.json`)
+- [ ] DataForSEO'ya en az 50 $ ve tam tarama tavanı onayı (öneri 2,50 $ / tarama günü)
 - [~] Pilot keywordleri (3–5), işletmelerin gerçek hizmetlerine göre – taslak [PILOT_SETUP.md](PILOT_SETUP.md) bölüm 1 (Google önerilerinden), Halil'in onayı bekleniyor
 - [~] Pilot alanı kararı (taslak [PILOT_SETUP.md](PILOT_SETUP.md) bölüm 2; önce pilot işletmenin konumu): 30 km / ≥10.000 nüfusta 66 belediye var; üst sınır 30 iken seçim 17,4 km'de bitiyor. Seçenekler: üst sınırı artırmak, nüfus eşiğini yükseltmek (30 km / ≥20.000 → 34) veya yarıçapı küçültmek (25 km / ≥20.000 → 29)
 - [ ] Pilot işletme 1 (aday: UG-ALU – katılım netleşmeli)
@@ -135,7 +142,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Pilot ayarları taslağı: keywordler (Google önerilerinden), alan seçenekleri ve maliyet; rakip etiket taslağı `data/` içinde (31 öneri, 18 belirsiz) | bu commit |
+| 21.10.2026 | Pilot 1 hazırlığı (Arbeitsbühnenvermietung, Heidenheim): `includeCenter`, `populationMax`, marka şubesi durumu; keşif 4 sorgu 0,016 $; dry-run 30 belediye / 180 görev / 0,86–2,16 $; toplam 316/316 | bu commit |
+| 21.10.2026 | Pilot ayarları taslağı: keywordler (Google önerilerinden), alan seçenekleri ve maliyet; rakip etiket taslağı `data/` içinde (31 öneri, 18 belirsiz) | `84e6540` |
 | 21.10.2026 | Local Pack profil adıyla eşleştirme (5 durum, ham ad + yöntem kaydı), `local_pack_gap` pilotta kapalı; toplam 304/304 | `94e850e` |
 | 21.10.2026 | Canlı deneme başarılı (8/8, 0,032 $); local pack `cid` null + Google domaini, organik ~15 sonuç → ayrıştırıcı ve kurallar düzeltildi; bütçe defterinde Windows dosya kilidine karşı tekrar; toplam 289/289 | `c1c9098` |
 | 21.10.2026 | İlk canlı deneme `trial-20261021`: 8 görev HTTP 403 / 40104 (hesap doğrulanmamış), maliyet 0 $, kayıt bütünlüğü %100. Düzeltme: HTTP hatasında sağlayıcı kodu kaydedilir; teknik denemede oturum sapması değerlendirilmez | `c5b9f41` |

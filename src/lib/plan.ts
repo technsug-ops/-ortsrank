@@ -32,6 +32,16 @@ export const projectSchema = z
     centerAgs: z.string().regex(/^\d{8}$/, "centerAgs must be an 8-digit AGS"),
     radiusKm: z.number().positive(),
     populationMin: z.number().int().nonnegative(),
+    /** Optional upper population bound (inclusive). */
+    populationMax: z.number().int().positive().optional(),
+    /** Always scan the centre settlement, whatever its population; it takes one of the maxSettlements slots. */
+    includeCenter: z.boolean().default(false),
+    /**
+     * Brand words of the target (e.g. "Beispielmiet"). A Local Pack entry carrying
+     * the brand but not the verified profile name is shown as another location
+     * of the brand, never matched to the target location.
+     */
+    brandNames: z.array(z.string().trim().min(2)).default([]),
     maxSettlements: z.number().int().positive(),
     device: z.enum(device.enumValues),
     depth: z.number().int().min(DEPTH_MIN).max(DEPTH_MAX),

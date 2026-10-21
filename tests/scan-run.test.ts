@@ -311,3 +311,50 @@ describe("result helpers", () => {
     expect(csv).toContain('"Dach, ""Profi""\nZeile"');
   });
 });
+
+describe("prepareScan: centre always included (includeCenter)", () => {
+  // 99000003 Beispieldorf C: 8 000 inhabitants, below the 10 000 threshold.
+  const project = (over: Record<string, unknown> = {}) => ({ ...projectJson, centerAgs: "99000003", includeCenter: true, ...over });
+
+  it("puts the centre first whatever its population and fills the rest by the usual selection", () => {
+    const p = prepareScan(project(), settlementFile, args(), env);
+    expect(p.scanned[0]).toMatchObject({ ags: "99000003", distanceKm: 0, population: 8000 });
+    expect(p.scanned.filter((s) => s.ags === "99000003")).toHaveLength(1);
+    expect(p.selection.belowThreshold.some((s) => s.ags === "99000003")).toBe(false);
+  });
+
+  it("never exceeds maxSettlements, the centre included", () => {
+    const p = prepareScan(project({ maxSettlements: 3 }), settlementFile, args(), env);
+    expect(p.scanned).toHaveLength(3);
+    expect(p.scanned[0].ags).toBe("99000003");
+    expect(p.selection.overLimit.length).toBeGreaterThan(0);
+    expect(prepareScan(project({ maxSettlements: 1 }), settlementFile, args(), env).scanned.map((s) => s.ags)).toEqual(["99000003"]);
+  });
+
+  it("fails clearly when the centre has no coordinates", () => {
+    expect(() => prepareScan(project({ centerAgs: "99000005" }), settlementFile, args(), env)).toThrow(/has no coordinates/);
+  });
+
+  it("applies the population maximum to the other settlements", () => {
+    const p = prepareScan(project({ populationMax: 140000 }), settlementFile, args(), env);
+    expect(p.selection.aboveMaximum.map((s) => s.ags)).toEqual(["06412000"]);
+    expect(p.scanned.some((s) => s.ags === "06412000")).toBe(false);
+  });
+
+  it("without includeCenter, a centre below the threshold is not scanned (unchanged behaviour)", () => {
+    const p = prepareScan(project({ includeCenter: false }), settlementFile, args(), env);
+    expect(p.scanned.some((s) => s.ags === "99000003")).toBe(false);
+  });
+
+  it("dry-run output breaks tasks down per keyword: settlements × samples", async () => {
+    const lines: string[] = [];
+    const file = join(root, "p.json");
+    writeFileSync(file, JSON.stringify(project({ maxSettlements: 3 })));
+    await main(["--project", file, "--settlements", SETTLEMENTS, "--runs-dir", join(root, "runs")], { SCAN_MAX_USD: "3" }, { out: (l) => lines.push(l) });
+    const text = lines.join("\n");
+    expect(text).toContain("centre Beispieldorf C (99000003) always included");
+    expect(text).toContain("  Terrassenüberdachung (main): 3 × 3 = 9");
+    expect(text).toContain("  Terrassenüberdachung mit Montage (intent): 3 × 1 = 3");
+    expect(text).toContain("  total 12");
+  });
+});

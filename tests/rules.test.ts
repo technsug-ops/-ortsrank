@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { SerpRow } from "@/lib/dataforseo/parse";
 import { NON_COMPETITOR_LABELS } from "@/lib/rules/config";
-import { evaluate, isSimilarName, localPackStatus, normalizeBusinessName, priorityScore, type Labels, type TargetIdentity } from "@/lib/rules/engine";
+import { evaluate, hasBrand, isSimilarName, localPackStatus, normalizeBusinessName, priorityScore, type Labels, type TargetIdentity } from "@/lib/rules/engine";
 import type { Measurement, PlannedSettlement, ScanData } from "@/lib/rules/measurements";
 import { fill, reportText } from "@/lib/rules/text";
 
@@ -68,6 +68,7 @@ function scan(settlements: PlannedSettlement[], measurements: Measurement[], ove
     targetDomains: [TARGET],
     targetCids: [TARGET_CID],
     targetProfileNames: [],
+    brandNames: [],
     keywords: [{ term: KW, type: "main", samples: 3 }],
     settlements,
     plannedTasks: planned,
@@ -525,5 +526,33 @@ describe("'not found' names the organic results actually returned", () => {
   it("says no organic results were shown when there are none", () => {
     const e = evaluate(scan([S2], [m(S2.ags, 1, [ad(1, "w.example")])]), labels);
     expect(e.statusTable[0].organic).toBe("keine organischen Ergebnisse angezeigt");
+  });
+});
+
+// ── brand: other locations (brand with several locations) ─────────────────────────
+
+describe("other locations of the brand in the Local Pack", () => {
+  const HDH = "Beispielmiet Heidenheim";
+  const id = (over: Partial<TargetIdentity> = {}): TargetIdentity => ({ domains: [TARGET], cids: [], profileNames: [HDH], brandNames: ["Beispielmiet"], ...over });
+  const named = (rank: number, title: string): SerpRow => ({ ...lp(rank, null, null), title });
+
+  it("matches only the verified profile name of the target location", () => {
+    expect(localPackStatus(m(S2.ags, 1, [named(1, "Beispielmiet Ravensburg"), named(2, HDH)]), id())).toMatchObject({ status: "matched", rank: 2, rawTitle: HDH });
+  });
+
+  it("shows another location of the brand on its own, never as the target", () => {
+    const r = localPackStatus(m(S2.ags, 1, [named(1, "Mitbewerber"), named(3, "Lift Beispielmiet Ravensburg")]), id());
+    expect(r).toMatchObject({ status: "brand_other_location", rank: 3, rawTitle: "Lift Beispielmiet Ravensburg" });
+    const e = evaluate(scan([S2], [m(S2.ags, 1, [named(3, "Lift Beispielmiet Ravensburg")])], { targetProfileNames: [HDH], brandNames: ["Beispielmiet"] }), labels);
+    expect(e.statusTable[0].localPack).toBe("Eintrag der Marke im Local Pack (Platz 3: Lift Beispielmiet Ravensburg), nicht dem Zielstandort zugeordnet");
+  });
+
+  it("without a verified profile name, a brand entry is still not the target", () => {
+    expect(localPackStatus(m(S2.ags, 1, [named(1, "Beispielmiet Service")]), id({ profileNames: [] })).status).toBe("brand_other_location");
+  });
+
+  it("needs the brand as a whole word", () => {
+    expect(hasBrand("Beispielmiet-Service GmbH", "Beispielmiet")).toBe(true);
+    expect(hasBrand("Schbeispielmiet Bau", "Beispielmiet")).toBe(false);
   });
 });

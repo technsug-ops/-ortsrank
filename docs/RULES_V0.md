@@ -171,3 +171,7 @@ Canlı yanıtta `cid` gelmediği için pilotta yöntem A: hedef işletme, **doğ
 - **Kayıt:** her ölçümde ham işletme adı (`rawTitle`), yöntem (`method`) ve neden (`reason`) durum tablosunda (`localPackDetails`) saklanır.
 - **`local_pack_gap` pilotta kapalı** (`LOCAL_PACK_GAP_ENABLED = false`); eşleşme bulunmaması işletmenin yokluğunu kanıtlamaz. Öncelik skoru yalnızca organik boşluktan beslenir. Organik kurallar değişmedi.
 - **B (Google Maps uç noktası) ertelendi.** Değerlendirilirken Maps'te bulunan kimlik ile ölçülen aramanın Local Pack'indeki işletmenin aynı olduğu ayrıca doğrulanmalı.
+
+## 11. Markanın başka şubeleri (21.10.2026)
+
+Projede `brandNames` (ör. markanın adı) tanımlıysa, Local Pack'te markayı tam kelime olarak taşıyan ama doğrulanmış profil adıyla birebir eşleşmeyen kayıt **`brand_other_location`** olur: „Eintrag der Marke im Local Pack (Platz {n}: {ham ad}), nicht dem Zielstandort zugeordnet". Hedef şubeyle asla eşleştirilmez; doğrulanmış profil adı yoksa da aynı durum gösterilir. Sıralama: `matched` > `brand_other_location` > `match_unverified` > `not_measurable` > `not_found_in_pack` > `no_local_pack`.
