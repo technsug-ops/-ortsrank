@@ -58,13 +58,15 @@ Rakip kapsaması: 17 gözlem; sınıflandırmalar onaylanmamış („vorläufig"
 Hedef işletmenin iki Google profili Halil'in onayıyla 2 Maps sorgusuyla (0,004 $) kimlik ve tam adresle doğrulandı. Şubeler aynı adı taşıyor; ofis profili ile başka bir şubenin kaydı aynı puanı ve aynı yorum sayısını da taşıyor. Ad, puan ve yorum sayısı kimlik olarak kullanılmıyor.
 
 - Marka 8 kayıtta görüldü, hepsi **yalnızca marka gözlemi**. 6 kayıtta ofisin sokak ve bina numarası var; posta kodu ve şehir yok, sokak sınırı belirsiz. Bu yüzden kısmi adres, eşleşme değil. 2 kaydın kimliği doğrulanmış listede yok; açıklamadaki yer adı ve telefon yalnızca yardımcı ipucu.
+- 30 ölçümün hesabı: 8 marka kaydı olan + 21 marka kaydı olmayan ölçümde Local Pack var; 1 ölçümde Local Pack gösterilmedi.
 - **Bu 30 ölçümde dönen Local Pack kayıtları arasında hedef şubeye doğrulanmış bir eşleşme bulunamadı.** Yokluk kanıtı değildir.
+- Ücretli Maps sorgusu bu belirsizliği çözmez: Maps yanıtı `cid`, `place_id` ve `feature_id` taşır (sonuncunun ikinci kısmı `cid`'in onaltılık hali), `/g/` taşımaz. `/g/` kimliğiyle gelen marka kayıtlarına bağlanacak ortak alan bulunmuyor.
 - Rakip Local Pack sayıları değişmedi: domain yalnızca kaydın kendi web sitesinden. Yalnızca `/g/` kimliği taşıyan 21 rakip profili domaine bağlanmadı.
 - Organik sonuçlar, kural kontrolleri ve 17 kapsama bulgusu değişmedi.
 
 ## Konum mantığı
 
-Keyword şehir adı eklenmeden gönderiliyor. Konum, belediye merkez koordinatı ile `location_coordinate` (yarıçap 200 mm) olarak veriliyor; 30/30 yanıtta aynen geri dönüyor. Sağlayıcının `check_url` bağlantısındaki Google konumu (`uule`) gönderilen noktadan 20–110 m uzakta ve farklı bir yarıçap değeri taşıyor (`[10000]`). Nokta yarıçapı, 60 km'lik belediye seçim alanıyla ve işletmenin hizmet alanıyla ilgisizdir. Ölçülen sorgular yalnızca dört keyword; „Arbeitsbühne" tek başına ölçülmedi.
+Keyword şehir adı eklenmeden gönderiliyor. Konum isteğe ayrı olarak, belediye merkez koordinatıyla `location_coordinate` parametresinde gidiyor; gönderilen değer 30/30 yanıtta aynen geri dönüyor. Bu, ölçümün **merkez koordinatıyla istendiğini** gösterir; Google'ın tam bu noktayı kullandığını kanıtlamaz. Sağlayıcının `check_url` bağlantısındaki konum (`uule`) ayrı bir değerdir: gönderilen noktadan 20–110 m uzakta bir nokta ve birimi belgelenmemiş bir `radius` alanı (`[10000]`); bu alan gönderilen değerle karşılaştırılmaz. Gönderilen değer sonuç kapsamı değildir; 60 km'lik belediye seçim alanıyla ve işletmenin hizmet alanıyla ilgisizdir. Ölçülen sorgular yalnızca dört keyword; „Arbeitsbühne" tek başına ölçülmedi.
 
 ## Gözlem: zamana yakın ölçümlerde farklı sonuç sayfası
 

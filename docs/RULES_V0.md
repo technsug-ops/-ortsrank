@@ -236,7 +236,9 @@ Bu yapı belgelenmiş değil. Yapı farklıysa değer `undecodable` olur; tahmin
 - **6 kayıt (`gid`, Heidenheim ve Steinheim):** Snippet'te ofis profilinin sokak adı ve bina numarası var. Bina numarası ofis adresiyle aynı, sokak belirsiz, posta kodu ve şehir yok; yani `partial`. Heidenheim adresiyle sokak ve numara farklı.
 - **2 kayıt (`cid`):** Kimlikleri doğrulanmış listede yok. Snippet'te yalnızca yer adı geçiyor.
 
-Bu ölçümlerde dönen kayıtlar arasında Heidenheim profiline doğrulanmış bir eşleşme bulunamadı.
+Bu ölçümlerde dönen kayıtlar arasında Heidenheim profiline doğrulanmış bir eşleşme bulunamadı. 30 ölçümün hesabı: 8 marka kaydı olan + 21 marka kaydı olmayan ölçümde Local Pack var, 1 ölçümde Local Pack yok.
+
+**`/g/` kayıtlarını bağlamanın sınırı:** Maps yanıtı `cid`, `place_id` ve `feature_id` (ikinci kısmı `cid`'in onaltılık hali) taşır, `/g/` taşımaz. Maps verisi yalnızca `cid` taşıyan kayıtlarla karşılaştırılabilir. Yalnızca `/g/` taşıyan kayıtlar için ortak alanı olan bir kaynak gösterilmeden ücretli sorgu yapılmaz.
 
 ## 11. Markanın başka şubeleri
 

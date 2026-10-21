@@ -268,3 +268,53 @@ describe("Local Pack entries against verified profiles", () => {
     expect(e.findings.some((f) => f.rule === "local_pack_gap")).toBe(false);
   });
 });
+
+// ── positive matches, from a raw response through parser and rules ───────
+
+describe("positive matches end to end (raw response → parser → status table)", () => {
+  const rawItem = (rank: number, over: Record<string, unknown>) => ({
+    type: "local_pack", rank_group: rank, rank_absolute: rank, title: "Mitbewerber GmbH", domain: "www.google.com",
+    url: viewer(svidFor(`/g/11other${rank}`)), cid: null, is_paid: false, rating: null, phone: null, description: null, ...over,
+  });
+  function measured(items: Record<string, unknown>[], taskKey = "t1"): Measurement {
+    const raw = { status_code: 20000, status_message: "Ok.", cost: 0.004, tasks: [{ id: "t", status_code: 20000, status_message: "Ok.", cost: 0.004, data: { depth: 20 }, result: [{ keyword: "k", check_url: null, datetime: null, items }] }] };
+    const r = parseLiveResponse(raw);
+    if (!r.ok || r.issues.length) throw new Error("expected a clean parse");
+    return m(taskKey, r.rows);
+  }
+  const cellOf = (e: ReturnType<typeof evaluate>) => e.statusTable[0];
+
+  it("a verified cid matches its profile", () => {
+    const ms = measured([rawItem(1, {}), rawItem(2, { title: "Anderer Name", cid: OFFICE.cid, domain: "www.beispielmiet.example", url: "https://www.beispielmiet.example/" })]);
+    const e = evaluate(scan([ms]), new Map());
+    expect(cellOf(e).localPack).toBe("im Local Pack, Platz 2: Büro (Abgleich über verifizierte Kennung)");
+    expect(cellOf(e).localPackDetails[0]).toMatchObject({ status: "matched", method: "cid", profile: "Büro", rank: 2 });
+    expect(e.targetProfiles.find((p) => p.profile === "Büro")).toMatchObject({ identityMatches: ["t1"], addressMatches: [], ambiguous: [] });
+    expect(e.targetProfiles.find((p) => p.profile === "Filiale")).toMatchObject({ identityMatches: [], addressMatches: [] });
+  });
+
+  it("a Google id matches when a verified entry links it to the profile", () => {
+    const linked = [{ ...BRANCH, googleId: "/g/11filiale" }, OFFICE];
+    const ms = measured([rawItem(1, {}), rawItem(3, { title: TITLE, url: viewer(svidFor("/g/11filiale")) })]);
+    const e = evaluate(scan([ms], linked), new Map());
+    expect(cellOf(e).localPackDetails[0]).toMatchObject({ status: "matched", method: "google_id", profile: "Filiale", rank: 3 });
+    expect(cellOf(e).localPack).toBe("im Local Pack, Platz 3: Filiale (Abgleich über verifizierte Kennung)");
+    expect(e.targetProfiles.find((p) => p.profile === "Filiale")!.identityMatches).toEqual(["t1"]);
+  });
+
+  it("a verified full address with the brand gives an address match, shown apart from an id match", () => {
+    const noIds = [{ ...BRANCH, cid: null }, { ...OFFICE, cid: null }];
+    const ms = measured([rawItem(1, {}), rawItem(2, { title: TITLE, description: "Verleih · Lindenallee 25/7, 73002 Beispielstadt an der Aue" })]);
+    const e = evaluate(scan([ms], noIds), new Map());
+    expect(cellOf(e).localPackDetails[0]).toMatchObject({ status: "address_match", method: "address_full", profile: "Filiale", rank: 2 });
+    expect(cellOf(e).localPack).toBe("im Local Pack, Platz 2: Eintrag mit der vollständigen verifizierten Adresse von Filiale (Adressabgleich, keine verifizierte Kennung)");
+    expect(e.targetProfiles.find((p) => p.profile === "Filiale")).toMatchObject({ identityMatches: [], addressMatches: ["t1"] });
+  });
+
+  it("an id match outranks a brand-only entry in the same measurement", () => {
+    const ms = measured([rawItem(1, { title: TITLE }), rawItem(2, { title: TITLE, cid: BRANCH.cid })]);
+    const d = evaluate(scan([ms]), new Map()).statusTable[0].localPackDetails[0];
+    expect(d).toMatchObject({ status: "matched", profile: "Filiale", rank: 2 });
+    expect(d.items.map((i) => i.assessment)).toEqual(["brand_only", "identity_match"]);
+  });
+});
