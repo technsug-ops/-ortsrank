@@ -22,6 +22,7 @@ import {
   RULES_VERSION,
   type CompetitorLabel,
 } from "@/lib/rules/config";
+import { CompetitorIndex, type CompetitorAssessment, type CompetitorRegistry } from "@/lib/rules/competitors";
 import type { Measurement, PlannedSettlement, ScanData, TargetProfile } from "@/lib/rules/measurements";
 import { deDate, deList, deNumber, fill, reportText as T } from "@/lib/rules/text";
 
@@ -529,16 +530,51 @@ export function priorityScore(i: PriorityInput): PriorityResult {
 
 const labelText = (labels: Labels, domain: string) => labels.get(domain) ?? null;
 
+function registryLabelText(index: CompetitorIndex, domain: string): string {
+  const b = index.business(domain);
+  if (!b || b.type === "unknown") return T.competitorCoverage.unlabeled;
+  return fill(b.approved ? T.competitorCoverage.typeApproved : T.competitorCoverage.typeDraft, { type: T.competitorCoverage.types[b.type] });
+}
+
 export interface EvaluateOptions {
   /** Off in the pilot (RULES_V0 section 10). */
   localPackGap?: boolean;
   /** False when labels come from an unapproved draft: wording and limits say so. */
   labelsApproved?: boolean;
+  /**
+   * Competitor registry (RULES_V0 section 13): organic_gap then counts businesses
+   * with a verified own location in the municipality and the verified measured
+   * service, instead of local/regional labels.
+   */
+  competitors?: CompetitorRegistry;
+}
+
+/** One measurement's top-10 competitors for organic_gap: counted, and open (could still count). */
+interface GapCount {
+  counted: string[];
+  open: string[];
+  details: { domain: string; assessment: CompetitorAssessment | { label: CompetitorLabel | null } }[];
+}
+
+function labelGapCount(m: Measurement, targets: readonly string[], labels: Labels): GapCount {
+  const counted = organicTopCompetitors(m, targets, labels, ORGANIC_GAP_LABELS);
+  const top = [...new Set(m.rows.filter((r) => r.type === "organic" && r.rank <= ORGANIC_TOP && r.domain && !isTarget(r.domain, targets)).map((r) => r.domain!))];
+  return { counted, open: top.filter((d) => !labels.has(d)), details: top.map((d) => ({ domain: d, assessment: { label: labels.get(d) ?? null } })) };
+}
+
+/** Distinct businesses, not domains: two sites of one business count once. */
+function registryGapCount(m: Measurement, targets: readonly string[], index: CompetitorIndex, settlement: PlannedSettlement): GapCount {
+  const top = [...new Set(m.rows.filter((r) => r.type === "organic" && r.rank <= ORGANIC_TOP && r.domain && !isTarget(r.domain, targets)).map((r) => r.domain!))];
+  const details = top.map((d) => ({ domain: d, assessment: index.assess(d, settlement.ags, settlement.name) }));
+  const ids = (status: CompetitorAssessment["status"]) => [...new Set(details.filter((x) => x.assessment.status === status).map((x) => x.assessment.business))];
+  const counted = ids("qualifies");
+  return { counted, open: ids("unverified").filter((b) => !counted.includes(b)), details };
 }
 
 export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOptions = {}): Evaluation {
   const localPackGapEnabled = options.localPackGap ?? LOCAL_PACK_GAP_ENABLED;
   const labelsApproved = options.labelsApproved ?? true;
+  const competitorIndex = options.competitors ? new CompetitorIndex(options.competitors) : null;
   const identity: TargetIdentity = {
     domains: scan.targetDomains.map(normalizeDomain),
     cids: scan.targetCids,
@@ -610,10 +646,19 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
       if (ms.length === 0) continue;
       const g = gaps.get(s.ags) ?? { organic: false, localPack: false, refs: [] };
 
-      // 1. organic_gap: in every valid measurement, target outside the top 10 and ≥ 2 local/regional competitors inside.
-      const perMeasurement = ms.map((m) => ({ m, best: targetOrganicBest(m, targets), competitors: organicTopCompetitors(m, targets, labels, ORGANIC_GAP_LABELS) }));
+      // 1. organic_gap: in every valid measurement, target outside the top 10 and ≥ 2 local competitors inside.
+      const perMeasurement = ms.map((m) => ({
+        m,
+        best: targetOrganicBest(m, targets),
+        ...(competitorIndex ? registryGapCount(m, targets, competitorIndex, s) : labelGapCount(m, targets, labels)),
+      }));
+      const nameOf = (b: string) => competitorIndex?.registry.businesses.find((x) => x.id === b)?.name ?? b;
+      const shown = (x: (typeof perMeasurement)[number]) => (competitorIndex ? x.counted.map(nameOf) : x.counted);
       const planned = plannedCount(s.ags, keyword);
-      if (hasTarget && perMeasurement.every((x) => (x.best === null || x.best > ORGANIC_TOP) && x.competitors.length >= ORGANIC_GAP_MIN_COMPETITORS)) {
+      const unapproved = competitorIndex
+        ? perMeasurement.some((x) => x.details.some((d) => "approved" in d.assessment && d.assessment.status === "qualifies" && !d.assessment.approved))
+        : !labelsApproved;
+      if (hasTarget && perMeasurement.every((x) => (x.best === null || x.best > ORGANIC_TOP) && x.counted.length >= ORGANIC_GAP_MIN_COMPETITORS)) {
         const found = perMeasurement.map((x) => x.best).filter((r): r is number => r !== null);
         const status = found.length ? organicCellText(ms, targets) : notFoundText(ms);
         const id = `organic_gap:${s.ags}:${keyword}`;
@@ -628,20 +673,24 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
           settlement: s.name,
           keyword,
           competitorDomain: null,
-          text: fill(T.organicGap.text, {
+          text: fill(competitorIndex ? T.organicGap.textVerified : T.organicGap.text, {
             settlement: s.name,
             target: targetName,
             keyword,
             measurements: measurementsText(ms.length, planned),
             status,
             perMeasurement: perMeasurement
-              .map((x) => fill(T.organicGap.measurement, { sample: x.m.session, date: deDate(x.m.datetime), competitors: deList(x.competitors) }))
+              .map((x) => fill(T.organicGap.measurement, { sample: x.m.session, date: deDate(x.m.datetime), competitors: deList(shown(x)) }))
               .join("; "),
           }),
-          limits: labelsApproved ? [] : [T.organicGap.labelsDraft],
+          limits: [...(competitorIndex ? [T.organicGap.scope] : []), ...(unapproved ? [T.organicGap.labelsDraft] : [])],
           evidence: {
             measurements: ms.map(ref),
-            details: { labelsApproved, perMeasurement: perMeasurement.map((x) => ({ taskKey: x.m.taskKey, targetBestRank: x.best, competitors: x.competitors })) },
+            details: {
+              competitorModel: competitorIndex ? "registry" : "labels",
+              labelsApproved: !unapproved,
+              perMeasurement: perMeasurement.map((x) => ({ taskKey: x.m.taskKey, targetBestRank: x.best, competitors: x.counted, open: x.open, domains: x.details })),
+            },
           },
         });
         actions.push({ findingId: id, type: "review", bucket: "website", text: fill(T.organicGap.action, { keyword, settlement: s.name }) });
@@ -654,17 +703,13 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
       } else if (perMeasurement.some((x) => x.best !== null && x.best <= ORGANIC_TOP)) {
         ruleChecks.push({ rule: "organic_gap", ags: s.ags, keyword, status: "not_met", reason: "target_in_top_10" });
       } else {
-        // Fewer than 2 labelled local/regional competitors in some measurement: unlabelled
-        // domains in its top 10 could change that, so the rule cannot be decided yet.
-        const undecided = perMeasurement.some((x) => {
-          if (x.competitors.length >= ORGANIC_GAP_MIN_COMPETITORS) return false;
-          const unlabelled = new Set(x.m.rows.filter((r) => r.type === "organic" && r.rank <= ORGANIC_TOP && r.domain && !isTarget(r.domain, targets) && !labels.has(r.domain)).map((r) => r.domain));
-          return x.competitors.length + unlabelled.size >= ORGANIC_GAP_MIN_COMPETITORS;
-        });
+        // The rule needs ≥ 2 in EVERY measurement. Open (unlabelled / unverified) competitors can
+        // change the result only if every measurement could still reach 2 with them.
+        const undecided = perMeasurement.every((x) => x.counted.length + x.open.length >= ORGANIC_GAP_MIN_COMPETITORS);
         ruleChecks.push(
           undecided
-            ? { rule: "organic_gap", ags: s.ags, keyword, status: "not_evaluable", reason: "unlabelled_competitors_in_top_10" }
-            : { rule: "organic_gap", ags: s.ags, keyword, status: "not_met", reason: "fewer_than_2_local_competitors" },
+            ? { rule: "organic_gap", ags: s.ags, keyword, status: "not_evaluable", reason: competitorIndex ? "unverified_competitors_could_change_result" : "unlabelled_competitors_in_top_10" }
+            : { rule: "organic_gap", ags: s.ags, keyword, status: "not_met", reason: competitorIndex ? "fewer_than_2_verified_local_competitors" : "fewer_than_2_local_competitors" },
         );
       }
 
@@ -829,7 +874,11 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
               .map(({ s, p }) => fill(T.competitorCoverage.perSettlement, { settlement: s.name, k: p.any.size, n: p.n, o: p.organic.size, l: p.localPack.size }))
               .join("; "),
           }),
-          label ? fill(labelsApproved ? T.competitorCoverage.label : T.competitorCoverage.labelDraft, { label }) : T.competitorCoverage.unlabeled,
+          competitorIndex
+            ? registryLabelText(competitorIndex, r.domain)
+            : label
+              ? fill(labelsApproved ? T.competitorCoverage.label : T.competitorCoverage.labelDraft, { label })
+              : T.competitorCoverage.unlabeled,
         ].join(" "),
         limits: [T.competitorCoverage.meaning],
         evidence: {

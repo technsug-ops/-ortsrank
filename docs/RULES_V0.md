@@ -252,40 +252,37 @@ Bölüm 10'a taşındı (`brand_other_location` → `brand_only`).
 - **Kural kontrolleri (`ruleChecks`):** her kural ve hücre için `finding` · `not_met` (değerlendirildi, koşul sağlanmadı) · `not_evaluable` (eksik bilgi: hedef domain yok, ilk 10'da etiketsiz rakipler, yalnızca teknik deneme) · `disabled` (pilotta kapalı). Organik boşlukta etiketsiz rakipler sonucu değiştirebiliyorsa hücre „değerlendirilemedi" olur; eşikler gevşetilmez.
 - **Teknik denemede reklam oranı** durum tablosunda gösterilmez („nicht ausgewertet (technische Validierung)").
 
-## 13. Rakip tanımı: ölçek ile belediye bazında varlık ayrımı (öneri, onay bekliyor · 21.10.2026)
+## 13. Rakip tanımı: işletme, belediyede fiziksel konum ve doğrulanmış hizmet (Halil'in onayı, 21.10.2026)
 
-**Sorun.** Tek etiket (`local` / `regional` / `national`) üç ayrı şeyi taşıyordu: kendi şube ağı, ülke çapında hizmet beyanı ve bir ağ üzerinden erişim. „Bölgede var" bilgisi de belediye bazında değildi. Bir rakibin bir şehirde merkezi olması yalnızca yerel çalıştığı anlamına gelmez; ulusal faaliyet de o şehirde yerel rakip olmayı engellemez.
+**Neden.** Tek etiket (`local` / `regional` / `national`) üç ayrı şeyi taşıyordu: kendi şube ağı, ülke çapında hizmet beyanı ve bir ağ üzerinden erişim. Bir rakibin bir şehirde merkezi olması yalnızca yerel çalıştığı anlamına gelmez; ulusal faaliyet de o şehirde yerel rakip olmayı engellemez.
 
-**Önerilen eksenler** (her biri kaynak + birebir alıntıyla):
+**Onaylanan dar tanım** (`organic_gap` için):
 
-| Eksen | Değerler |
-| --- | --- |
-| Tür | kiralama şirketi · kiralama zinciri · karma işletme · ağ (bağımsız şirketler birliği) · portal · dizin |
-| Kendi konumları | tek konum · bir bölge · birden fazla bölge · ülke geneli şube ağı · yok · bilinmiyor |
-| Beyan edilen hizmet alanı | bölge · ülke/Avrupa (kendi) · ülke/Avrupa (ağ üzerinden) · yok |
-| Belediye bazında varlık | her ölçülen belediye için: şube (o belediyede adres) · hizmet beyanı (şehir sayfası, teslimat listesi dahil) · yok |
+- Bir **işletme** (domain değil) bir belediyede ancak aşağıdakilerin hepsi doğrulandıysa yerel rakip sayılır:
+  1. **Tür:** doğrudan kiralama (`rental`, `rental_chain`, `mixed`). Ağlar (PartnerLIFT, SYSTEM LIFT, DID), portallar, dizinler ve üreticiler sayılmaz.
+  2. **Faal kendi konumu:** O belediyede şube veya merkez var. Yalnızca resmi/yazışma adresi (`legal_only`) yetmez.
+  3. **Belediye eşleşmesi:** Adresteki şehir, resmi belediye adıyla (Destatis adı, ek olmadan) birebir aynı. Posta kodu tek başına anahtar değildir; „Neu-Ulm" Ulm, „Heidenheim" Heidenheim an der Brenz değildir. Belirsiz adres atanmaz.
+  4. **Ölçülen hizmet:** Ölçülen hizmet (Arbeitsbühne kiralama) işletmede doğrulanmış olmalı. Zincir ve karma işletmede bu ayrıca **o konumda** doğrulanmalı; genel ekipman kiralama şubesi olmak yetmez.
+- **Sayım:** Aynı işletmenin iki sitesi veya aynı belediyedeki iki şubesi tek rakiptir.
+- **Eksik kanıt** „yok" değil, **„doğrulanmadı"** olur. Kayıtta olmayan domain, eksik okunmuş konum listesi, bilinmeyen tür, doğrulanmamış hizmet ve belirsiz adres bu gruptadır. Bir işletmenin pilot belediyesinde konumu olmadığı ancak kendi konum listesi tam okunduysa söylenir (`not_listed`).
+- **Eşikler değişmedi:** her geçerli ölçümde hedef ilk 10 dışında **ve** ilk 10'da en az 2 yerel rakip.
+- **Sonuçlar:**
+  - `not_met`: Koşul sağlanmadı. Bunun için en az bir ölçümde, doğrulanmamış işletmelerin hepsi yerel sayılsa bile 2'ye ulaşılamaması gerekir.
+  - `not_evaluable` (`unverified_competitors_could_change_result`): Doğrulanmamış işletmeler her ölçümde sonucu değiştirebiliyor.
+- **Kapsam metni:** Bulgu metni ve sınır notu, sayımın yalnızca aynı belediyede doğrulanmış konumu ve hizmeti olan rakipleri kapsadığını söyler. Komşu belediyeden hizmet veren işletmeler gerçek rakip olabilir ama bu kuralda sayılmaz. Hizmet beyanları rapor ve inceleme tablosunda korunur; platformların arama sonuçlarındaki yeri rakip kapsamasında ayrı görünür.
+- **Müşteri ifadesi:** Bulgu yoksa „Bu pilotta, aynı belediyede fiziksel konumu ve ilgili hizmeti doğrulanmış en az iki rakibin her ölçümde ilk 10'da bulunması koşulu sağlanmadı." Bu ifade „organik görünürlük sorunu yok" ya da „yerel rekabet yok" anlamına gelmez.
 
-**Kurallar:**
+**Uygulama** (`src/lib/rules/competitors.ts`, `findings --competitors <dosya>`):
 
-- Adres posta koduyla belediyeye bağlanır. Şube adı belediye değildir: „Ulm" adlı bir şube Neu-Ulm'da olabilir.
-- Şehir sayfası, posta kodu veya şehir listesi şube değildir.
-- Ağ ile üyeleri ayrı tutulur ve birlikte iki ayrı rakip sayılmaz. Aynı işletmenin birden fazla sitesi tek rakip sayılır.
+- Rakip kaydı işletme bazındadır. Her işletme için şunlar tutulur: alan adları, tür, ölçülen hizmet, konum listesinin ne kadar okunduğu (`complete` / `partial` / `not_reviewed`) ve her konum için AGS, türü, adresi, konumdaki hizmet ve kaynakları.
+- Bir domain iki işletmede geçerse dosya reddedilir.
+- Kayıt verilmezse eski etiket yolu (`local` / `regional`) aynen çalışır.
+- Rakip kapsaması bulgusunda kayıt verildiğinde işletme türü gösterilir; onaylanmadıysa „vorläufig, nicht freigegeben" yazar.
 
-**Organik boşluk kuralı için karar gereken tanım:**
+**Düzeltme (iki yolda da):** Eski „değerlendirilemedi" kontrolü `some` ile yazılmıştı: tek bir ölçümde etiketsiz domainler sonucu değiştirebiliyorsa hücreyi „değerlendirilemedi" yapıyordu. Kural her ölçümde koşul aradığı için doğrusu `every`: sonuç ancak her ölçüm 2'ye ulaşabiliyorsa açık kalır. Bu hatayı yakalayan test eklendi.
 
-- **Sıkı (öneri):** Bir domain yalnızca o belediyede kendi adresli şubesi varsa orada yerel rakip sayılır.
-- **Geniş:** Hizmet beyanı da sayılır. Şehir sayfaları yaygın olduğu için rakip sayısı şişer.
+**Pilot 1 sonucu** (30 ham yanıt, yeni istek yok; rakip kaydı onaylanmadı):
 
-Her iki durumda da eşikler (ilk 10, en az 2 rakip, her ölçümde) değişmez.
-
-**Uygulama, onaydan sonra yapılır:**
-
-- Etiket dosyası belediye bazında varlığı taşır.
-- `organicTopCompetitors` ölçeğe değil, o belediyedeki varlığa bakar.
-- Kaynağı okunamayan domainler ilgili hücreyi „değerlendirilemedi" yapar. Bu yalnızca, o domainler yerel sayılsaydı sonuç değişecekse olur.
-
-**Pilot 1 simülasyonu** (salt okunur, motor değişmedi). Ana keyword'ün ilk 10'undaki domainlerin tamamı incelendi; yalnızca diğer keywordlerde görülen 12 domain açık kaldı.
-
-- Sıkı tanımla 5 belediyenin hiçbirinde organik boşluk bulgusu çıkmıyor: Heidenheim'da hedef bir ölçümde ilk 10'da, diğer dördünde her ölçümde 2 yerel rakip yok.
-- Pilot belediyelerinde kendi şubesi olan rakipler: Heidenheim 1 işletme (2 site), Aalen 3, Ulm 2, Steinheim ve Babenhausen 0.
-
+- Beş belediyede de `not_met`. Heidenheim'da hedef bir ölçümde ilk 10'da; diğer dördünde her ölçümde doğrulanmış 2 yerel rakip yok.
+- Pilot belediyelerinde konumu kayıtlı 5 işletme var. Bir zincirin şubelerinde ölçülen hizmet doğrulanmadığı için o zincir sayılmadı.
+- Sitesine erişilemeyen bir domain doğrulanamadı; sonucu değiştiremediği için hücreler açık kalmadı.

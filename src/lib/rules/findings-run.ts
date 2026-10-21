@@ -10,17 +10,20 @@ import { competitorLabel } from "@/db/schema";
 import { normalizeDomain } from "@/lib/dataforseo/parse";
 import { DEFAULT_LABELS_FILE, type CompetitorLabel } from "@/lib/rules/config";
 import { evaluate, type Evaluation, type Labels } from "@/lib/rules/engine";
+import { readRegistry } from "@/lib/rules/competitors";
 import { loadScan, withProjectIdentity } from "@/lib/rules/measurements";
 import { parseProject } from "@/lib/plan";
 
 export const FINDINGS_USAGE = `Usage:
-  npx tsx scripts/findings.ts --scan-id <id> [--runs-dir runs] [--labels ${DEFAULT_LABELS_FILE}] [--project <file>]
+  npx tsx scripts/findings.ts --scan-id <id> [--runs-dir runs] [--labels ${DEFAULT_LABELS_FILE}] [--project <file>] [--competitors <file>]
 
 Labels file: {"domain.de": "local" | "regional" | "national" | "portal" | "directory" | "manufacturer", ...}
 --labels-draft <file>: unapproved draft {"domain.de": {"suggested": "...", "evidence": "..."}}; findings are marked provisional.
 Domains without a label stay "nicht eingeordnet".
 --project <file>: target identity (domains, brand words, verified Google profiles) from this project
-file instead of the run plans, e.g. profiles verified after the run. Run files are not changed.`;
+file instead of the run plans, e.g. profiles verified after the run. Run files are not changed.
+--competitors <file>: competitor registry (businesses, own locations per municipality, measured service;
+RULES_V0 section 13). organic_gap then counts verified local competitors instead of labels.`;
 
 const labelsFileSchema = z.record(z.string(), z.enum(competitorLabel.enumValues));
 
@@ -86,6 +89,7 @@ export async function findingsMain(argv: string[], deps: { out?: (l: string) => 
         labels: { type: "string" },
         "labels-draft": { type: "string" },
         project: { type: "string" },
+        competitors: { type: "string" },
       },
     });
     if (!values["scan-id"]) throw new Error("--scan-id is required");
@@ -101,11 +105,13 @@ export async function findingsMain(argv: string[], deps: { out?: (l: string) => 
     if (project && project.name !== loaded.project) throw new Error(`project file ${values.project} is "${project.name}", scan belongs to "${loaded.project}"`);
     const scan = project ? withProjectIdentity(loaded, project, values.project!) : loaded;
     if (project) out(`Target identity from ${values.project} (${scan.targetProfiles.length} verified profiles), not from the run plans.`);
-    const evaluation = evaluate(scan, labels, { labelsApproved: !draft });
+    const competitors = values.competitors ? readRegistry(values.competitors) : undefined;
+    if (competitors) out(`Competitor registry ${values.competitors}: ${competitors.businesses.length} businesses (organic_gap counts verified local competitors).`);
+    const evaluation = evaluate(scan, labels, { labelsApproved: !draft, competitors });
     const dir = join(runsDir, "scans", scan.scanId);
     mkdirSync(dir, { recursive: true });
     const file = join(dir, "findings.json");
-    writeFileSync(file, `${JSON.stringify({ ...evaluation, runs: scan.runIds, labelsFile: found ? labelsPath : null }, null, 2)}\n`, "utf8");
+    writeFileSync(file, `${JSON.stringify({ ...evaluation, runs: scan.runIds, labelsFile: found ? labelsPath : null, competitorsFile: values.competitors ?? null }, null, 2)}\n`, "utf8");
     out(formatEvaluation(evaluation));
     out(`Written to ${file}`);
     return 0;

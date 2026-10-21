@@ -30,7 +30,9 @@
     "text": "In {settlement} war {target} bei „{keyword}“ {measurements} nicht unter den ersten 10 organischen Ergebnissen. Je Messung: {status}. In jeder dieser Messungen waren mindestens 2 lokale oder regionale Wettbewerber unter den ersten 10 – {perMeasurement}.",
     "measurement": "Messung {sample} ({date}): {competitors}",
     "action": "Prüfen Sie, ob Ihre bestehende Seite den Bedarf für „{keyword}“ in {settlement} abdeckt.",
-    "labelsDraft": "Die Einordnung der Wettbewerber als lokal oder regional ist vorläufig und noch nicht freigegeben; diese Beobachtung gilt nur unter diesem Vorbehalt."
+    "labelsDraft": "Die Einordnung der Wettbewerber als lokal oder regional ist vorläufig und noch nicht freigegeben; diese Beobachtung gilt nur unter diesem Vorbehalt.",
+    "textVerified": "In {settlement} war {target} bei „{keyword}“ {measurements} nicht unter den ersten 10 organischen Ergebnissen. Je Messung: {status}. In jeder dieser Messungen waren mindestens 2 Wettbewerber mit verifiziertem eigenem Standort in {settlement} und verifiziertem Angebot für die gemessene Leistung unter den ersten 10 – {perMeasurement}.",
+    "scope": "Gezählt werden nur Wettbewerber mit verifiziertem eigenem Standort in derselben Gemeinde und verifiziertem Angebot. Anbieter aus Nachbargemeinden oder mit Liefergebiet hier können ebenfalls Wettbewerber sein; sie sind hier nicht gezählt."
   },
   "localPackGap": {
     "text": "In {settlement} erschien Ihr Betrieb bei „{keyword}“ {measurements} im Local Pack (Karten-Ergebnisse). {packs} Lokale Wettbewerber im Local Pack: {competitors}.",
@@ -46,7 +48,19 @@
     "meaning": "„In mindestens einer Messung beobachtet“ bedeutet nicht, dass die Domain dort dauerhaft sichtbar ist.",
     "labelDraft": "Vorläufige Einordnung durch TechNS (nicht freigegeben): {label}.",
     "perSettlement": "{settlement}: {k} von {n} Messungen (organisch {o}, Local Pack {l})",
-    "observedIn": "Beobachtet in: {list}."
+    "observedIn": "Beobachtet in: {list}.",
+    "typeApproved": "Art des Anbieters (freigegeben): {type}.",
+    "typeDraft": "Art des Anbieters (vorläufig, nicht freigegeben): {type}.",
+    "types": {
+      "rental": "Vermieter",
+      "rental_chain": "Vermietkette",
+      "mixed": "Mischbetrieb",
+      "network": "Vermieter-Netzwerk",
+      "portal": "Portal",
+      "directory": "Verzeichnis",
+      "manufacturer": "Hersteller",
+      "unknown": "nicht eingeordnet"
+    }
   },
   "adObservation": {
     "seen": "In {settlement} wurden bei „{keyword}“ in {k} von {n} Messungen aus {n} verschiedenen Sitzungen Anzeigen gesehen ({dates}, {device}, Gemeindemitte).",
