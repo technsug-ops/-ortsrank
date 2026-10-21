@@ -26,7 +26,9 @@ const planSchema = z.object({
   depth: z.number().int(),
   pointRadiusMm: z.number().int(),
   targetDomains: z.array(z.string()).default([]),
-  targetLocalBusinesses: z.array(z.object({ cid: z.string(), name: z.string().optional() })).default([]),
+  targetLocalBusinesses: z
+    .array(z.object({ cid: z.string().optional(), profileName: z.string().optional(), source: z.string().optional() }))
+    .default([]),
   samplingMode: z.enum(["sessions", "technical_validation"]),
   keywords: z.array(z.object({ term: z.string(), type: z.string(), samples: z.number().int() })),
   scanned: z.array(
@@ -92,6 +94,8 @@ export interface ScanData {
   device: RunPlan["device"];
   targetDomains: string[];
   targetCids: string[];
+  /** Verified Google profile names of the target business. */
+  targetProfileNames: string[];
   keywords: { term: string; type: string; samples: number }[];
   settlements: PlannedSettlement[];
   /** Planned tasks per settlement × keyword, across the runs found. */
@@ -178,7 +182,8 @@ export function loadScan(runsDir: string, scanId: string): ScanData {
     depth: first.depth,
     device: first.device,
     targetDomains: [...new Set(plans.flatMap((p) => p.targetDomains))],
-    targetCids: [...new Set(plans.flatMap((p) => p.targetLocalBusinesses.map((b) => b.cid)))],
+    targetCids: [...new Set(plans.flatMap((p) => p.targetLocalBusinesses.flatMap((b) => (b.cid ? [b.cid] : []))))],
+    targetProfileNames: [...new Set(plans.flatMap((p) => p.targetLocalBusinesses.flatMap((b) => (b.profileName ? [b.profileName] : []))))],
     keywords: [...keywords.values()],
     settlements: [...settlements.values()].sort((a, b) => a.distanceKm - b.distanceKm),
     plannedTasks: [...planned.values()],

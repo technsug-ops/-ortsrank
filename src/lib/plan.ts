@@ -38,9 +38,21 @@ export const projectSchema = z
     pointRadiusMm: z.number().int().min(POINT_RADIUS_MM_MIN).max(POINT_RADIUS_MM_MAX),
     keywords: z.array(keywordSchema).min(1),
     targetDomains: z.array(z.string()).default([]),
-    /** Verified Google business ids (DataForSEO `local_pack.cid`) of the target business. */
+    /**
+     * The target business in Google's local results. `profileName` is the exact
+     * name shown on its Google business profile, taken from a verified source
+     * (never guessed from the domain or company name); `source` says where.
+     */
     targetLocalBusinesses: z
-      .array(z.object({ cid: z.string().regex(/^\d+$/, "cid must be digits"), name: z.string().optional() }))
+      .array(
+        z
+          .object({
+            cid: z.string().regex(/^\d+$/, "cid must be digits").optional(),
+            profileName: z.string().trim().min(1).optional(),
+            source: z.string().trim().min(3, "source of the verified identity is required"),
+          })
+          .refine((b) => b.cid !== undefined || b.profileName !== undefined, "cid or profileName is required"),
+      )
       .default([]),
     sessions: z.array(sessionSchema).min(1),
   })

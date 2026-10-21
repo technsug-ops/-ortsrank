@@ -73,7 +73,8 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] Küçük canlı deneme: 2 belediye × 2 keyword, teknik doğrulama (21.10.2026, tarama `trial-20261021`: 8/8 başarılı, kayıt bütünlüğü %100, 0,032 $)
 - [x] Gerçek `cost` ile fiyat varsayımı doğrulandı: 0,004 $ / deneme (depth 20), Advanced = Regular fiyatı (21.10.2026)
 - [x] `local_pack` yanıt yapısı doğrulandı: öğe başına tek işletme, **ama `cid: null` ve domain `www.google.com`** (21.10.2026, `c1c9098`)
-- [ ] Local Pack'te hedef işletme kimliği: `cid` yanıtta yok. Seçenekler: Google Maps SERP uç noktası (ek maliyet), doğrulanmış işletme adıyla tam eşleşme, ya da v0'da Local Pack'i yalnızca „nicht verifiziert“ göstermek
+- [x] Local Pack'te hedef işletme kimliği: pilotta doğrulanmış Google profil adıyla tam eşleşme (yöntem A, kesin kimlik sayılmaz); `local_pack_gap` pilotta kapalı; Maps uç noktası (B) ertelendi – RULES_V0 bölüm 10 (21.10.2026, bu commit)
+- [ ] Pilot işletmenin Google profil adı doğrulanmış kaynaktan proje dosyasına girildi
 - [ ] Tam pilot taraması (oturumlu)
 - [ ] Değişkenlik ölçümü (3 gün)
 
@@ -134,6 +135,7 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
+| 21.10.2026 | Local Pack profil adıyla eşleştirme (5 durum, ham ad + yöntem kaydı), `local_pack_gap` pilotta kapalı; toplam 304/304 | bu commit |
 | 21.10.2026 | Canlı deneme başarılı (8/8, 0,032 $); local pack `cid` null + Google domaini, organik ~15 sonuç → ayrıştırıcı ve kurallar düzeltildi; bütçe defterinde Windows dosya kilidine karşı tekrar; toplam 289/289 | `c1c9098` |
 | 21.10.2026 | İlk canlı deneme `trial-20261021`: 8 görev HTTP 403 / 40104 (hesap doğrulanmamış), maliyet 0 $, kayıt bütünlüğü %100. Düzeltme: HTTP hatasında sağlayıcı kodu kaydedilir; teknik denemede oturum sapması değerlendirilmez | `c5b9f41` |
 | 21.10.2026 | Kurallar v0 inceleme düzeltmeleri: hedef domain yoksa organik bulgu yok, keyword bazlı hipotez, ayrıştırma sorunlu yanıt geçersiz, eksik ölçüm cümlede; toplam 281/281 | `babbd61` |

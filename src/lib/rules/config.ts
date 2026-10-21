@@ -15,6 +15,12 @@ export const ORGANIC_TOP = 10;
 export const ORGANIC_GAP_MIN_COMPETITORS = 2;
 export const ORGANIC_GAP_LABELS: readonly CompetitorLabel[] = ["local", "regional"];
 
+/**
+ * local_pack_gap is off during the pilot: Local Pack identity rests on the
+ * profile name, and a missing name match does not prove the business is absent.
+ */
+export const LOCAL_PACK_GAP_ENABLED = false;
+
 /** local_pack_gap: at least this many `local` competitors in a shown Local Pack. */
 export const LOCAL_PACK_GAP_MIN_COMPETITORS = 1;
 export const LOCAL_PACK_GAP_LABELS: readonly CompetitorLabel[] = ["local"];

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { SerpRow } from "@/lib/dataforseo/parse";
 import { NON_COMPETITOR_LABELS } from "@/lib/rules/config";
-import { evaluate, localPackStatus, priorityScore, type Labels } from "@/lib/rules/engine";
+import { evaluate, isSimilarName, localPackStatus, normalizeBusinessName, priorityScore, type Labels, type TargetIdentity } from "@/lib/rules/engine";
 import type { Measurement, PlannedSettlement, ScanData } from "@/lib/rules/measurements";
 import { fill, reportText } from "@/lib/rules/text";
 
@@ -67,6 +67,7 @@ function scan(settlements: PlannedSettlement[], measurements: Measurement[], ove
     device: "mobile",
     targetDomains: [TARGET],
     targetCids: [TARGET_CID],
+    targetProfileNames: [],
     keywords: [{ term: KW, type: "main", samples: 3 }],
     settlements,
     plannedTasks: planned,
@@ -135,75 +136,125 @@ describe("organic_gap", () => {
   });
 });
 
-// ── local pack ──────────────────────────────────────────────────────────
+// ── local pack (RULES_V0 section 10: profile name, pilot) ───────────────
 
-describe("local pack matching", () => {
-  const targets = [TARGET];
-  it("distinguishes matched, not matched, no local pack and unverified", () => {
-    expect(localPackStatus(m(S2.ags, 1, [lp(2, TARGET, TARGET_CID)]), targets, [TARGET_CID])).toEqual({ status: "matched", rank: 2 });
-    expect(localPackStatus(m(S2.ags, 1, [lp(1, "lokal-a.example", "2")]), targets, [TARGET_CID])).toEqual({ status: "not_matched", rank: null });
-    expect(localPackStatus(m(S2.ags, 1, organic("lokal-a.example")), targets, [TARGET_CID])).toEqual({ status: "no_local_pack", rank: null });
+const PROFILE = "Ziel Betrieb GmbH – Terrassendächer";
+const identity = (over: Partial<TargetIdentity> = {}): TargetIdentity => ({ domains: [TARGET], cids: [], profileNames: [PROFILE], ...over });
+const named = (rank: number, title: string | null, domain: string | null = null, cid: string | null = null): SerpRow => ({ ...lp(rank, domain, cid), title });
+
+describe("normalizeBusinessName", () => {
+  it("normalises case, Unicode and whitespace only", () => {
+    expect(normalizeBusinessName("  ZIEL  Betrieb\u00a0GmbH ")).toBe("ziel betrieb gmbh");
+    expect(normalizeBusinessName("Ｚiel")).toBe("ziel"); // full-width letter (NFKC)
+    expect(normalizeBusinessName("Ziel-Betrieb, GmbH")).toBe("ziel-betrieb, gmbh"); // punctuation kept
+  });
+});
+
+describe("isSimilarName (downgrade only)", () => {
+  it.each([
+    ["ziel betrieb gmbh", "ziel betrieb gmbh – terrassendächer", true],
+    ["ziel-betrieb gmbh", "ziel betrieb gmbh", true],
+    ["terrassen ziel betrieb", "ziel betrieb gmbh", true],
+    ["mitbewerber terrassen", "ziel betrieb gmbh", false],
+    ["ziel gmbh", "ziel betrieb ag", false],
+  ])("%s ~ %s = %s", (a, b, expected) => {
+    expect(isSimilarName(a, b)).toBe(expected);
+  });
+});
+
+describe("local pack matching by profile name", () => {
+  const status = (rows: SerpRow[], id: TargetIdentity = identity()) => localPackStatus(m(S2.ags, 1, rows), id);
+
+  it("matches the exact profile name, keeping the raw name and the method", () => {
+    expect(status([named(1, "Mitbewerber A"), named(2, "  ziel betrieb gmbh –  TERRASSENDÄCHER ")])).toEqual({
+      status: "matched",
+      rank: 2,
+      method: "profile_name_exact",
+      rawTitle: "  ziel betrieb gmbh –  TERRASSENDÄCHER ",
+      reason: null,
+    });
   });
 
-  it("is unverified without a verified cid, even when the domain matches", () => {
-    expect(localPackStatus(m(S2.ags, 1, [lp(1, TARGET, TARGET_CID)]), targets, []).status).toBe("match_unverified");
-    expect(localPackStatus(m(S2.ags, 1, [lp(1, "lokal-a.example", "2")]), targets, []).status).toBe("match_unverified");
+  it("does not match a similar but different name: unverified", () => {
+    for (const title of ["Ziel Betrieb GmbH", "Ziel Betrieb GmbH – Terrassendächer Frankfurt", "Ziel Betrieb GmbH - Terrassendächer"]) {
+      // Hyphen instead of en dash: a different name (no punctuation cleanup for matching), but similar → unverified.
+      expect(status([named(1, title)])).toMatchObject({ status: "match_unverified", reason: "similar_name", rawTitle: title });
+    }
   });
 
-  it("is unverified when the target domain appears with another cid", () => {
-    expect(localPackStatus(m(S2.ags, 1, [lp(1, TARGET, "999")]), targets, [TARGET_CID]).status).toBe("match_unverified");
+  it("marks the same name appearing more than once as unverified", () => {
+    expect(status([named(1, PROFILE), named(3, PROFILE.toUpperCase())])).toMatchObject({ status: "match_unverified", reason: "duplicate_name" });
   });
 
-  it("a business found by cid without a website is still matched", () => {
-    expect(localPackStatus(m(S2.ags, 1, [lp(3, null, TARGET_CID)]), targets, [TARGET_CID]).status).toBe("matched");
+  it("reports no name match in a shown pack as not found in the pack", () => {
+    expect(status([named(1, "Mitbewerber A"), named(2, "Mitbewerber B")])).toMatchObject({ status: "not_found_in_pack", method: null });
+  });
+
+  it("is not measurable when pack items come without a name", () => {
+    expect(status([named(1, "Mitbewerber A"), named(2, null)])).toMatchObject({ status: "not_measurable", reason: "items_without_name" });
+    expect(status([named(1, "   ")]).status).toBe("not_measurable");
+  });
+
+  it("distinguishes no local pack at all", () => {
+    expect(status(organic("lokal-a.example")).status).toBe("no_local_pack");
+  });
+
+  it("is unverified without a verified profile name or cid", () => {
+    expect(status([named(1, PROFILE)], identity({ profileNames: [] }))).toMatchObject({ status: "match_unverified", reason: "no_verified_identity" });
+  });
+
+  it("is unverified when the target domain shows up under another name", () => {
+    expect(status([named(1, "Anderer Name", TARGET)])).toMatchObject({ status: "match_unverified", reason: "target_domain_without_identity" });
+  });
+
+  it("still matches a verified cid when the provider returns one", () => {
+    expect(status([named(4, "Irgendwas", null, TARGET_CID)], identity({ cids: [TARGET_CID] }))).toMatchObject({ status: "matched", method: "cid", rank: 4 });
+  });
+
+  it("never matches by similarity, word removal or punctuation cleanup", () => {
+    expect(status([named(1, "Ziel Betrieb Terrassendächer")]).status).not.toBe("matched");
+    expect(status([named(1, "Ziel Betrieb GmbH Terrassendächer")]).status).not.toBe("matched");
+  });
+});
+
+describe("local pack in the status table", () => {
+  it("shows the method and keeps raw names per measurement", () => {
+    const e = evaluate(scan([S2], [m(S2.ags, 1, [named(2, PROFILE)]), m(S2.ags, 2, [named(1, "Mitbewerber A")])], { targetProfileNames: [PROFILE] }), labels);
+    expect(e.statusTable[0].localPack).toBe("im Local Pack, Platz 2 (Abgleich über den Profilnamen)");
+    expect(e.statusTable[0].localPackDetails).toEqual([
+      expect.objectContaining({ taskKey: `${S2.ags}-k1-s1`, status: "matched", method: "profile_name_exact", rawTitle: PROFILE }),
+      expect.objectContaining({ taskKey: `${S2.ags}-k1-s2`, status: "not_found_in_pack" }),
+    ]);
+  });
+
+  it.each([
+    [[named(1, "Mitbewerber A")], "im angezeigten Local Pack kein Eintrag mit dem Profilnamen gefunden"],
+    [[named(1, null)], "Local Pack nicht auswertbar"],
+    [[named(1, "Ziel Betrieb GmbH")], "Betriebszuordnung nicht verifiziert"],
+    [organic("x.example"), "kein Local Pack angezeigt"],
+  ])("cell text for %#", (rows, text) => {
+    const e = evaluate(scan([S2], [m(S2.ags, 1, rows as SerpRow[])], { targetProfileNames: [PROFILE] }), labels);
+    expect(e.statusTable[0].localPack).toBe(text);
   });
 });
 
 describe("local_pack_gap", () => {
-  it("fires when no measurement matches and a shown pack contains a local competitor; counts packs shown and not shown", () => {
-    const ms = [
-      m(S2.ags, 1, [lp(1, "lokal-a.example", "2"), lp(2, "unbekannt.example", "3")]),
-      m(S2.ags, 2, organic("lokal-a.example")),
-      m(S2.ags, 3, [lp(1, "lokal-b.example", "4")]),
-    ];
-    const e = evaluate(scan([S2], ms), labels);
+  const notFound = () => [1, 2, 3].map((s) => m(S2.ags, s, [named(1, "lokal-a", "lokal-a.example"), ...organic("x.example")]));
+
+  it("is off in the pilot: no finding even when every measurement lacks the name", () => {
+    const e = evaluate(scan([S2], notFound(), { targetProfileNames: [PROFILE] }), labels);
+    expect(byRule(e, "local_pack_gap")).toEqual([]);
+    expect(e.actions.some((a) => a.bucket === "google_profile")).toBe(false);
+    expect(byRule(e, "review_priority")).toEqual([]); // no gap → no priority
+  });
+
+  it("when enabled later, it fires only on not-found measurements with a local competitor", () => {
+    const e = evaluate(scan([S2], notFound(), { targetProfileNames: [PROFILE] }), labels, { localPackGap: true });
     const [f] = byRule(e, "local_pack_gap");
     expect(f.text).toContain("in keiner der 3 gültigen Messungen im Local Pack");
-    expect(f.text).toContain("In 2 Messungen wurde ein Local Pack angezeigt, in 1 nicht.");
-    expect(f.text).toContain("lokal-a.example und lokal-b.example");
     expect(f.limits[0]).toContain("Relevanz, Entfernung und Bekanntheit");
-    expect(e.actions.find((a) => a.findingId === f.id)).toMatchObject({
-      type: "review",
-      bucket: "google_profile",
-      text: "Prüfen Sie, ob Profilangaben, Kategorie und das tatsächlich bediente Einzugsgebiet in Ihrem Google-Unternehmensprofil zutreffend sind.",
-    });
-  });
-
-  it("does not fire when any measurement is unverified, matched, or no pack was shown at all", () => {
-    const unverified = [m(S2.ags, 1, [lp(1, "lokal-a.example", "2")]), m(S2.ags, 2, [lp(1, TARGET, "999")])];
-    const e1 = evaluate(scan([S2], unverified), labels);
-    expect(byRule(e1, "local_pack_gap")).toEqual([]);
-    expect(e1.statusTable[0].localPack).toBe("Betriebszuordnung nicht verifiziert");
-
-    const matched = [m(S2.ags, 1, [lp(1, "lokal-a.example", "2")]), m(S2.ags, 2, [lp(2, TARGET, TARGET_CID)])];
-    expect(byRule(evaluate(scan([S2], matched), labels), "local_pack_gap")).toEqual([]);
-
-    const none = [m(S2.ags, 1, organic("lokal-a.example"))];
-    const e3 = evaluate(scan([S2], none), labels);
-    expect(byRule(e3, "local_pack_gap")).toEqual([]);
-    expect(e3.statusTable[0].localPack).toBe("kein Local Pack angezeigt");
-  });
-
-  it("is unverified for the whole scan when no verified cid is configured", () => {
-    const ms = [m(S2.ags, 1, [lp(1, "lokal-a.example", "2")])];
-    const e = evaluate(scan([S2], ms, { targetCids: [] }), labels);
-    expect(byRule(e, "local_pack_gap")).toEqual([]);
-    expect(e.statusTable[0].localPack).toBe("Betriebszuordnung nicht verifiziert");
-  });
-
-  it("does not count unlabeled or portal businesses in the pack as local competitors", () => {
-    const ms = [m(S2.ags, 1, [lp(1, "portal.example", "2"), lp(2, "unbekannt.example", "3"), lp(3, null, "4")])];
-    expect(byRule(evaluate(scan([S2], ms), labels), "local_pack_gap")).toEqual([]);
+    const unverified = [m(S2.ags, 1, [named(1, "Ziel Betrieb GmbH"), named(2, "lokal-a", "lokal-a.example")])];
+    expect(byRule(evaluate(scan([S2], unverified, { targetProfileNames: [PROFILE] }), labels, { localPackGap: true }), "local_pack_gap")).toEqual([]);
   });
 });
 
@@ -417,7 +468,7 @@ describe("partial measurements in sentences", () => {
   it("names valid and planned measurements when some failed", () => {
     const gapRows = organic("lokal-a.example", "lokal-b.example");
     const ms = [m(S2.ags, 1, [lp(1, "lokal-a.example", "2"), ...gapRows]), m(S2.ags, 3, [lp(1, "lokal-a.example", "2"), ...gapRows])];
-    const e = evaluate(scan([S2], ms), labels);
+    const e = evaluate(scan([S2], ms, { targetProfileNames: ["Ziel Betrieb GmbH – Terrassendächer"] }), labels, { localPackGap: true });
     expect(byRule(e, "organic_gap")[0].text).toContain("in 2 gültigen von 3 geplanten Messungen nicht unter den ersten 10");
     expect(byRule(e, "local_pack_gap")[0].text).toContain("in keiner der 2 gültigen von 3 geplanten Messungen im Local Pack");
   });
@@ -451,7 +502,7 @@ describe("live local pack shape: cid null, Google as domain", () => {
 
   it("items without cid make the match unverified, never 'not matched'", () => {
     const rows = [lp(1, null, null), lp(2, null, null)];
-    expect(localPackStatus(m(S2.ags, 1, rows), [TARGET], [TARGET_CID]).status).toBe("match_unverified");
+    expect(localPackStatus(m(S2.ags, 1, rows), { domains: [TARGET], cids: [TARGET_CID], profileNames: [] }).status).toBe("match_unverified");
     const e = evaluate(scan([S2], [m(S2.ags, 1, [...rows, ...organic("lokal-a.example")])]), labels);
     expect(e.statusTable[0].localPack).toBe("Betriebszuordnung nicht verifiziert");
     expect(byRule(e, "local_pack_gap")).toEqual([]);

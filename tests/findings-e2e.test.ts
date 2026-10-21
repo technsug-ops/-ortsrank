@@ -15,7 +15,6 @@ import { loadFixture } from "./fixtures/load";
 
 const SETTLEMENTS = "tests/fixtures/settlements.sample.json";
 const TARGET = "ziel-betrieb.example";
-const TARGET_CID = "1000000000000000001";
 const MAIN = "Terrassenüberdachung";
 
 const FRANKFURT = "06412000";
@@ -37,8 +36,10 @@ const organicItems = (ags: string, domains: string[]): Item[] => {
   for (let i = all.length; i < 20; i++) all.push(`f-${ags}-${i + 1}.example`);
   return all.map((d, i) => ({ type: "organic", rank_group: i + 1, domain: d, url: `https://${d}/`, title: d }));
 };
-const pack = (...entries: [string | null, string][]): Item[] =>
-  entries.map(([domain, cid], i) => ({ type: "local_pack", rank_group: i + 1, domain, url: domain ? `https://${domain}/` : null, title: domain ?? "Betrieb ohne Website", cid, is_paid: false, rating: null, phone: null }));
+// Live responses carry cid: null and Google as domain; the business is known by its name only.
+const PROFILE = "Ziel Betrieb GmbH";
+const pack = (...titles: string[]): Item[] =>
+  titles.map((title, i) => ({ type: "local_pack", rank_group: i + 1, domain: "www.google.com", url: "https://www.google.com/searchviewer/10", title, cid: null, is_paid: false, rating: null, phone: null }));
 const ads = (...domains: string[]): Item[] => domains.map((d, i) => ({ type: "paid", rank_group: i + 1, position: "top", domain: d, url: `https://${d}/`, title: d }));
 
 /** What Google "shows" per settlement and session for the main keyword. */
@@ -46,15 +47,15 @@ function world(ags: string, session: number): Item[] {
   const filler = (n: number) => Array.from({ length: n }, (_, i) => `x-${ags}-${i}.example`);
   switch (ags) {
     case FRANKFURT:
-      return [...ads("werbung.example"), ...pack([TARGET, TARGET_CID], ["lokal-a.example", "2"]), ...organicItems(ags, ["lokal-a.example", "lokal-b.example", TARGET])];
+      return [...ads("werbung.example"), ...pack(PROFILE, "Lokal A Überdachungen"), ...organicItems(ags, ["lokal-a.example", "lokal-b.example", TARGET])];
     case A:
-      return [...pack(["lokal-a.example", "2"], ["portal.example", "5"]), ...organicItems(ags, ["lokal-a.example", "lokal-b.example", ...filler(11), TARGET])];
+      return [...pack("Lokal A Überdachungen", "Portal Terrassen"), ...organicItems(ags, ["lokal-a.example", "lokal-b.example", ...filler(11), TARGET])];
     case B: {
       const comps = session === 1 ? ["lokal-a.example", "lokal-b.example"] : session === 2 ? ["lokal-a.example", "region-c.example"] : ["lokal-a.example", "portal.example"];
       return [...(session === 2 ? ads("werbung.example") : []), ...organicItems(ags, comps)];
     }
     case G:
-      return [...pack([TARGET, "999"], ["lokal-a.example", "2"]), ...organicItems(ags, ["lokal-a.example", "lokal-b.example"])];
+      return [...pack("Ziel Betrieb", "Lokal A Überdachungen"), ...organicItems(ags, ["lokal-a.example", "lokal-b.example"])];
     case H:
       return organicItems(ags, ["lokal-a.example", "region-c.example"]);
     default:
@@ -107,7 +108,7 @@ beforeAll(async () => {
     JSON.stringify({
       ...JSON.parse(readFileSync("projects/pilot-rhein-main.json", "utf8")),
       targetDomains: [TARGET],
-      targetLocalBusinesses: [{ cid: TARGET_CID, name: "Ziel Betrieb GmbH" }],
+      targetLocalBusinesses: [{ profileName: PROFILE, source: "Testdaten (synthetisch)" }],
     }),
   );
   const labels = join(root, "labels.json");
@@ -142,7 +143,7 @@ const cellOf = (ags: string, keyword = MAIN) => evaluation.statusTable.find((c) 
 
 describe("findings end to end (synthetic world)", () => {
   it("counts one measurement per session task: retries and repeated runs are not samples", () => {
-    expect(cellOf(FRANKFURT)).toMatchObject({ plannedSamples: 3, validSamples: 3, failedSamples: 0, organic: "bestes Ergebnis Platz 3", localPack: "im Local Pack, Platz 1", ads: "3/3" });
+    expect(cellOf(FRANKFURT)).toMatchObject({ plannedSamples: 3, validSamples: 3, failedSamples: 0, organic: "bestes Ergebnis Platz 3", localPack: "im Local Pack, Platz 1 (Abgleich über den Profilnamen)", ads: "3/3" });
   });
 
   it("keeps failed measurements apart", () => {
@@ -153,7 +154,6 @@ describe("findings end to end (synthetic world)", () => {
     expect(ids()).toEqual(
       expect.arrayContaining([
         `organic_gap:${A}:${MAIN}`,
-        `local_pack_gap:${A}:${MAIN}`,
         `organic_gap:${G}:${MAIN}`,
         `organic_gap:${H}:${MAIN}`,
         `ad_observation:${A}:${MAIN}`,
@@ -166,7 +166,10 @@ describe("findings end to end (synthetic world)", () => {
     // B: competitors change between measurements, never 2 local/regional in session 3.
     expect(ids()).not.toContain(`organic_gap:${B}:${MAIN}`);
     // G: target domain in the pack with an unverified cid → no local pack gap.
-    expect(ids()).not.toContain(`local_pack_gap:${G}:${MAIN}`);
+    // Local Pack gap rule is off in the pilot.
+    expect(ids().some((id) => id.startsWith("local_pack_gap"))).toBe(false);
+    expect(cellOf(A).localPack).toBe("im angezeigten Local Pack kein Eintrag mit dem Profilnamen gefunden");
+    // G: "Ziel Betrieb" is similar to the profile name but not equal → unverified.
     expect(cellOf(G).localPack).toBe("Betriebszuordnung nicht verifiziert");
     // B: no local pack shown at all.
     expect(cellOf(B).localPack).toBe("kein Local Pack angezeigt");

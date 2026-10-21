@@ -1,7 +1,7 @@
 # Kurallar v0 – Tasarım (taslak)
 
 > Kapsam: ROADMAP 3.3, Aşama 1 › Rapor › „Kurallar v0 (5 kural), her bulgu kanıt seviyesiyle".
-> Durum: **onaylandı, uygulandı** · 21.10.2026 · Sürüm 0.2 (Halil'in kararları ve ölçüm ayrıntıları, bölüm 7; kod incelemesi düzeltmeleri bölüm 8)
+> Durum: **onaylandı, uygulandı** · 21.10.2026 · Sürüm 0.2 (kararlar bölüm 7; kod incelemesi bölüm 8; canlı yanıt bölüm 9; Local Pack ad eşleştirmesi bölüm 10)
 > Girdi yalnızca SERP taraması (`serp_raw` / `runs/`). Sayfa taraması gerektiren kurallar („rakibin Hanau sayfası var") sayfa taraması eklendiğinde gelir.
 
 ---
@@ -153,3 +153,21 @@
 
 - **Local Pack kimliği:** Canlı yanıtta `cid: null`, `domain: "www.google.com"`, `url` Google searchviewer linki. Google domaini işletme domaini sayılmaz (ayrıştırıcıda `null`); `cid`'siz öğe varken hedef eşleşmesi „Betriebszuordnung nicht verifiziert“ olur ve `local_pack_gap` üretilmez. Google rakip kapsamasına girmez. Hedef işletmeyi Local Pack'te tanıma yöntemi için karar bekleniyor (STATUS).
 - **„Bulunamadı“ derinliği:** depth 20 istenir ama yanıt 14–16 organik sonuç içerir. Cümle artık ölçümlerdeki en küçük organik liste uzunluğunu söyler: „unter den ersten {n} organischen Ergebnissen nicht gefunden“; hiç organik sonuç yoksa „keine organischen Ergebnisse angezeigt“.
+
+## 10. Local Pack: profil adıyla eşleştirme, pilot (Halil'in kararı, 21.10.2026)
+
+Canlı yanıtta `cid` gelmediği için pilotta yöntem A: hedef işletme, **doğrulanmış kaynaktan** alınan Google profil adıyla tanınır (`targetLocalBusinesses[].profileName` + zorunlu `source`; domain veya şirket unvanından tahmin edilmez). Ad eşleşmesi kesin kimlik doğrulaması sayılmaz.
+
+| Ölçüm başına durum | Koşul | Durum tablosu |
+| --- | --- | --- |
+| `matched` (`profile_name_exact`) | Normalleştirilmiş ad birebir aynı, tek sonuç | „im Local Pack, Platz {n} (Abgleich über den Profilnamen)" |
+| `match_unverified` | Benzer ama farklı ad · aynı ad birden fazla · hedef domaini başka adla · doğrulanmış ad/kimlik yok | „Betriebszuordnung nicht verifiziert" |
+| `not_found_in_pack` | Local Pack gösterildi, adla eşleşen sonuç yok | „im angezeigten Local Pack kein Eintrag mit dem Profilnamen gefunden" |
+| `no_local_pack` | Local Pack gösterilmedi | „kein Local Pack angezeigt" |
+| `not_measurable` | Local Pack öğelerinde ad yok | „Local Pack nicht auswertbar" |
+
+- **Normalizasyon (eşleşme için):** Unicode NFKC, küçük harf, boşlukların teke indirilmesi ve kırpılması. Kelime silme, noktalama temizleme, benzerlik eşleşmesi **yok**.
+- **Benzerlik (yalnızca „doğrulanamadı"ya düşürmek için):** biri diğerini içeriyor, noktalama/boşluk yok sayılınca aynı, ya da en az iki ortak kelime (≥ 3 harf).
+- **Kayıt:** her ölçümde ham işletme adı (`rawTitle`), yöntem (`method`) ve neden (`reason`) durum tablosunda (`localPackDetails`) saklanır.
+- **`local_pack_gap` pilotta kapalı** (`LOCAL_PACK_GAP_ENABLED = false`); eşleşme bulunmaması işletmenin yokluğunu kanıtlamaz. Öncelik skoru yalnızca organik boşluktan beslenir. Organik kurallar değişmedi.
+- **B (Google Maps uç noktası) ertelendi.** Değerlendirilirken Maps'te bulunan kimlik ile ölçülen aramanın Local Pack'indeki işletmenin aynı olduğu ayrıca doğrulanmalı.

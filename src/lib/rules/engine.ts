@@ -8,6 +8,7 @@ import { matchesDomain, normalizeDomain } from "@/lib/dataforseo/parse";
 import {
   AD_MIN_SESSIONS,
   COVERAGE_MIN_SHARE,
+  LOCAL_PACK_GAP_ENABLED,
   LOCAL_PACK_GAP_LABELS,
   LOCAL_PACK_GAP_MIN_COMPETITORS,
   NON_COMPETITOR_LABELS,
@@ -25,7 +26,30 @@ import { deDate, deList, deNumber, fill, reportText as T } from "@/lib/rules/tex
 
 export type Labels = ReadonlyMap<string, CompetitorLabel>;
 
-export type LocalPackStatus = "matched" | "not_matched" | "no_local_pack" | "match_unverified";
+/**
+ * Target business in the Local Pack, per measurement (RULES_V0 section 10):
+ * matched (by cid or exact profile name) · match_unverified (no verified
+ * identity, similar but different name, duplicate name, or target domain
+ * without matching identity) · not_found_in_pack (pack shown, no entry with
+ * the profile name) · no_local_pack · not_measurable (items without name).
+ */
+export type LocalPackStatus = "matched" | "match_unverified" | "not_found_in_pack" | "no_local_pack" | "not_measurable";
+export type LocalPackMethod = "cid" | "profile_name_exact" | null;
+
+export interface LocalPackResult {
+  status: LocalPackStatus;
+  rank: number | null;
+  method: LocalPackMethod;
+  /** Business name exactly as returned by the provider (matched or causing the doubt). */
+  rawTitle: string | null;
+  reason: string | null;
+}
+
+export interface TargetIdentity {
+  domains: readonly string[];
+  cids: readonly string[];
+  profileNames: readonly string[];
+}
 
 export interface EvidenceRef {
   runId: string;
@@ -70,6 +94,8 @@ export interface StatusCell {
   organic: string;
   localPack: string;
   ads: string;
+  /** Per measurement: Local Pack status, matching method and the raw business name. */
+  localPackDetails: (LocalPackResult & { taskKey: string })[];
 }
 
 export interface Evaluation {
@@ -113,17 +139,60 @@ export function organicTopCompetitors(m: Measurement, targets: readonly string[]
   return [...out];
 }
 
-export function localPackStatus(m: Measurement, targets: readonly string[], targetCids: readonly string[]): { status: LocalPackStatus; rank: number | null } {
+/** Case, Unicode (NFKC) and whitespace only; no word or punctuation removal. */
+export function normalizeBusinessName(name: string): string {
+  return name.normalize("NFKC").toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+const letters = (s: string) => s.replace(/[^\p{L}\p{N}]/gu, "");
+const words = (s: string) => new Set(s.split(/[^\p{L}\p{N}]+/u).filter((w) => w.length >= 3));
+
+/**
+ * Used only to downgrade a non-matching name to "unverified" (never to
+ * match): substring either way, same letters and digits once punctuation
+ * and spaces are ignored, or at least two shared words of 3+ characters.
+ */
+export function isSimilarName(a: string, b: string): boolean {
+  if (a.includes(b) || b.includes(a)) return true;
+  if (letters(a) === letters(b)) return true;
+  const wb = words(b);
+  return [...words(a)].filter((w) => wb.has(w)).length >= 2;
+}
+
+const result = (status: LocalPackStatus, extra: Partial<LocalPackResult> = {}): LocalPackResult => ({
+  status,
+  rank: null,
+  method: null,
+  rawTitle: null,
+  reason: null,
+  ...extra,
+});
+
+export function localPackStatus(m: Measurement, target: TargetIdentity): LocalPackResult {
   const items = m.rows.filter((r) => r.type === "local_pack");
-  if (items.length === 0) return { status: "no_local_pack", rank: null };
-  if (targetCids.length === 0) return { status: "match_unverified", rank: null };
-  const byCid = items.find((r) => r.cid && targetCids.includes(r.cid));
-  if (byCid) return { status: "matched", rank: byCid.rank };
-  // The target's domain without a verified cid: some business claims the site, identity unclear.
-  if (items.some((r) => isTarget(r.domain, targets))) return { status: "match_unverified", rank: null };
-  // An item without cid could be the target: absence cannot be concluded (live responses carry cid: null).
-  if (items.some((r) => !r.cid)) return { status: "match_unverified", rank: null };
-  return { status: "not_matched", rank: null };
+  if (items.length === 0) return result("no_local_pack");
+
+  const byCid = items.find((r) => r.cid && target.cids.includes(r.cid));
+  if (byCid) return result("matched", { rank: byCid.rank, method: "cid", rawTitle: byCid.title });
+
+  if (target.profileNames.length === 0) {
+    return result("match_unverified", { reason: target.cids.length ? "no_cid_in_response" : "no_verified_identity" });
+  }
+  const untitled = items.filter((r) => !r.title || !r.title.trim());
+  if (untitled.length) return result("not_measurable", { reason: "items_without_name" });
+
+  const wanted = target.profileNames.map(normalizeBusinessName);
+  const exact = items.filter((r) => wanted.includes(normalizeBusinessName(r.title!)));
+  if (exact.length > 1) return result("match_unverified", { reason: "duplicate_name", rawTitle: exact[0].title });
+  if (exact.length === 1) return result("matched", { rank: exact[0].rank, method: "profile_name_exact", rawTitle: exact[0].title });
+
+  // Similar but different names only downgrade to "unverified", they never match.
+  const similar = items.find((r) => wanted.some((w) => isSimilarName(normalizeBusinessName(r.title!), w)));
+  if (similar) return result("match_unverified", { reason: "similar_name", rawTitle: similar.title });
+  const byDomain = items.find((r) => isTarget(r.domain, target.domains));
+  if (byDomain) return result("match_unverified", { reason: "target_domain_without_identity", rawTitle: byDomain.title });
+
+  return result("not_found_in_pack");
 }
 
 function localPackCompetitors(m: Measurement, targets: readonly string[], labels: Labels, wanted: readonly CompetitorLabel[]): string[] {
@@ -179,7 +248,14 @@ export function priorityScore(i: PriorityInput): PriorityResult {
 
 const labelText = (labels: Labels, domain: string) => labels.get(domain) ?? null;
 
-export function evaluate(scan: ScanData, labels: Labels): Evaluation {
+export interface EvaluateOptions {
+  /** Off in the pilot (RULES_V0 section 10). */
+  localPackGap?: boolean;
+}
+
+export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOptions = {}): Evaluation {
+  const localPackGapEnabled = options.localPackGap ?? LOCAL_PACK_GAP_ENABLED;
+  const identity: TargetIdentity = { domains: scan.targetDomains.map(normalizeDomain), cids: scan.targetCids, profileNames: scan.targetProfileNames };
   const targets = scan.targetDomains.map(normalizeDomain);
   // Without a target domain nothing can be "not found": organic findings about the target are skipped.
   const hasTarget = targets.length > 0;
@@ -208,6 +284,7 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
       let organic = T.status.notMeasured;
       let localPack = T.status.notMeasured;
       let ads = T.status.notMeasured;
+      let localPackDetails: StatusCell["localPackDetails"] = [];
       if (ms.length) {
         const best = ms.map((m) => targetOrganicBest(m, targets)).filter((r): r is number => r !== null);
         organic = !hasTarget
@@ -215,15 +292,18 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
           : best.length
             ? fill(T.status.rank, { rank: Math.min(...best) })
             : notFoundText(ms);
-        const lp = ms.map((m) => localPackStatus(m, targets, scan.targetCids));
-        const matched = lp.filter((x) => x.status === "matched").map((x) => x.rank!);
+        const lp = ms.map((m) => ({ taskKey: m.taskKey, ...localPackStatus(m, identity) }));
+        localPackDetails = lp;
+        const matched = lp.filter((x) => x.status === "matched").sort((a, b) => a.rank! - b.rank!);
         localPack = matched.length
-          ? fill(T.status.lpMatched, { rank: Math.min(...matched) })
+          ? fill(matched[0].method === "cid" ? T.status.lpMatched : T.status.lpMatchedName, { rank: matched[0].rank! })
           : lp.some((x) => x.status === "match_unverified")
             ? T.status.lpUnverified
-            : lp.some((x) => x.status === "not_matched")
-              ? T.status.lpNotMatched
-              : T.status.lpNone;
+            : lp.some((x) => x.status === "not_measurable")
+              ? T.status.lpNotMeasurable
+              : lp.some((x) => x.status === "not_found_in_pack")
+                ? T.status.lpNameNotFound
+                : T.status.lpNone;
         ads = `${ms.filter(hasAds).length}/${ms.length}`;
       }
       statusTable.push({
@@ -236,6 +316,7 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
         organic,
         localPack,
         ads,
+        localPackDetails,
       });
     }
   }
@@ -290,11 +371,11 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
         g.refs.push(...ms.map(ref));
       }
 
-      // 2. local_pack_gap: no matched / unverified measurement, and a shown pack with a local competitor.
-      const lp = ms.map((m) => ({ m, ...localPackStatus(m, targets, scan.targetCids), competitors: localPackCompetitors(m, targets, labels, LOCAL_PACK_GAP_LABELS) }));
-      const noMatch = lp.every((x) => x.status === "not_matched" || x.status === "no_local_pack");
-      const withCompetitor = lp.some((x) => x.status === "not_matched" && x.competitors.length >= LOCAL_PACK_GAP_MIN_COMPETITORS);
-      if (noMatch && withCompetitor) {
+      // 2. local_pack_gap (off in the pilot): every measurement without the target, a shown pack with a local competitor.
+      const lp = ms.map((m) => ({ m, ...localPackStatus(m, identity), competitors: localPackCompetitors(m, targets, labels, LOCAL_PACK_GAP_LABELS) }));
+      const noMatch = lp.every((x) => x.status === "not_found_in_pack" || x.status === "no_local_pack");
+      const withCompetitor = lp.some((x) => x.status === "not_found_in_pack" && x.competitors.length >= LOCAL_PACK_GAP_MIN_COMPETITORS);
+      if (localPackGapEnabled && noMatch && withCompetitor) {
         const id = `local_pack_gap:${s.ags}:${keyword}`;
         const competitors = [...new Set(lp.flatMap((x) => x.competitors))];
         const withoutPack = lp.filter((x) => x.status === "no_local_pack").length;
@@ -321,7 +402,7 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
           limits: [T.localPackGap.limit],
           evidence: {
             measurements: ms.map(ref),
-            details: { perMeasurement: lp.map((x) => ({ taskKey: x.m.taskKey, status: x.status, competitors: x.competitors })) },
+            details: { perMeasurement: lp.map((x) => ({ taskKey: x.m.taskKey, status: x.status, method: x.method, rawTitle: x.rawTitle, competitors: x.competitors })) },
           },
         });
         actions.push({ findingId: id, type: "review", bucket: "google_profile", text: T.localPackGap.action });
