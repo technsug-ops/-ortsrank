@@ -73,7 +73,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] Küçük canlı deneme: 2 belediye × 2 keyword, teknik doğrulama (21.10.2026, tarama `trial-20261021`: 8/8 başarılı, kayıt bütünlüğü %100, 0,032 $)
 - [x] Gerçek `cost` ile fiyat varsayımı doğrulandı: 0,004 $ / deneme (depth 20), Advanced = Regular fiyatı (21.10.2026)
 - [x] `local_pack` yanıt yapısı doğrulandı: öğe başına tek işletme, **ama `cid: null` ve domain `www.google.com`** (21.10.2026, `c1c9098`)
-- [x] Local Pack'te hedef işletme kimliği: pilotta doğrulanmış Google profil adıyla tam eşleşme (yöntem A, kesin kimlik sayılmaz); `local_pack_gap` pilotta kapalı; Maps uç noktası (B) ertelendi – RULES_V0 bölüm 10 (21.10.2026, bu commit)
+- [x] Local Pack'te hedef işletme kimliği: pilotta doğrulanmış Google profil adıyla tam eşleşme (yöntem A, kesin kimlik sayılmaz); `local_pack_gap` pilotta kapalı; Maps uç noktası (B) ertelendi – RULES_V0 bölüm 10 (21.10.2026, `94e850e`)
 - [ ] Pilot işletmenin Google profil adı doğrulanmış kaynaktan proje dosyasına girildi
 - [ ] Tam pilot taraması (oturumlu)
 - [ ] Değişkenlik ölçümü (3 gün)
@@ -88,8 +88,8 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 ### İş hattı (Halil)
 
 - [x] Pilot çerçevesi: Terrassenüberdachung, Frankfurt/Rhein-Main, 20–30 belediye (21.10.2026)
-- [ ] Pilot keywordleri (3–5), işletmelerin gerçek hizmetlerine göre
-- [ ] Pilot alanı kararı: 30 km / ≥10.000 nüfusta 66 belediye var; üst sınır 30 iken seçim 17,4 km'de bitiyor. Seçenekler: üst sınırı artırmak, nüfus eşiğini yükseltmek (30 km / ≥20.000 → 34) veya yarıçapı küçültmek (25 km / ≥20.000 → 29)
+- [~] Pilot keywordleri (3–5), işletmelerin gerçek hizmetlerine göre – taslak [PILOT_SETUP.md](PILOT_SETUP.md) bölüm 1 (Google önerilerinden), Halil'in onayı bekleniyor
+- [~] Pilot alanı kararı (taslak [PILOT_SETUP.md](PILOT_SETUP.md) bölüm 2; önce pilot işletmenin konumu): 30 km / ≥10.000 nüfusta 66 belediye var; üst sınır 30 iken seçim 17,4 km'de bitiyor. Seçenekler: üst sınırı artırmak, nüfus eşiğini yükseltmek (30 km / ≥20.000 → 34) veya yarıçapı küçültmek (25 km / ≥20.000 → 29)
 - [ ] Pilot işletme 1 (aday: UG-ALU – katılım netleşmeli)
 - [ ] Pilot işletme 2
 - [ ] Pilot işletme 3
@@ -135,7 +135,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Local Pack profil adıyla eşleştirme (5 durum, ham ad + yöntem kaydı), `local_pack_gap` pilotta kapalı; toplam 304/304 | bu commit |
+| 21.10.2026 | Pilot ayarları taslağı: keywordler (Google önerilerinden), alan seçenekleri ve maliyet; rakip etiket taslağı `data/` içinde (31 öneri, 18 belirsiz) | bu commit |
+| 21.10.2026 | Local Pack profil adıyla eşleştirme (5 durum, ham ad + yöntem kaydı), `local_pack_gap` pilotta kapalı; toplam 304/304 | `94e850e` |
 | 21.10.2026 | Canlı deneme başarılı (8/8, 0,032 $); local pack `cid` null + Google domaini, organik ~15 sonuç → ayrıştırıcı ve kurallar düzeltildi; bütçe defterinde Windows dosya kilidine karşı tekrar; toplam 289/289 | `c1c9098` |
 | 21.10.2026 | İlk canlı deneme `trial-20261021`: 8 görev HTTP 403 / 40104 (hesap doğrulanmamış), maliyet 0 $, kayıt bütünlüğü %100. Düzeltme: HTTP hatasında sağlayıcı kodu kaydedilir; teknik denemede oturum sapması değerlendirilmez | `c5b9f41` |
 | 21.10.2026 | Kurallar v0 inceleme düzeltmeleri: hedef domain yoksa organik bulgu yok, keyword bazlı hipotez, ayrıştırma sorunlu yanıt geçersiz, eksik ölçüm cümlede; toplam 281/281 | `babbd61` |
