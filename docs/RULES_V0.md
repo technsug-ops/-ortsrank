@@ -251,3 +251,41 @@ Bölüm 10'a taşındı (`brand_other_location` → `brand_only`).
 - **Rakip kapsaması** bulgusu belediye başına gözlendiği ölçüm sayısını ve organik / Local Pack ayrımını söyler („Beobachtet in: Heidenheim: 1 von 3 Messungen (organisch 1, Local Pack 0); …"); `evidence.details.perSettlement`.
 - **Kural kontrolleri (`ruleChecks`):** her kural ve hücre için `finding` · `not_met` (değerlendirildi, koşul sağlanmadı) · `not_evaluable` (eksik bilgi: hedef domain yok, ilk 10'da etiketsiz rakipler, yalnızca teknik deneme) · `disabled` (pilotta kapalı). Organik boşlukta etiketsiz rakipler sonucu değiştirebiliyorsa hücre „değerlendirilemedi" olur; eşikler gevşetilmez.
 - **Teknik denemede reklam oranı** durum tablosunda gösterilmez („nicht ausgewertet (technische Validierung)").
+
+## 13. Rakip tanımı: ölçek ile belediye bazında varlık ayrımı (öneri, onay bekliyor · 21.10.2026)
+
+**Sorun.** Tek etiket (`local` / `regional` / `national`) üç ayrı şeyi taşıyordu: kendi şube ağı, ülke çapında hizmet beyanı ve bir ağ üzerinden erişim. „Bölgede var" bilgisi de belediye bazında değildi. Bir rakibin bir şehirde merkezi olması yalnızca yerel çalıştığı anlamına gelmez; ulusal faaliyet de o şehirde yerel rakip olmayı engellemez.
+
+**Önerilen eksenler** (her biri kaynak + birebir alıntıyla):
+
+| Eksen | Değerler |
+| --- | --- |
+| Tür | kiralama şirketi · kiralama zinciri · karma işletme · ağ (bağımsız şirketler birliği) · portal · dizin |
+| Kendi konumları | tek konum · bir bölge · birden fazla bölge · ülke geneli şube ağı · yok · bilinmiyor |
+| Beyan edilen hizmet alanı | bölge · ülke/Avrupa (kendi) · ülke/Avrupa (ağ üzerinden) · yok |
+| Belediye bazında varlık | her ölçülen belediye için: şube (o belediyede adres) · hizmet beyanı (şehir sayfası, teslimat listesi dahil) · yok |
+
+**Kurallar:**
+
+- Adres posta koduyla belediyeye bağlanır. Şube adı belediye değildir: „Ulm" adlı bir şube Neu-Ulm'da olabilir.
+- Şehir sayfası, posta kodu veya şehir listesi şube değildir.
+- Ağ ile üyeleri ayrı tutulur ve birlikte iki ayrı rakip sayılmaz. Aynı işletmenin birden fazla sitesi tek rakip sayılır.
+
+**Organik boşluk kuralı için karar gereken tanım:**
+
+- **Sıkı (öneri):** Bir domain yalnızca o belediyede kendi adresli şubesi varsa orada yerel rakip sayılır.
+- **Geniş:** Hizmet beyanı da sayılır. Şehir sayfaları yaygın olduğu için rakip sayısı şişer.
+
+Her iki durumda da eşikler (ilk 10, en az 2 rakip, her ölçümde) değişmez.
+
+**Uygulama, onaydan sonra yapılır:**
+
+- Etiket dosyası belediye bazında varlığı taşır.
+- `organicTopCompetitors` ölçeğe değil, o belediyedeki varlığa bakar.
+- Kaynağı okunamayan domainler ilgili hücreyi „değerlendirilemedi" yapar. Bu yalnızca, o domainler yerel sayılsaydı sonuç değişecekse olur.
+
+**Pilot 1 simülasyonu** (salt okunur, motor değişmedi). Ana keyword'ün ilk 10'undaki domainlerin tamamı incelendi; yalnızca diğer keywordlerde görülen 12 domain açık kaldı.
+
+- Sıkı tanımla 5 belediyenin hiçbirinde organik boşluk bulgusu çıkmıyor: Heidenheim'da hedef bir ölçümde ilk 10'da, diğer dördünde her ölçümde 2 yerel rakip yok.
+- Pilot belediyelerinde kendi şubesi olan rakipler: Heidenheim 1 işletme (2 site), Aalen 3, Ulm 2, Steinheim ve Babenhausen 0.
+
