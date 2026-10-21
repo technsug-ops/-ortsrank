@@ -1,113 +1,68 @@
 # Pilot 1 – küçük gerçek veri denemesi (özet)
 
-> 21.10.2026 · **Anonim özet**: işletme ve rakip adları yok; tam rapor git dışında (`data/reports/`). Sektör: Arbeitsbühnenvermietung, Heidenheim çevresi.
+> 21.10.2026 · **Anonim özet**: işletme ve rakip adları yok. Müşteri raporu (Almanca), etiket inceleme tablosu ve tam teknik rapor git dışında (`data/reports/`, `data/competitor-review.pilot1.md`). Sektör: Arbeitsbühnenvermietung, Heidenheim çevresi.
+> Yalnızca bu 5 belediye ve bu zaman penceresi için geçerlidir; ölçülmeyen belediyelere genellenmez.
 
-## 1. Kapsam
+## Kapsam ve çalıştırma
 
-Küçük gerçek veri denemesi (Halil'in talimatı, 21.10.2026). **Yalnızca bu 5 belediye için geçerlidir; ölçülmeyen belediyelere ve bütün bölgeye genellenmez.**
+| | |
+| --- | --- |
+| Belediyeler | Heidenheim (merkez, zorunlu), Steinheim am Albuch (yakın, küçük), Aalen (orta mesafe, büyük), Ulm (uzak, çok büyük), Babenhausen (çok uzak, küçük); 60 km aday alan, nüfus 5.000–140.000 |
+| Keywordler | Arbeitsbühne mieten (3 ölçüm), Hubarbeitsbühne mieten, Scherenbühne mieten, Arbeitsbühne mieten in der Nähe (1'er) – mevcut keşiften |
+| Görev | 30 planlı, 30 geçerli, 0 başarısız, 0 atlanan; 30 deneme (tekrar yok) |
+| Oturumlar | **Peş peşe** (21.10.2026 ≈ 14:49 UTC) → `technical_validation`; planlı saatlerde ölçüm yapılmadı; reklam sıklığı çıkarılmadı |
+| Veri toplama maliyeti | **0.12 $** (0,024 $ / belediye); toplam hizmet maliyeti değildir. Bakiye 0,94 $ → 0,82 $; para yüklenmedi |
 
-- Merkez: Heidenheim an der Brenz (zorunlu, `includeCenter`); aday alan 60 km, nüfus 5.000–140.000 (sınırlar dahil); açık liste (`settlementAgs`), en fazla 5.
-- Keywordler (mevcut keşiften, yeni ücretli keşif yok): Arbeitsbühne mieten (3 oturum), Hubarbeitsbühne mieten, Scherenbühne mieten, Arbeitsbühne mieten in der Nähe (1'er).
-- Görev: 5 × (3 + 1 + 1 + 1) = **30**; oturum 1: 20, oturum 2: 5, oturum 3: 5.
+## Durum tablosu (ölçüm bazında)
 
-| Belediye | AGS | km | Nüfus | Seçim gerekçesi |
+Messungen: planlı / geçerli / başarısız. Local Pack'teki marka adı `[Markenname]` ile gizlendi.
+
+| Belediye | Keyword | Messungen | Organik (hedef domain) | Local Pack |
 | --- | --- | --- | --- | --- |
-| Heidenheim an der Brenz | 08135019 | 0.0 | 50.612 | Merkez (zorunlu); orta büyüklükte ilçe merkezi |
-| Steinheim am Albuch | 08135032 | 6.9 | 8.790 | Yakın + küçük (6.9 km. < 10.000); işletmenin şube adresi burada – marka kaydı mantığını gerçek veriyle sınamak için |
-| Aalen | 08136088 | 18.1 | 67.675 | Orta mesafe + büyük (18.1 km. ≈ 68.000); en yakın büyük şehir. yerel rakip adresleri burada |
-| Ulm | 08421000 | 33.3 | 130.288 | Uzak + çok büyük (33.3 km. ≈ 130.000); üst nüfus sınırına yakın en büyük belediye |
-| Babenhausen | 09778115 | 59.9 | 5.694 | Çok uzak + küçük (59.9 km. < 6.000); alan sınırı. Bavyera. farklı yön |
+| Heidenheim an der Brenz | Arbeitsbühne mieten | 3 / 3 / 0 | in 2 von 3 Messungen gefunden (Platz 8 und 8); in 1 Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Heidenheim an der Brenz | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Heidenheim an der Brenz | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Eintrag der Marke im Local Pack (Platz 3: [Markenname]), nicht dem Zielstandort zugeordnet |
+| Heidenheim an der Brenz | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Steinheim am Albuch | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (19, 19 und 19 Ergebnisse) | Eintrag der Marke im Local Pack (Platz 2: [Markenname]), nicht dem Zielstandort zugeordnet |
+| Steinheim am Albuch | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | Eintrag der Marke im Local Pack (Platz 2: [Markenname]), nicht dem Zielstandort zugeordnet |
+| Steinheim am Albuch | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | kein Local Pack angezeigt |
+| Steinheim am Albuch | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung gefunden: Platz 5 | Eintrag der Marke im Local Pack (Platz 1: [Markenname]), nicht dem Zielstandort zugeordnet |
+| Aalen | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (19, 19 und 18 Ergebnisse) | Eintrag der Marke im Local Pack (Platz 7: [Markenname]), nicht dem Zielstandort zugeordnet |
+| Aalen | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Aalen | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Aalen | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Ulm | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (18, 19 und 19 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Ulm | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Ulm | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Ulm | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Babenhausen | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (19, 19 und 18 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Babenhausen | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | Eintrag der Marke im Local Pack (Platz 6: [Markenname]), nicht dem Zielstandort zugeordnet |
+| Babenhausen | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Babenhausen | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | Betriebszuordnung nicht verifiziert |
 
-## 2. Çalıştırma
+„Nicht gefunden" = yanıtta dönen organik sonuçlar arasında yok (sayılar ölçüm başına); sıra numaraları tüm ölçümlerde 1..n kesintisiz.
 
-| | |
-| --- | --- |
-| Tarama | `pilot1-small-20261021`, çalıştırma `20261021-164919-pilot1-small-b5a646` |
-| Oturumlar | **Peş peşe** çalıştırıldı (14:49 UTC civarı, planlı 09:00/13:00/18:00 saatlerinde değil) → `technical_validation`; reklam sıklığı çıkarılmadı. Planlı oturumlar **tamamlanmış sayılmaz.** |
-| Görev | 30 başarılı · 0 hata · 0 iptal · 0 atlanan |
-| Deneme | 30 (tekrar gerekmedi) |
-| Kayıt bütünlüğü / geçerli sonuç | %100 / %100 |
-| Parametre uyuşmazlığı | 0 |
+## Kurallar
 
-## 3. Maliyet
-
-| | |
-| --- | --- |
-| Tavan | min(0,40 $; kullanılabilir bakiye 0,94 $) = **0,40 $** (bütçe defteri, tüm oturum ve tekrarlar için ortak) |
-| Plan | beklenen 0,144 $, en kötü durum 0,36 $ |
-| **Gerçek harcama** | **0.120 $** (confirmed; uncertain 0.000 $) |
-| Defterde kalan | 0.280 $ / 0,40 $ |
-| DataForSEO bakiyesi | 0,94 $ → **0,82 $** (panel API, `user_data`) |
-| Para yükleme | yapılmadı |
-
-| Belediye | Deneme | Maliyet |
+| Kural | Sonuç | Hücre sayısı |
 | --- | --- | --- |
-| Heidenheim an der Brenz | 6 | 0.024 $ |
-| Steinheim am Albuch | 6 | 0.024 $ |
-| Aalen | 6 | 0.024 $ |
-| Ulm | 6 | 0.024 $ |
-| Babenhausen | 6 | 0.024 $ |
+| Organische Lücke | geprüft, Bedingung nicht erfüllt: Zieldomain in mindestens einer Messung unter den ersten 10 | 1 |
+| Local-Pack-Lücke | im Pilot abgeschaltet (Betriebszuordnung im Local Pack nicht verifiziert) | 5 |
+| Anzeigenbeobachtung | nicht auswertbar: nur technische Validierung, keine geplanten Sitzungen | 5 |
+| Organische Lücke | nicht auswertbar: nicht eingeordnete Wettbewerber unter den ersten 10 (Einordnung offen) | 4 |
 
-Belediye başına **0,024 $** = 6 ölçüm × 0,004 $ (depth 20 = 2 SERP sayfası × 0,002 $). Tekrar denemesi gerekseydi her tekrar +0,004 $.
+Rakip kapsaması: 17 gözlem; sınıflandırmalar onaylanmamış („vorläufig"). Organik boşluk 4 belediyede **değerlendirilemedi** (ilk 10'da etiketsiz rakipler), Heidenheim'da **değerlendirildi, koşul sağlanmadı** (hedef bir ölçümde ilk 10'da).
 
-## 4. Sonuçlar (gerçek veri)
+## Gözlem: zamana yakın ölçümlerde farklı sonuç sayfası
 
-Hedef: işletmenin domaini (organik) ve Heidenheim şubesi (Local Pack, kimlik doğrulanmadı). Marka adı `<Markenname>` ile gizlendi.
+Aynı belediye/keyword/koordinat için aynı saniyede gönderilen ölçümlerde Google iki farklı sayfa döndürdü (birinde AI Overview ve farklı bir ilk 10). Eşleme doğrulandı. Bu, gün içi değişkenliğin kanıtı değil; yakın zamanlı ölçümler arasındaki fark.
 
-| Belediye | Keyword | Geçerli/plan | Organik (hedef domain) | Local Pack | Reklam |
-| --- | --- | --- | --- | --- | --- |
-| Heidenheim an der Brenz | Arbeitsbühne mieten | 3/3 | bestes Ergebnis Platz 8 | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Heidenheim an der Brenz | Hubarbeitsbühne mieten | 1/1 | unter den ersten 18 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Heidenheim an der Brenz | Scherenbühne mieten | 1/1 | unter den ersten 19 organischen Ergebnissen nicht gefunden | Eintrag der Marke im Local Pack (Platz 3: <Markenname>), nicht dem Zielstandort zugeordnet | nicht ausgewertet (technische Validierung) |
-| Heidenheim an der Brenz | Arbeitsbühne mieten in der Nähe | 1/1 | unter den ersten 20 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Steinheim am Albuch | Arbeitsbühne mieten | 3/3 | unter den ersten 19 organischen Ergebnissen nicht gefunden | Eintrag der Marke im Local Pack (Platz 2: <Markenname>), nicht dem Zielstandort zugeordnet | nicht ausgewertet (technische Validierung) |
-| Steinheim am Albuch | Hubarbeitsbühne mieten | 1/1 | unter den ersten 18 organischen Ergebnissen nicht gefunden | Eintrag der Marke im Local Pack (Platz 2: <Markenname>), nicht dem Zielstandort zugeordnet | nicht ausgewertet (technische Validierung) |
-| Steinheim am Albuch | Scherenbühne mieten | 1/1 | unter den ersten 18 organischen Ergebnissen nicht gefunden | kein Local Pack angezeigt | nicht ausgewertet (technische Validierung) |
-| Steinheim am Albuch | Arbeitsbühne mieten in der Nähe | 1/1 | bestes Ergebnis Platz 5 | Eintrag der Marke im Local Pack (Platz 1: <Markenname>), nicht dem Zielstandort zugeordnet | nicht ausgewertet (technische Validierung) |
-| Aalen | Arbeitsbühne mieten | 3/3 | unter den ersten 18 organischen Ergebnissen nicht gefunden | Eintrag der Marke im Local Pack (Platz 7: <Markenname>), nicht dem Zielstandort zugeordnet | nicht ausgewertet (technische Validierung) |
-| Aalen | Hubarbeitsbühne mieten | 1/1 | unter den ersten 19 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Aalen | Scherenbühne mieten | 1/1 | unter den ersten 20 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Aalen | Arbeitsbühne mieten in der Nähe | 1/1 | unter den ersten 20 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Ulm | Arbeitsbühne mieten | 3/3 | unter den ersten 18 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Ulm | Hubarbeitsbühne mieten | 1/1 | unter den ersten 19 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Ulm | Scherenbühne mieten | 1/1 | unter den ersten 19 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Ulm | Arbeitsbühne mieten in der Nähe | 1/1 | unter den ersten 20 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Babenhausen | Arbeitsbühne mieten | 3/3 | unter den ersten 18 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Babenhausen | Hubarbeitsbühne mieten | 1/1 | unter den ersten 18 organischen Ergebnissen nicht gefunden | Eintrag der Marke im Local Pack (Platz 6: <Markenname>), nicht dem Zielstandort zugeordnet | nicht ausgewertet (technische Validierung) |
-| Babenhausen | Scherenbühne mieten | 1/1 | unter den ersten 19 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
-| Babenhausen | Arbeitsbühne mieten in der Nähe | 1/1 | unter den ersten 20 organischen Ergebnissen nicht gefunden | Betriebszuordnung nicht verifiziert | nicht ausgewertet (technische Validierung) |
+## Teknik olarak doğrulananlar / doğrulanamayanlar
 
-**Üretilen bulgular:** rakip kapsaması 17 (hepsi „vorläufige Einordnung", etiketler onaylanmadı; 6 domain sınıflandırılmamış). Organik boşluk, Local Pack boşluğu, reklam gözlemi ve inceleme önceliği üretilmedi – nedenleri bölüm 5'te.
+**Doğrulandı:** veri çekme (30/30, parametreler eşleşiyor), bütçe muhasebesi (istek öncesi ayırma, confirmed, ortak tavan 0,40 $; panel bakiyesiyle tutarlı), ayrıştırma (organik, Local Pack `cid: null` / Google domaini), kurallar ve raporlama (ölçüm bazında hücreler, kural kontrol durumları, onaysız etiket işaretleri, teknik denemede reklam oranı yok).
 
-**Hedef domain organikte:** Heidenheim'da „Arbeitsbühne mieten" için oturum 2 ve 3'te 8. sırada, oturum 1'de ilk 18'de yok; Steinheim'da „Arbeitsbühne mieten in der Nähe" için 5.; diğer hücrelerde dönen ilk 18–20 organik sonuçta bulunamadı. Tek zaman penceresi, mobil, belediye merkez noktası.
+**Doğrulanamadı:** organik boşluk (etiket onayı yok), Local Pack hedef şubesi (profil kimliği doğrulanmadı; marka kaydı 4 belediyede görüldü, şubeye atanmadı), reklam gözlemi ve gün içi değişkenlik (planlı oturum yok).
 
-## 5. Teknik olarak doğrulananlar / henüz doğrulanamayanlar
+## Sonraki adım (bu işin dışında)
 
-**Doğrulandı (gerçek veriyle):**
-- Veri çekme: 30/30 istek başarılı; gönderilen parametreler yanıttaki `data` ile aynı.
-- Bütçe: istek öncesi ayırma, confirmed muhasebe, ortak tavan; gerçek maliyet = 30 × 0,004 $; panel bakiyesi defterle tutarlı.
-- Ayrıştırma: organik, reklam, Local Pack satırları; Local Pack'te `cid: null` / Google domaini doğru ele alındı.
-- Kurallar: durum tablosu, „bulunamadı" ifadesinde gerçek organik sonuç sayısı (18–20), marka kaydı ayrı gösterimi, teknik denemede reklam oranı gösterilmemesi, onaylanmamış etiketlerin „vorläufig" işaretlenmesi.
-- Raporlama: `findings.json`, durum tablosu ve bulgu cümleleri gerçek veriden üretildi.
-
-**Henüz doğrulanamayan / üretilemeyen:**
-- **Organik boşluk (`organic_gap`):** üretilmedi. Rakip etiketleri onaylanmamış ve taslakta yalnızca 3 local/regional domain var; koşul (her ölçümde ≥ 2 local/regional rakip ilk 10'da) 5 belediyenin hiçbirinde her ölçümde sağlanmadı. Oturum 1 ölçümlerinde ilk 10'da taslak listesinde olmayan (sınıflandırılmamış) domainler çıktı. Etiket onayı ve sınıflandırılmamış domainlerin incelenmesi gerekiyor.
-- **Local Pack hedef şubesi:** kimlik doğrulanmadı; markanın bir kaydı 5 belediyenin 4'ünde en az bir ölçümde Local Pack'te görüldü ama Heidenheim şubesine bağlanmadı. Yokluk bulgusu üretilmedi; `local_pack_gap` pilotta kapalı.
-- **Reklam gözlemi:** teknik denemede değerlendirilmedi (planlı oturumlar gerekli).
-- **İnceleme önceliği:** organik boşluk olmadığı için üretilmedi.
-- **Planlı oturumlar, değişkenlik, dönem karşılaştırması:** yapılmadı.
-
-## 6. Gözlem: aynı anda farklı sonuç sayfası
-
-Aynı belediye, keyword ve koordinat için aynı saniyede gönderilen 3 ölçümde Google iki farklı sayfa döndürdü: oturum 1 ölçümlerinde „AI Overview" kutusu ve farklı bir ilk 10 vardı; oturum 2 ve 3 ölçümleri birbirine çok yakındı. Eşleme doğrulandı (yanıttaki `data` doğru). Bu, tek ölçümle karar vermemenin ve örneklemenin gerekçesidir; rapor cümleleri her ölçümü ayrı ele alıyor.
-
-## 7. Maliyet modeli (fiyatlandırma için)
-
-| Kalem | Bu pilotta | Not |
-| --- | --- | --- |
-| SERP verisi (DataForSEO) | 0,024 $ / belediye / tarama günü | 6 ölçüm × 0,004 $; tekrar oranı %20 varsayımıyla ≈ 0,029 $ |
-| Tam pilot ölçeği (30 belediye) | ≈ 0,72 $ (tekrarsız) / 0,86 $ (beklenen) / 2,16 $ (en kötü) | aynı keyword seti |
-| LLM (Claude API) | 0 $ | tarama ve kurallar deterministik; rapor metni şablondan, LLM kullanılmıyor |
-| Barındırma / veritabanı | tarama başına ayrıca ölçülmedi | tarama yerelde çalışıyor; Vercel ve Neon kullanımı bu ölçümde yok |
-| Geliştirme (Claude Code oturumları) | bu belgede ölçülmedi | kullanım Claude hesabının kullanım ekranında görünür; belediye başına maliyet değildir |
-| İnsan emeği (inceleme, açıklama) | ölçülmedi | ROADMAP: pilot kaydı 5 (saat) |
+Planlı saatlerde (09:00 / 13:00 / 18:00) aynı 5 belediye: 30 görev, beklenen ≈ 0,14 $, en kötü durum 0,36 $; reklam gözlemi ve gün içi değişkenlik için gerekli. Önce etiket onayı ve Heidenheim profil bağlantısı.

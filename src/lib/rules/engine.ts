@@ -106,8 +106,22 @@ export interface StatusCell {
   localPackDetails: (LocalPackResult & { taskKey: string })[];
 }
 
+/**
+ * Why a rule did or did not produce a finding for a cell, so that
+ * "could not be evaluated (missing information)" and "evaluated, conditions
+ * not met" stay apart in reports.
+ */
+export interface RuleCheck {
+  rule: Finding["rule"];
+  ags: string;
+  keyword: string | null;
+  status: "finding" | "not_met" | "not_evaluable" | "disabled";
+  reason: string | null;
+}
+
 export interface Evaluation {
   rulesVersion: string;
+  ruleChecks: RuleCheck[];
   labelsApproved: boolean;
   scanId: string;
   plannedSettlements: number;
@@ -223,10 +237,32 @@ const hasAds = (m: Measurement) => m.rows.some((r) => r.type === "ad");
 /** Organic results actually returned; live SERPs give ~15 even when depth is 20. */
 export const organicCount = (m: Measurement) => Math.max(0, ...m.rows.filter((r) => r.type === "organic").map((r) => r.rank));
 
-/** "Not found" names the smallest organic list of the measurements, never the requested depth. */
+/** "18 Ergebnisse" or "18, 19 und 19 Ergebnisse": per measurement, never the requested depth. */
+function countsText(ms: readonly Measurement[]): string {
+  const counts = ms.map(organicCount);
+  return counts.length === 1 ? fill(T.status.organicCount, { count: counts[0] }) : fill(T.status.organicCounts, { counts: deList(counts.map(String)) });
+}
+
+/** "Not found" names how many organic results each measurement returned. */
 function notFoundText(ms: readonly Measurement[]): string {
-  const depth = Math.min(...ms.map(organicCount));
-  return depth > 0 ? fill(T.status.notFound, { depth }) : T.status.noOrganic;
+  return ms.every((m) => organicCount(m) === 0) ? T.status.noOrganic : fill(T.status.notFound, { counts: countsText(ms) });
+}
+
+/**
+ * Organic cell per measurement: found in k of n (with each rank), and for the
+ * others how many organic results were returned. Never only the best rank.
+ */
+export function organicCellText(ms: readonly Measurement[], targets: readonly string[]): string {
+  const ranks = ms.map((m) => targetOrganicBest(m, targets));
+  const found = ranks.filter((r): r is number => r !== null);
+  const missing = ms.filter((_, i) => ranks[i] === null);
+  if (ms.length === 1 && found.length === 1) return fill(T.status.organicOneFound, { rank: found[0] });
+  if (found.length === ms.length) return fill(T.status.organicAll, { n: ms.length, ranks: deList(found.map(String)) });
+  if (missing.every((m) => organicCount(m) === 0) && found.length === 0) return T.status.noOrganic;
+  if (ms.length === 1) return fill(T.status.organicOneNone, { counts: countsText(ms) });
+  if (found.length === 0) return fill(T.status.organicNone, { n: ms.length, counts: countsText(ms) });
+  const some = missing.length === 1 ? T.status.organicSomeOne : T.status.organicSome;
+  return fill(some, { k: found.length, n: ms.length, ranks: deList(found.map(String)), m: missing.length, counts: countsText(missing) });
 }
 
 // ── Priority ────────────────────────────────────────────────────────────
@@ -307,12 +343,7 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
       let ads = T.status.notMeasured;
       let localPackDetails: StatusCell["localPackDetails"] = [];
       if (ms.length) {
-        const best = ms.map((m) => targetOrganicBest(m, targets)).filter((r): r is number => r !== null);
-        organic = !hasTarget
-          ? T.status.targetUndefined
-          : best.length
-            ? fill(T.status.rank, { rank: Math.min(...best) })
-            : notFoundText(ms);
+        organic = hasTarget ? organicCellText(ms, targets) : T.status.targetUndefined;
         const lp = ms.map((m) => ({ taskKey: m.taskKey, ...localPackStatus(m, identity) }));
         localPackDetails = lp;
         const matched = lp.filter((x) => x.status === "matched").sort((a, b) => a.rank! - b.rank!);
@@ -350,6 +381,7 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
   }
 
   // Rules 1, 2, 4 per settlement × main keyword.
+  const ruleChecks: RuleCheck[] = [];
   const gaps = new Map<string, { organic: boolean; localPack: boolean; refs: EvidenceRef[] }>();
   /** `${ags}|${keyword}` with an organic_gap: hypotheses must rest on the same settlement and keyword. */
   const organicGapKeys = new Set<string>();
@@ -364,7 +396,7 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
       const planned = plannedCount(s.ags, keyword);
       if (hasTarget && perMeasurement.every((x) => (x.best === null || x.best > ORGANIC_TOP) && x.competitors.length >= ORGANIC_GAP_MIN_COMPETITORS)) {
         const found = perMeasurement.map((x) => x.best).filter((r): r is number => r !== null);
-        const status = found.length ? fill(T.status.rank, { rank: Math.min(...found) }) : notFoundText(ms);
+        const status = found.length ? organicCellText(ms, targets) : notFoundText(ms);
         const id = `organic_gap:${s.ags}:${keyword}`;
         findings.push({
           id,
@@ -397,12 +429,31 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
         g.organic = true;
         organicGapKeys.add(`${s.ags}|${keyword}`);
         g.refs.push(...ms.map(ref));
+        ruleChecks.push({ rule: "organic_gap", ags: s.ags, keyword, status: "finding", reason: null });
+      } else if (!hasTarget) {
+        ruleChecks.push({ rule: "organic_gap", ags: s.ags, keyword, status: "not_evaluable", reason: "no_target_domain" });
+      } else if (perMeasurement.some((x) => x.best !== null && x.best <= ORGANIC_TOP)) {
+        ruleChecks.push({ rule: "organic_gap", ags: s.ags, keyword, status: "not_met", reason: "target_in_top_10" });
+      } else {
+        // Fewer than 2 labelled local/regional competitors in some measurement: unlabelled
+        // domains in its top 10 could change that, so the rule cannot be decided yet.
+        const undecided = perMeasurement.some((x) => {
+          if (x.competitors.length >= ORGANIC_GAP_MIN_COMPETITORS) return false;
+          const unlabelled = new Set(x.m.rows.filter((r) => r.type === "organic" && r.rank <= ORGANIC_TOP && r.domain && !isTarget(r.domain, targets) && !labels.has(r.domain)).map((r) => r.domain));
+          return x.competitors.length + unlabelled.size >= ORGANIC_GAP_MIN_COMPETITORS;
+        });
+        ruleChecks.push(
+          undecided
+            ? { rule: "organic_gap", ags: s.ags, keyword, status: "not_evaluable", reason: "unlabelled_competitors_in_top_10" }
+            : { rule: "organic_gap", ags: s.ags, keyword, status: "not_met", reason: "fewer_than_2_local_competitors" },
+        );
       }
 
       // 2. local_pack_gap (off in the pilot): every measurement without the target, a shown pack with a local competitor.
       const lp = ms.map((m) => ({ m, ...localPackStatus(m, identity), competitors: localPackCompetitors(m, targets, labels, LOCAL_PACK_GAP_LABELS) }));
       const noMatch = lp.every((x) => x.status === "not_found_in_pack" || x.status === "no_local_pack");
       const withCompetitor = lp.some((x) => x.status === "not_found_in_pack" && x.competitors.length >= LOCAL_PACK_GAP_MIN_COMPETITORS);
+      if (!localPackGapEnabled) ruleChecks.push({ rule: "local_pack_gap", ags: s.ags, keyword, status: "disabled", reason: "off_in_pilot" });
       if (localPackGapEnabled && noMatch && withCompetitor) {
         const id = `local_pack_gap:${s.ags}:${keyword}`;
         const competitors = [...new Set(lp.flatMap((x) => x.competitors))];
@@ -443,6 +494,17 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
       const bySession = new Map<number, Measurement>();
       for (const m of ms) if (m.samplingMode === "sessions" && !bySession.has(m.session)) bySession.set(m.session, m);
       const sessionMs = [...bySession.values()];
+      if (sessionMs.length < AD_MIN_SESSIONS) {
+        ruleChecks.push({
+          rule: "ad_observation",
+          ags: s.ags,
+          keyword,
+          status: "not_evaluable",
+          reason: sessionMs.length === 0 && ms.length > 0 ? "technical_validation_only" : "fewer_than_3_sessions",
+        });
+      } else {
+        ruleChecks.push({ rule: "ad_observation", ags: s.ags, keyword, status: "finding", reason: null });
+      }
       if (sessionMs.length >= AD_MIN_SESSIONS) {
         const k = sessionMs.filter(hasAds).length;
         const n = sessionMs.length;
@@ -492,17 +554,23 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
     const measured = scan.settlements.filter((s) => cell(s.ags, keyword).length > 0);
     const planned = scan.settlements.filter((s) => plannedCount(s.ags, keyword) > 0).length;
     if (measured.length === 0) continue;
-    const seen = new Map<string, { organic: Set<string>; localPack: Set<string>; refs: EvidenceRef[] }>();
+    type PerSettlement = { n: number; any: Set<string>; organic: Set<string>; localPack: Set<string> };
+    const seen = new Map<string, { organic: Set<string>; localPack: Set<string>; refs: EvidenceRef[]; per: Map<string, PerSettlement> }>();
     for (const s of measured) {
-      for (const m of cell(s.ags, keyword)) {
+      const ms = cell(s.ags, keyword);
+      for (const m of ms) {
         for (const r of m.rows) {
           if (!r.domain || isTarget(r.domain, targets)) continue;
           const inOrganic = r.type === "organic" && r.rank <= ORGANIC_TOP;
           const inPack = r.type === "local_pack";
           if (!inOrganic && !inPack) continue;
-          const e = seen.get(r.domain) ?? { organic: new Set(), localPack: new Set(), refs: [] };
+          const e = seen.get(r.domain) ?? { organic: new Set<string>(), localPack: new Set<string>(), refs: [] as EvidenceRef[], per: new Map<string, PerSettlement>() };
           (inOrganic ? e.organic : e.localPack).add(s.ags);
           if (!e.refs.some((x) => x.taskKey === m.taskKey)) e.refs.push(ref(m));
+          const p = e.per.get(s.ags) ?? { n: ms.length, any: new Set(), organic: new Set(), localPack: new Set() };
+          p.any.add(m.taskKey);
+          (inOrganic ? p.organic : p.localPack).add(m.taskKey);
+          e.per.set(s.ags, p);
           seen.set(r.domain, e);
         }
       }
@@ -535,6 +603,13 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
             organic: r.organic.size,
             localPack: r.localPack.size,
           }),
+          fill(T.competitorCoverage.observedIn, {
+            list: [...r.per]
+              .map(([ags, p]) => ({ s: settlementByAgs.get(ags)!, p }))
+              .sort((a, b) => a.s.distanceKm - b.s.distanceKm)
+              .map(({ s, p }) => fill(T.competitorCoverage.perSettlement, { settlement: s.name, k: p.any.size, n: p.n, o: p.organic.size, l: p.localPack.size }))
+              .join("; "),
+          }),
           label ? fill(labelsApproved ? T.competitorCoverage.label : T.competitorCoverage.labelDraft, { label }) : T.competitorCoverage.unlabeled,
         ].join(" "),
         limits: [T.competitorCoverage.meaning],
@@ -546,6 +621,7 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
             organic: [...r.organic].sort(),
             localPack: [...r.localPack].sort(),
             observedAtLeastOnce: [...r.any].sort(),
+            perSettlement: Object.fromEntries([...r.per].map(([ags, p]) => [ags, { validMeasurements: p.n, observed: p.any.size, organic: p.organic.size, localPack: p.localPack.size }])),
             label,
             listedSeparately: label !== null && NON_COMPETITOR_LABELS.includes(label),
           },
@@ -598,6 +674,7 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
 
   return {
     rulesVersion: RULES_VERSION,
+    ruleChecks,
     labelsApproved,
     scanId: scan.scanId,
     plannedSettlements: scan.settlements.length,

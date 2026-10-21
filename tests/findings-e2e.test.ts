@@ -143,11 +143,11 @@ const cellOf = (ags: string, keyword = MAIN) => evaluation.statusTable.find((c) 
 
 describe("findings end to end (synthetic world)", () => {
   it("counts one measurement per session task: retries and repeated runs are not samples", () => {
-    expect(cellOf(FRANKFURT)).toMatchObject({ plannedSamples: 3, validSamples: 3, failedSamples: 0, organic: "bestes Ergebnis Platz 3", localPack: "im Local Pack, Platz 1 (Abgleich über den Profilnamen)", ads: "3/3" });
+    expect(cellOf(FRANKFURT)).toMatchObject({ plannedSamples: 3, validSamples: 3, failedSamples: 0, organic: "in 3 von 3 Messungen gefunden: Platz 3, 3 und 3", localPack: "im Local Pack, Platz 1 (Abgleich über den Profilnamen)", ads: "3/3" });
   });
 
   it("keeps failed measurements apart", () => {
-    expect(cellOf(H)).toMatchObject({ validSamples: 2, failedSamples: 1, organic: "unter den ersten 20 organischen Ergebnissen nicht gefunden" });
+    expect(cellOf(H)).toMatchObject({ validSamples: 2, failedSamples: 1, organic: "in keiner der 2 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (20 und 20 Ergebnisse)" });
   });
 
   it("produces the expected findings", () => {
@@ -183,7 +183,7 @@ describe("findings end to end (synthetic world)", () => {
 
   it("writes the expected sentences", () => {
     expect(output).toContain(
-      "(Beobachtung) In Beispielstadt A war ziel-betrieb.example bei „Terrassenüberdachung“ in 3 von 3 gültigen Messungen nicht unter den ersten 10 organischen Ergebnissen (bestes Ergebnis Platz 14).",
+      "(Beobachtung) In Beispielstadt A war ziel-betrieb.example bei „Terrassenüberdachung“ in 3 von 3 gültigen Messungen nicht unter den ersten 10 organischen Ergebnissen. Je Messung: in 3 von 3 Messungen gefunden: Platz 14, 14 und 14.",
     );
     expect(output).toContain("Von 5 geplanten Gemeinden konnten 5 für „Terrassenüberdachung“ gemessen werden. lokal-a.example wurde in 5 dieser 5 Gemeinden");
     expect(output).toContain("In Beispielstadt B wurden bei „Terrassenüberdachung“ in 1 von 3 Messungen aus 3 verschiedenen Sitzungen Anzeigen gesehen");

@@ -175,3 +175,11 @@ Canlı yanıtta `cid` gelmediği için pilotta yöntem A: hedef işletme, **doğ
 ## 11. Markanın başka şubeleri (21.10.2026)
 
 Projede `brandNames` (ör. markanın adı) tanımlıysa, Local Pack'te markayı tam kelime olarak taşıyan ama doğrulanmış profil adıyla birebir eşleşmeyen kayıt **`brand_other_location`** olur: „Eintrag der Marke im Local Pack (Platz {n}: {ham ad}), nicht dem Zielstandort zugeordnet". Hedef şubeyle asla eşleştirilmez; doğrulanmış profil adı yoksa da aynı durum gösterilir. Sıralama: `matched` > `brand_other_location` > `match_unverified` > `not_measurable` > `not_found_in_pack` > `no_local_pack`.
+
+## 12. Ölçüm bazında gösterim ve kural kontrolleri (Pilot 1 değerlendirmesi, 21.10.2026)
+
+- **Organik hücre her ölçümü gösterir**, yalnızca en iyi sırayı değil: „in 2 von 3 Messungen gefunden (Platz 8 und 8); in 1 Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse)". Tek ölçümde tekil ifade. Sonuç sayıları ölçüm başına korunur („18, 19 und 19 Ergebnisse").
+- **„İlk N'de yok" denmez:** „unter den zurückgegebenen organischen Ergebnissen nicht gefunden (N Ergebnisse)". Sağlayıcının sıra numaraları raporda ayrıca kontrol edilir (pilot 1: tüm ölçümlerde 1..n kesintisiz).
+- **Rakip kapsaması** bulgusu belediye başına gözlendiği ölçüm sayısını ve organik / Local Pack ayrımını söyler („Beobachtet in: Heidenheim: 1 von 3 Messungen (organisch 1, Local Pack 0); …"); `evidence.details.perSettlement`.
+- **Kural kontrolleri (`ruleChecks`):** her kural ve hücre için `finding` · `not_met` (değerlendirildi, koşul sağlanmadı) · `not_evaluable` (eksik bilgi: hedef domain yok, ilk 10'da etiketsiz rakipler, yalnızca teknik deneme) · `disabled` (pilotta kapalı). Organik boşlukta etiketsiz rakipler sonucu değiştirebiliyorsa hücre „değerlendirilemedi" olur; eşikler gevşetilmez.
+- **Teknik denemede reklam oranı** durum tablosunda gösterilmez („nicht ausgewertet (technische Validierung)").

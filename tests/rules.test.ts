@@ -93,7 +93,7 @@ describe("organic_gap", () => {
     const e = evaluate(scan([S2], ms), labels);
     const [f] = byRule(e, "organic_gap");
     expect(f).toMatchObject({ evidenceLevel: "observation", kind: "opportunity", ags: S2.ags });
-    expect(f.text).toContain("in 3 von 3 gültigen Messungen nicht unter den ersten 10 organischen Ergebnissen (bestes Ergebnis Platz 14)");
+    expect(f.text).toContain("in 3 von 3 gültigen Messungen nicht unter den ersten 10 organischen Ergebnissen. Je Messung: in 3 von 3 Messungen gefunden: Platz 14, 14 und 14.");
     expect(f.text).toContain("Messung 1 (21.10.2026): lokal-a.example und lokal-b.example");
     expect(e.actions.find((a) => a.findingId === f.id)).toMatchObject({ type: "review", bucket: "website" });
     expect(f.evidence.measurements).toHaveLength(3);
@@ -114,7 +114,7 @@ describe("organic_gap", () => {
     const ms = [m(S2.ags, 1, organic("lokal-a.example", "lokal-b.example")), m(S2.ags, 2, organic("lokal-a.example", "region-c.example"))];
     const [f] = byRule(evaluate(scan([S2], ms), labels), "organic_gap");
     expect(f.text).toContain("Messung 1 (21.10.2026): lokal-a.example und lokal-b.example; Messung 2 (22.10.2026): lokal-a.example und region-c.example");
-    expect(f.text).toContain("unter den ersten 20 organischen Ergebnissen nicht gefunden");
+    expect(f.text).toContain("Je Messung: unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 und 20 Ergebnisse).");
   });
 
   it("does not fire with one competitor, or with national/portal/unlabeled ones", () => {
@@ -409,7 +409,7 @@ describe("report wording", () => {
   });
 
   it("'not found' always names the scanned depth", () => {
-    expect(fill(reportText.status.notFound, { depth: 20 })).toBe("unter den ersten 20 organischen Ergebnissen nicht gefunden");
+    expect(fill(reportText.status.notFound, { counts: "18 Ergebnisse" })).toBe("unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse)");
   });
 
   it("refuses to render a template with a missing placeholder", () => {
@@ -519,8 +519,8 @@ describe("'not found' names the organic results actually returned", () => {
   it("uses the smallest organic list of the measurements, not the requested depth", () => {
     const fifteen = organic("lokal-a.example", "lokal-b.example").slice(0, 15);
     const e = evaluate(scan([S2], [m(S2.ags, 1, fifteen), m(S2.ags, 2, organic("lokal-a.example", "lokal-b.example"))]), labels);
-    expect(e.statusTable[0].organic).toBe("unter den ersten 15 organischen Ergebnissen nicht gefunden");
-    expect(byRule(e, "organic_gap")[0].text).toContain("(unter den ersten 15 organischen Ergebnissen nicht gefunden)");
+    expect(e.statusTable[0].organic).toBe("in keiner der 2 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (15 und 20 Ergebnisse)");
+    expect(byRule(e, "organic_gap")[0].text).toContain("Je Messung: unter den zurückgegebenen organischen Ergebnissen nicht gefunden (15 und 20 Ergebnisse).");
   });
 
   it("says no organic results were shown when there are none", () => {
@@ -581,5 +581,87 @@ describe("ads cell in technical validation", () => {
     expect(evaluate(scan([S2], tech), labels).statusTable[0].ads).toBe("nicht ausgewertet (technische Validierung)");
     const real = [1, 2, 3].map((s) => m(S2.ags, s, s === 2 ? organic("x.example") : [ad(1, "w.example")]));
     expect(evaluate(scan([S2], real), labels).statusTable[0].ads).toBe("2/3");
+  });
+});
+
+// ── report review (pilot 1): per-measurement cells, coverage detail, rule checks ──
+
+describe("organic cell shows every measurement", () => {
+  const withTarget = (rank: number) => organic(...Array(rank - 1).fill(0).map((_, i) => `x${i}.example`), TARGET);
+  const eighteen = organic("a.example").slice(0, 18);
+
+  it("found in some measurements: ranks of each plus the result counts of the others", () => {
+    const e = evaluate(scan([S2], [m(S2.ags, 1, eighteen), m(S2.ags, 2, withTarget(8)), m(S2.ags, 3, withTarget(8))]), labels);
+    expect(e.statusTable[0].organic).toBe("in 2 von 3 Messungen gefunden (Platz 8 und 8); in 1 Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse)");
+  });
+
+  it("found in every measurement lists every rank, not only the best", () => {
+    const e = evaluate(scan([S2], [m(S2.ags, 1, withTarget(3)), m(S2.ags, 2, withTarget(7))]), labels);
+    expect(e.statusTable[0].organic).toBe("in 2 von 2 Messungen gefunden: Platz 3 und 7");
+  });
+
+  it("keeps different result counts per measurement", () => {
+    const e = evaluate(scan([S2], [m(S2.ags, 1, eighteen), m(S2.ags, 2, organic("a.example").slice(0, 19))]), labels);
+    expect(e.statusTable[0].organic).toBe("in keiner der 2 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (18 und 19 Ergebnisse)");
+  });
+});
+
+describe("competitor coverage detail", () => {
+  it("lists settlements with valid measurements and the organic / Local Pack split", () => {
+    const ms = [
+      m(S1.ags, 1, organic("lokal-a.example")),
+      m(S1.ags, 2, organic("x.example")),
+      m(S2.ags, 1, [{ ...lp(1, "lokal-a.example", null) }, ...organic("y.example")]),
+    ];
+    const f = byRule(evaluate(scan([S1, S2], ms), labels), "competitor_coverage").find((x) => x.competitorDomain === "lokal-a.example")!;
+    expect(f.text).toContain("Beobachtet in: Frankfurt am Main: 1 von 2 Messungen (organisch 1, Local Pack 0); Offenbach am Main: 1 von 1 Messungen (organisch 0, Local Pack 1).");
+    expect(f.evidence.details.perSettlement).toEqual({
+      [S1.ags]: { validMeasurements: 2, observed: 1, organic: 1, localPack: 0 },
+      [S2.ags]: { validMeasurements: 1, observed: 1, organic: 0, localPack: 1 },
+    });
+  });
+});
+
+describe("rule checks: not evaluable vs not met", () => {
+  const check = (e: ReturnType<typeof evaluate>, rule: string) => e.ruleChecks.filter((c) => c.rule === rule).map((c) => [c.status, c.reason]);
+
+  it("organic_gap: unlabelled domains in the top 10 make the cell not evaluable", () => {
+    const e = evaluate(scan([S2], [m(S2.ags, 1, organic("lokal-a.example", "unbekannt.example"))]), labels);
+    expect(check(e, "organic_gap")).toEqual([["not_evaluable", "unlabelled_competitors_in_top_10"]]);
+  });
+
+  it("organic_gap: evaluated, not met when the target is in the top 10 or competitors are clearly too few", () => {
+    expect(check(evaluate(scan([S2], [m(S2.ags, 1, organic(TARGET, "lokal-a.example", "lokal-b.example"))]), labels), "organic_gap")).toEqual([["not_met", "target_in_top_10"]]);
+    const fewLabelled = organic("lokal-a.example", "national-d.example", "portal.example", ...Array(7).fill(0).map((_, i) => `z${i}.example`)).map((r) => (r.domain?.startsWith("z") ? { ...r, domain: "portal.example" } : r));
+    expect(check(evaluate(scan([S2], [m(S2.ags, 1, fewLabelled)]), labels), "organic_gap")).toEqual([["not_met", "fewer_than_2_local_competitors"]]);
+  });
+
+  it("organic_gap: not evaluable without a target domain; finding when it fires", () => {
+    const rows = organic("lokal-a.example", "lokal-b.example");
+    expect(check(evaluate(scan([S2], [m(S2.ags, 1, rows)], { targetDomains: [] }), labels), "organic_gap")).toEqual([["not_evaluable", "no_target_domain"]]);
+    expect(check(evaluate(scan([S2], [m(S2.ags, 1, rows)]), labels), "organic_gap")).toEqual([["finding", null]]);
+  });
+
+  it("local_pack_gap is reported as disabled; ad_observation as not evaluable in technical validation", () => {
+    const ms = [1, 2, 3].map((s) => m(S2.ags, s, organic("x.example"), { samplingMode: "technical_validation" }));
+    const e = evaluate(scan([S2], ms), labels);
+    expect(check(e, "local_pack_gap")).toEqual([["disabled", "off_in_pilot"]]);
+    expect(check(e, "ad_observation")).toEqual([["not_evaluable", "technical_validation_only"]]);
+  });
+});
+
+describe("organic cell wording for a single measurement", () => {
+  const withTarget = (rank: number) => organic(...Array(rank - 1).fill(0).map((_, i) => `x${i}.example`), TARGET);
+  it("uses singular wording", () => {
+    expect(evaluate(scan([S2], [m(S2.ags, 1, withTarget(5))]), labels).statusTable[0].organic).toBe("in der Messung gefunden: Platz 5");
+    expect(evaluate(scan([S2], [m(S2.ags, 1, organic("a.example").slice(0, 18))]), labels).statusTable[0].organic).toBe(
+      "in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse)",
+    );
+  });
+  it("uses plural wording when several measurements missed", () => {
+    const ms = [m(S2.ags, 1, withTarget(4)), m(S2.ags, 2, organic("a.example").slice(0, 18)), m(S2.ags, 3, organic("a.example").slice(0, 19))];
+    expect(evaluate(scan([S2], ms), labels).statusTable[0].organic).toBe(
+      "in 1 von 3 Messungen gefunden (Platz 4); in 2 Messungen unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 und 19 Ergebnisse)",
+    );
   });
 });

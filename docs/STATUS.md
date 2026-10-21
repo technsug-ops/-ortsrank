@@ -95,7 +95,8 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] **Pilot 1 küçük gerçek veri denemesi** (21.10.2026): 5 belediye (Heidenheim, Steinheim, Aalen, Ulm, Babenhausen), 30/30 görev, 0,12 $ (0,024 $ / belediye), bakiye 0,94 → 0,82 $; oturumlar peş peşe → `technical_validation`. Özet [reports/pilot1-small-run.md](reports/pilot1-small-run.md); tam rapor git dışında
 - [ ] Pilot 1 planlı oturumlarla ölçüm (09:00 / 13:00 / 18:00) – reklam gözlemi için
 - [ ] Pilot 1 Heidenheim şubesinin Google profili (tam ad, adres, bağlantı, kimlik) doğrulanmış kaynaktan
-- [ ] Pilot 1 rakip etiket taslağı onayı (`data/competitor-labels.pilot1.draft.json`)
+- [ ] Pilot 1 rakip etiket onayı – inceleme tablosu `data/competitor-review.pilot1.md` (34 domain, kamuya açık kaynaklar, hiçbiri onaylanmadı)
+- [x] Pilot 1 müşteri raporu taslağı (Almanca, git dışı `data/reports/pilot1-kundenbericht-20261021.md`), Halil'in incelemesine hazır
 - [-] DataForSEO'ya 50 $ yükleme – Halil'in talimatıyla uygulanmadı; yalnızca mevcut bakiye kullanılıyor (kalan 0,82 $)
 - [~] Pilot keywordleri (3–5), işletmelerin gerçek hizmetlerine göre – taslak [PILOT_SETUP.md](PILOT_SETUP.md) bölüm 1 (Google önerilerinden), Halil'in onayı bekleniyor
 - [~] Pilot alanı kararı (taslak [PILOT_SETUP.md](PILOT_SETUP.md) bölüm 2; önce pilot işletmenin konumu): 30 km / ≥10.000 nüfusta 66 belediye var; üst sınır 30 iken seçim 17,4 km'de bitiyor. Seçenekler: üst sınırı artırmak, nüfus eşiğini yükseltmek (30 km / ≥20.000 → 34) veya yarıçapı küçültmek (25 km / ≥20.000 → 29)
@@ -144,7 +145,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Pilot 1 küçük canlı deneme: 5 belediye, 30/30, 0,12 $; 17 rakip kapsaması bulgusu (etiketler taslak); organik boşluk etiket onayı olmadan üretilemedi; SERP varyantı gözlemi. Kod: açık belediye listesi, `--labels-draft`, teknik denemede reklam oranı gizli; toplam 326/326 | bu commit |
+| 21.10.2026 | Pilot 1 değerlendirme raporu (mevcut ham veriden, yeni istek yok): Almanca müşteri raporu ve etiket inceleme tablosu git dışında; ölçüm bazında organik hücre, rakip kapsamasında belediye başına ölçüm, `ruleChecks` (değerlendirilemedi / koşul sağlanmadı), Markdown düzeltmeleri; toplam 336/336 | bu commit |
+| 21.10.2026 | Pilot 1 küçük canlı deneme: 5 belediye, 30/30, 0,12 $; 17 rakip kapsaması bulgusu (etiketler taslak); organik boşluk etiket onayı olmadan üretilemedi; SERP varyantı gözlemi. Kod: açık belediye listesi, `--labels-draft`, teknik denemede reklam oranı gizli; toplam 326/326 | `eb5bf65` |
 | 21.10.2026 | Pilot 1 hazırlığı (Arbeitsbühnenvermietung, Heidenheim): `includeCenter`, `populationMax`, marka şubesi durumu; keşif 4 sorgu 0,016 $; dry-run 30 belediye / 180 görev / 0,86–2,16 $; toplam 316/316 | `9f761c3` |
 | 21.10.2026 | Pilot ayarları taslağı: keywordler (Google önerilerinden), alan seçenekleri ve maliyet; rakip etiket taslağı `data/` içinde (31 öneri, 18 belirsiz) | `84e6540` |
 | 21.10.2026 | Local Pack profil adıyla eşleştirme (5 durum, ham ad + yöntem kaydı), `local_pack_gap` pilotta kapalı; toplam 304/304 | `94e850e` |
