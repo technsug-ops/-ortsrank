@@ -37,7 +37,7 @@ export function formatEvaluation(e: Evaluation): string {
   const lines: string[] = [`Rules v${e.rulesVersion} · scan ${e.scanId} · ${e.plannedSettlements} planned settlements`, ""];
   lines.push("Status (settlement · keyword · valid/planned · organic · local pack · ads):");
   for (const c of e.statusTable) {
-    lines.push(`  ${c.settlement} · ${c.keyword} · ${c.validSamples}/${c.plannedSamples}${c.failedSamples ? ` (${c.failedSamples} failed)` : ""} · ${c.organic} · ${c.localPack} · ${c.ads}`);
+    lines.push(`  ${c.settlement} · ${c.keyword} · ${c.validSamples}/${c.plannedSamples}${c.failedSamples ? ` (${c.failedSamples} failed or unusable)` : ""} · ${c.organic} · ${c.localPack} · ${c.ads}`);
   }
   const level = { observation: "Beobachtung", inference: "Ableitung", hypothesis: "Hypothese" } as const;
   for (const rule of ["organic_gap", "local_pack_gap", "competitor_coverage", "ad_observation", "review_priority"] as const) {

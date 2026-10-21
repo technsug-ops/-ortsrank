@@ -364,3 +364,69 @@ describe("report wording", () => {
     expect(() => fill(reportText.organicGap.action, { keyword: "x" })).toThrow(/settlement/);
   });
 });
+
+// ── review fixes (f787001 review) ───────────────────────────────────────
+
+describe("without a target domain", () => {
+  const gapRows = organic("lokal-a.example", "lokal-b.example");
+
+  it("says the target is not defined and produces no target-based organic findings", () => {
+    const ms = [1, 2, 3].map((s) => m(S2.ags, s, gapRows));
+    const e = evaluate(scan([S2], ms, { targetDomains: [] }), labels);
+    expect(e.statusTable[0].organic).toBe("Ziel-Domain nicht festgelegt");
+    expect(byRule(e, "organic_gap")).toEqual([]);
+    expect(byRule(e, "review_priority")).toEqual([]);
+    // General observations continue; no hypothesis without an organic gap.
+    expect(byRule(e, "ad_observation").map((f) => f.evidenceLevel)).toEqual(["observation"]);
+    expect(byRule(e, "competitor_coverage").map((f) => f.competitorDomain)).toContain("lokal-a.example");
+  });
+});
+
+describe("keyword isolation", () => {
+  const KW2 = "Terrassendach";
+  it("an organic gap in one keyword does not create an ad hypothesis for another", () => {
+    const gapRows = organic("lokal-a.example", "lokal-b.example");
+    const kw1 = [1, 2, 3].map((s) => m(S2.ags, s, [ad(1, "w.example"), ...gapRows]));
+    const kw2 = [1, 2, 3].map((s) => m(S2.ags, s, organic(TARGET), { keyword: KW2, taskKey: `${S2.ags}-k2-s${s}` }));
+    const planned = [1, 2, 3].flatMap((session) => [
+      { taskKey: `${S2.ags}-k1-s${session}`, ags: S2.ags, keyword: KW, session },
+      { taskKey: `${S2.ags}-k2-s${session}`, ags: S2.ags, keyword: KW2, session },
+    ]);
+    const e = evaluate(
+      scan([S2], [...kw1, ...kw2], { keywords: [{ term: KW, type: "main", samples: 3 }, { term: KW2, type: "main", samples: 3 }], plannedTasks: planned }),
+      labels,
+    );
+    expect(byRule(e, "organic_gap").map((f) => f.keyword)).toEqual([KW]);
+    // KW: ads seen → no hypothesis. KW2: no ads, but no organic gap for KW2 → no hypothesis either.
+    expect(byRule(e, "ad_observation").filter((f) => f.evidenceLevel === "hypothesis")).toEqual([]);
+  });
+
+  it("a hypothesis links only to the organic gap of the same settlement and keyword", () => {
+    const gapRows = organic("lokal-a.example", "lokal-b.example");
+    const kw1 = [1, 2, 3].map((s) => m(S2.ags, s, gapRows));
+    const kw2 = [1, 2, 3].map((s) => m(S2.ags, s, organic(TARGET), { keyword: KW2, taskKey: `${S2.ags}-k2-s${s}` }));
+    const e = evaluate(scan([S2], [...kw1, ...kw2], { keywords: [{ term: KW, type: "main", samples: 3 }, { term: KW2, type: "main", samples: 3 }] }), labels);
+    const hyp = byRule(e, "ad_observation").filter((f) => f.evidenceLevel === "hypothesis");
+    expect(hyp.map((f) => f.keyword)).toEqual([KW]);
+    const basedOn = hyp[0].evidence.details.basedOn as string[];
+    for (const id of basedOn) expect(e.findings.map((f) => f.id)).toContain(id);
+  });
+});
+
+describe("partial measurements in sentences", () => {
+  it("names valid and planned measurements when some failed", () => {
+    const gapRows = organic("lokal-a.example", "lokal-b.example");
+    const ms = [m(S2.ags, 1, [lp(1, "lokal-a.example", "2"), ...gapRows]), m(S2.ags, 3, [lp(1, "lokal-a.example", "2"), ...gapRows])];
+    const e = evaluate(scan([S2], ms), labels);
+    expect(byRule(e, "organic_gap")[0].text).toContain("in 2 gültigen von 3 geplanten Messungen nicht unter den ersten 10");
+    expect(byRule(e, "local_pack_gap")[0].text).toContain("in keiner der 2 gültigen von 3 geplanten Messungen im Local Pack");
+  });
+});
+
+describe("review_priority actions", () => {
+  it("ask to check the findings of the settlement; the order is given by the numbers", () => {
+    const e = evaluate(scan([S2], [m(S2.ags, 1, organic("lokal-a.example", "lokal-b.example"))]), labels);
+    const id = byRule(e, "review_priority")[0].id;
+    expect(e.actions.find((a) => a.findingId === id)?.text).toBe("Prüfen Sie die Befunde für Offenbach am Main.");
+  });
+});

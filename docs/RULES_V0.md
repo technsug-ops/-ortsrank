@@ -1,7 +1,7 @@
 # Kurallar v0 – Tasarım (taslak)
 
 > Kapsam: ROADMAP 3.3, Aşama 1 › Rapor › „Kurallar v0 (5 kural), her bulgu kanıt seviyesiyle".
-> Durum: **onaylandı, uygulamada** · 21.10.2026 · Sürüm 0.2 (Halil'in kararları ve ölçüm ayrıntıları, bölüm 7)
+> Durum: **onaylandı, uygulandı** · 21.10.2026 · Sürüm 0.2 (Halil'in kararları ve ölçüm ayrıntıları, bölüm 7; kod incelemesi düzeltmeleri bölüm 8)
 > Girdi yalnızca SERP taraması (`serp_raw` / `runs/`). Sayfa taraması gerektiren kurallar („rakibin Hanau sayfası var") sayfa taraması eklendiğinde gelir.
 
 ---
@@ -140,3 +140,11 @@
 **Kapsama paydası:** İlgili keyword'de en az bir geçerli ölçümü olan belediyeler. Rapor planlanan ve ölçülen sayıyı birlikte verir; organik kapsama, Local Pack kapsaması ve birleşik „en az bir kez gözlenen kapsama" ayrı gösterilir. Birleşik oran sürekli görünürlük anlamına gelmez.
 
 **Öncelik skoru:** İş potansiyeli değil, inceleme sırası üretmek için seçilmiş bir yöntemdir; rapor bunu yazar (nüfus ≠ arama talebi, yakınlık ≠ kârlılık). Nüfus eksikse skor üretilmez, belediye „manuel inceleme" listesine girer. Bileşenler 0–1 aralığına sınırlanır; yarıçap ≤ 0 geçersizdir.
+
+## 8. Kod incelemesi düzeltmeleri (`f787001` sonrası)
+
+1. **Hedef domain tanımlı değilse** organik durum „Ziel-Domain nicht festgelegt" olur; hedefe bağlı organik bulgu (`organic_gap`), ona bağlı öncelik ve reklam hipotezi üretilmez. Rakip kapsaması ve reklam gözlemi devam eder.
+2. **Keyword ayrımı:** organik boşluk belediye + keyword düzeyinde tutulur. Reklam hipotezi yalnızca aynı belediye ve aynı keyword'deki `organic_gap`'e dayanır; `basedOn` yalnızca var olan bulgulara bağlanır. (Öncelik skoru belediye düzeyinde kalır.)
+3. **Kısmen ayrıştırılmış yanıt:** ayrıştırıcı bir sonuç öğesini çözemediyse (`issues`) o ölçüm bulgular için kullanılmaz; „unusable" (`parse_issues:<tür>`) olarak durum tablosunda „failed or unusable" sayılır. Yokluk çıkarımı yapılmaz.
+4. **Eksik ölçüm cümlede görünür:** geçerli < planlanan ise „in 2 gültigen von 3 geplanten Messungen" / „in keiner der 2 gültigen von 3 geplanten Messungen".
+5. **Öncelik aksiyonu:** „Prüfen Sie die Befunde für {Gemeinde}."; sıralamayı numaralar verir. İç şemada `bucket = monitoring` kalır; raporda „Prüfreihenfolge" altında gösterilir.

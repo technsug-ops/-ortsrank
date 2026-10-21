@@ -170,7 +170,13 @@ const labelText = (labels: Labels, domain: string) => labels.get(domain) ?? null
 
 export function evaluate(scan: ScanData, labels: Labels): Evaluation {
   const targets = scan.targetDomains.map(normalizeDomain);
-  const targetName = targets.length ? deList(targets) : T.status.targetFallback;
+  // Without a target domain nothing can be "not found": organic findings about the target are skipped.
+  const hasTarget = targets.length > 0;
+  const targetName = deList(targets);
+  const measurementsText = (n: number, planned: number, none = false) =>
+    n === planned
+      ? fill(none ? T.measurements.noneAll : T.measurements.all, { n })
+      : fill(none ? T.measurements.nonePartial : T.measurements.partial, { n, planned });
   const findings: Finding[] = [];
   const actions: ActionProposal[] = [];
   const settlementByAgs = new Map(scan.settlements.map((s) => [s.ags, s]));
@@ -193,7 +199,11 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
       let ads = T.status.notMeasured;
       if (ms.length) {
         const best = ms.map((m) => targetOrganicBest(m, targets)).filter((r): r is number => r !== null);
-        organic = best.length ? fill(T.status.rank, { rank: Math.min(...best) }) : fill(T.status.notFound, { depth: scan.depth });
+        organic = !hasTarget
+          ? T.status.targetUndefined
+          : best.length
+            ? fill(T.status.rank, { rank: Math.min(...best) })
+            : fill(T.status.notFound, { depth: scan.depth });
         const lp = ms.map((m) => localPackStatus(m, targets, scan.targetCids));
         const matched = lp.filter((x) => x.status === "matched").map((x) => x.rank!);
         localPack = matched.length
@@ -221,6 +231,8 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
 
   // Rules 1, 2, 4 per settlement × main keyword.
   const gaps = new Map<string, { organic: boolean; localPack: boolean; refs: EvidenceRef[] }>();
+  /** `${ags}|${keyword}` with an organic_gap: hypotheses must rest on the same settlement and keyword. */
+  const organicGapKeys = new Set<string>();
   for (const s of scan.settlements) {
     for (const keyword of mainKeywords) {
       const ms = cell(s.ags, keyword);
@@ -229,7 +241,8 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
 
       // 1. organic_gap: in every valid measurement, target outside the top 10 and ≥ 2 local/regional competitors inside.
       const perMeasurement = ms.map((m) => ({ m, best: targetOrganicBest(m, targets), competitors: organicTopCompetitors(m, targets, labels, ORGANIC_GAP_LABELS) }));
-      if (perMeasurement.every((x) => (x.best === null || x.best > ORGANIC_TOP) && x.competitors.length >= ORGANIC_GAP_MIN_COMPETITORS)) {
+      const planned = plannedCount(s.ags, keyword);
+      if (hasTarget && perMeasurement.every((x) => (x.best === null || x.best > ORGANIC_TOP) && x.competitors.length >= ORGANIC_GAP_MIN_COMPETITORS)) {
         const found = perMeasurement.map((x) => x.best).filter((r): r is number => r !== null);
         const status = found.length ? fill(T.status.rank, { rank: Math.min(...found) }) : fill(T.status.notFound, { depth: scan.depth });
         const id = `organic_gap:${s.ags}:${keyword}`;
@@ -248,7 +261,7 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
             settlement: s.name,
             target: targetName,
             keyword,
-            n: ms.length,
+            measurements: measurementsText(ms.length, planned),
             status,
             perMeasurement: perMeasurement
               .map((x) => fill(T.organicGap.measurement, { sample: x.m.session, date: deDate(x.m.datetime), competitors: deList(x.competitors) }))
@@ -262,6 +275,7 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
         });
         actions.push({ findingId: id, type: "review", bucket: "website", text: fill(T.organicGap.action, { keyword, settlement: s.name }) });
         g.organic = true;
+        organicGapKeys.add(`${s.ags}|${keyword}`);
         g.refs.push(...ms.map(ref));
       }
 
@@ -287,7 +301,7 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
           text: fill(T.localPackGap.text, {
             settlement: s.name,
             keyword,
-            n: ms.length,
+            measurements: measurementsText(ms.length, planned, true),
             packs: withoutPack === 0
               ? fill(T.localPackGap.packsAll, { n: ms.length })
               : fill(T.localPackGap.packsSome, { withPack: ms.length - withoutPack, withoutPack }),
@@ -330,7 +344,7 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
           limits: [],
           evidence: { measurements: sessionMs.map(ref), details: { sessionsWithAds: k, sessions: n } },
         });
-        if (k === 0 && g.organic) {
+        if (k === 0 && organicGapKeys.has(`${s.ags}|${keyword}`)) {
           const hid = `ad_observation:hypothesis:${s.ags}:${keyword}`;
           findings.push({
             id: hid,

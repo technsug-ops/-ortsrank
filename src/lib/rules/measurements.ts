@@ -6,6 +6,8 @@
  * Retries of a task are not extra samples. If a task succeeded in more than
  * one run, the first successful run (by run id, i.e. time) is used.
  * Failed or cancelled tasks are kept apart and never count as "not found".
+ * A response with items that could not be parsed (`issues`) is not usable
+ * either: absence of a result type cannot be concluded from it.
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -76,7 +78,8 @@ export interface FailedTask {
   ags: string;
   keyword: string;
   session: number;
-  status: "error" | "cancelled";
+  /** unusable: the provider answered, but some result items could not be parsed. */
+  status: "error" | "cancelled" | "unusable";
   reason: string | null;
 }
 
@@ -143,6 +146,11 @@ export function loadScan(runsDir: string, scanId: string): ScanData {
       const raw = JSON.parse(readFileSync(join(runDir, attempt.rawPath), "utf8"));
       const parsed = parseLiveResponse(raw, { targetDomains: plan.targetDomains });
       if (!parsed.ok) continue;
+      if (parsed.issues.length) {
+        const types = [...new Set(parsed.issues.map((i) => i.type))].sort().join(",");
+        failed.set(t.taskKey, { runId: plan.runId, taskKey: t.taskKey, ags: t.ags, keyword: t.keyword, session: t.session, status: "unusable", reason: `parse_issues:${types}` });
+        continue;
+      }
       failed.delete(t.taskKey);
       measurements.set(t.taskKey, {
         runId: plan.runId,

@@ -12,15 +12,15 @@
       "mobile": "mobil",
       "desktop": "Desktop"
     },
-    "targetFallback": "Ihr Betrieb"
+    "targetUndefined": "Ziel-Domain nicht festgelegt"
   },
   "organicGap": {
-    "text": "In {settlement} war {target} bei „{keyword}“ in {n} von {n} gültigen Messungen nicht unter den ersten 10 organischen Ergebnissen ({status}). In jeder dieser Messungen waren mindestens 2 lokale oder regionale Wettbewerber unter den ersten 10 – {perMeasurement}.",
+    "text": "In {settlement} war {target} bei „{keyword}“ {measurements} nicht unter den ersten 10 organischen Ergebnissen ({status}). In jeder dieser Messungen waren mindestens 2 lokale oder regionale Wettbewerber unter den ersten 10 – {perMeasurement}.",
     "measurement": "Messung {sample} ({date}): {competitors}",
     "action": "Prüfen Sie, ob Ihre bestehende Seite den Bedarf für „{keyword}“ in {settlement} abdeckt."
   },
   "localPackGap": {
-    "text": "In {settlement} erschien Ihr Betrieb bei „{keyword}“ in keiner der {n} gültigen Messungen im Local Pack (Karten-Ergebnisse). {packs} Lokale Wettbewerber im Local Pack: {competitors}.",
+    "text": "In {settlement} erschien Ihr Betrieb bei „{keyword}“ {measurements} im Local Pack (Karten-Ergebnisse). {packs} Lokale Wettbewerber im Local Pack: {competitors}.",
     "limit": "Das Local Pack hängt stark von der Entfernung zum Messpunkt ab; gemessen wurde von einem repräsentativen Punkt in der Gemeindemitte. Google berücksichtigt bei lokalen Ergebnissen Relevanz, Entfernung und Bekanntheit; die Prüfung des Profils ist keine Zusage für eine Platzierung in dieser Gemeinde.",
     "action": "Prüfen Sie, ob Profilangaben, Kategorie und das tatsächlich bediente Einzugsgebiet in Ihrem Google-Unternehmensprofil zutreffend sind.",
     "packsAll": "In allen {n} Messungen wurde ein Local Pack angezeigt.",
@@ -42,6 +42,12 @@
     "intro": "Prüfreihenfolge (Ableitung aus den Beobachtungen oben). Das ist ein für diese erste Version gewähltes Verfahren, um eine Reihenfolge für die Prüfung festzulegen – keine Bewertung des Geschäftspotenzials: Einwohnerzahl ist kein Suchvolumen, Nähe ist keine Rentabilität. Formel: 100 × (0,5 × Lücke + 0,3 × Einwohneranteil + 0,2 × Nähe).",
     "item": "{position}. {settlement} – Wert {score} (Lücke {gap}, Einwohneranteil {population}, Nähe {proximity})",
     "manual": "{settlement}: Einwohnerzahl fehlt in den Daten, daher kein Wert – bitte manuell einordnen.",
-    "action": "Prüfen Sie zuerst die Lage in {settlement} (siehe Beobachtungen oben)."
+    "action": "Prüfen Sie die Befunde für {settlement}."
+  },
+  "measurements": {
+    "all": "in {n} von {n} gültigen Messungen",
+    "partial": "in {n} gültigen von {planned} geplanten Messungen",
+    "noneAll": "in keiner der {n} gültigen Messungen",
+    "nonePartial": "in keiner der {n} gültigen von {planned} geplanten Messungen"
   }
 }

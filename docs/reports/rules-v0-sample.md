@@ -1,7 +1,7 @@
 # Kurallar v0 – sentetik örnek çıktı
 
 > **Sentetik veri.** Bu çıktı `tests/findings-e2e.test.ts` testindeki uydurma bir „dünyadan" üretildi; belediyelerden yalnızca Frankfurt am Main gerçek AGS'dir, diğerleri (`Beispielstadt …`, `99xxxxxx`) uydurmadır. Domainler kurgusal (`.example`). Gerçek tarama verisi değildir.
-> Kurallar: [RULES_V0.md](../RULES_V0.md) sürüm 0.2 · Üretim: 21.10.2026 · Yeniden üretmek için: `SHOW_FINDINGS=<dosya> npx vitest run tests/findings-e2e.test.ts`
+> Kurallar: [RULES_V0.md](../RULES_V0.md) sürüm 0.2 · Üretim: 21.10.2026 (inceleme düzeltmeleri sonrası) · Yeniden üretmek için: `SHOW_FINDINGS=<dosya> npx vitest run tests/findings-e2e.test.ts`
 
 ## Sentetik dünya
 
@@ -29,7 +29,7 @@ Status (settlement · keyword · valid/planned · organic · local pack · ads):
   Beispielstadt B · Terrassenüberdachung mit Montage · 1/1 · bestes Ergebnis Platz 2 · kein Local Pack angezeigt · 0/1
   Beispielstadt G · Terrassenüberdachung · 3/3 · in den ersten 20 Ergebnissen nicht gefunden · Betriebszuordnung nicht verifiziert · 0/3
   Beispielstadt G · Terrassenüberdachung mit Montage · 1/1 · bestes Ergebnis Platz 2 · kein Local Pack angezeigt · 0/1
-  Beispielstadt H · Terrassenüberdachung · 2/3 (1 failed) · in den ersten 20 Ergebnissen nicht gefunden · kein Local Pack angezeigt · 0/2
+  Beispielstadt H · Terrassenüberdachung · 2/3 (1 failed or unusable) · in den ersten 20 Ergebnissen nicht gefunden · kein Local Pack angezeigt · 0/2
   Beispielstadt H · Terrassenüberdachung mit Montage · 1/1 · bestes Ergebnis Platz 2 · kein Local Pack angezeigt · 0/1
 
 [organic_gap] 3
@@ -37,7 +37,7 @@ Status (settlement · keyword · valid/planned · organic · local pack · ads):
     → review/website: Prüfen Sie, ob Ihre bestehende Seite den Bedarf für „Terrassenüberdachung“ in Beispielstadt A abdeckt.
   (Beobachtung) In Beispielstadt G war ziel-betrieb.example bei „Terrassenüberdachung“ in 3 von 3 gültigen Messungen nicht unter den ersten 10 organischen Ergebnissen (in den ersten 20 Ergebnissen nicht gefunden). In jeder dieser Messungen waren mindestens 2 lokale oder regionale Wettbewerber unter den ersten 10 – Messung 1 (21.10.2026): lokal-a.example und lokal-b.example; Messung 2 (21.10.2026): lokal-a.example und lokal-b.example; Messung 3 (21.10.2026): lokal-a.example und lokal-b.example.
     → review/website: Prüfen Sie, ob Ihre bestehende Seite den Bedarf für „Terrassenüberdachung“ in Beispielstadt G abdeckt.
-  (Beobachtung) In Beispielstadt H war ziel-betrieb.example bei „Terrassenüberdachung“ in 2 von 2 gültigen Messungen nicht unter den ersten 10 organischen Ergebnissen (in den ersten 20 Ergebnissen nicht gefunden). In jeder dieser Messungen waren mindestens 2 lokale oder regionale Wettbewerber unter den ersten 10 – Messung 1 (21.10.2026): lokal-a.example und region-c.example; Messung 3 (21.10.2026): lokal-a.example und region-c.example.
+  (Beobachtung) In Beispielstadt H war ziel-betrieb.example bei „Terrassenüberdachung“ in 2 gültigen von 3 geplanten Messungen nicht unter den ersten 10 organischen Ergebnissen (in den ersten 20 Ergebnissen nicht gefunden). In jeder dieser Messungen waren mindestens 2 lokale oder regionale Wettbewerber unter den ersten 10 – Messung 1 (21.10.2026): lokal-a.example und region-c.example; Messung 3 (21.10.2026): lokal-a.example und region-c.example.
     → review/website: Prüfen Sie, ob Ihre bestehende Seite den Bedarf für „Terrassenüberdachung“ in Beispielstadt H abdeckt.
 
 [local_pack_gap] 1
@@ -64,10 +64,10 @@ Status (settlement · keyword · valid/planned · organic · local pack · ads):
 [review_priority] 3
   Prüfreihenfolge (Ableitung aus den Beobachtungen oben). Das ist ein für diese erste Version gewähltes Verfahren, um eine Reihenfolge für die Prüfung festzulegen – keine Bewertung des Geschäftspotenzials: Einwohnerzahl ist kein Suchvolumen, Nähe ist keine Rentabilität. Formel: 100 × (0,5 × Lücke + 0,3 × Einwohneranteil + 0,2 × Nähe).
   (Ableitung) 1. Beispielstadt A – Wert 71 (Lücke 1,00, Einwohneranteil 0,17, Nähe 0,80)
-    → review/monitoring: Prüfen Sie zuerst die Lage in Beispielstadt A (siehe Beobachtungen oben).
+    → review/monitoring: Prüfen Sie die Befunde für Beispielstadt A.
   (Ableitung) 2. Beispielstadt G – Wert 32 (Lücke 0,60, Einwohneranteil 0,02, Nähe 0,07)
-    → review/monitoring: Prüfen Sie zuerst die Lage in Beispielstadt G (siehe Beobachtungen oben).
+    → review/monitoring: Prüfen Sie die Befunde für Beispielstadt G.
   (Ableitung) 3. Beispielstadt H – Wert 31 (Lücke 0,60, Einwohneranteil 0,01, Nähe 0,03)
-    → review/monitoring: Prüfen Sie zuerst die Lage in Beispielstadt H (siehe Beobachtungen oben).
+    → review/monitoring: Prüfen Sie die Befunde für Beispielstadt H.
 Written to runs/scans/test-scan/findings.json
 ```
