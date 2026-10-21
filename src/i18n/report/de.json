@@ -49,8 +49,8 @@
     "labelDraft": "Vorläufige Einordnung durch TechNS (nicht freigegeben): {label}.",
     "perSettlement": "{settlement}: {k} von {n} Messungen (organisch {o}, Local Pack {l})",
     "observedIn": "Beobachtet in: {list}.",
-    "typeApproved": "Art des Anbieters (freigegeben): {type}.",
-    "typeDraft": "Art des Anbieters (vorläufig, nicht freigegeben): {type}.",
+    "typeApproved": "Art des Anbieters laut öffentlicher Quelle: {type} (Einordnung freigegeben).",
+    "typeDraft": "Art des Anbieters laut öffentlicher Quelle: {type} (Einordnung noch nicht freigegeben).",
     "types": {
       "rental": "Vermieter",
       "rental_chain": "Vermietkette",

@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import type { SerpRow } from "@/lib/dataforseo/parse";
-import { addressMatchesMunicipality, CompetitorIndex, readRegistry, type Business, type CompetitorRegistry } from "@/lib/rules/competitors";
+import { CompetitorIndex, matchMunicipality, readRegistry, type Business, type CompetitorRegistry } from "@/lib/rules/competitors";
 import { evaluate, type Labels } from "@/lib/rules/engine";
 import type { Measurement, PlannedSettlement, ScanData } from "@/lib/rules/measurements";
 
@@ -22,13 +22,13 @@ function business(id: string, over: Partial<Business> = {}): Business {
     domains: [`${id}.example`],
     type: "rental",
     measuredService: { status: "verified", sources: src },
-    locationsReviewed: { status: "complete", sources: src },
+    locationsReviewed: { status: "comprehensive_list", sources: src },
     locations: [{ ags: STADT.ags, kind: "branch", address: address("Musterstadt an der Aue"), serviceAtLocation: "not_verified", sources: src }],
     approved: false,
     ...over,
   };
 }
-const registry = (...businesses: Business[]): CompetitorRegistry => ({ measuredService: "Arbeitsbühnenvermietung", businesses });
+const registry = (...businesses: Business[]): CompetitorRegistry => ({ measuredService: "Arbeitsbühnenvermietung", locationScope: "measured_municipalities", businesses });
 
 const org = (rank: number, domain: string): SerpRow => ({ type: "organic", rank, rankAbsolute: rank, domain, url: `https://${domain}/`, title: domain });
 /** Organic list: given domains at ranks 1.., padded with portal fillers to 20 (the fillers are in no registry). */
@@ -53,15 +53,17 @@ const fillers = Array.from({ length: 20 }, (_, i) => business(`f-${i}`, { domain
 
 describe("address city against the official municipality name", () => {
   it.each([
-    ["Ulm", "Ulm, Universitätsstadt", true],
-    ["Neu-Ulm", "Ulm, Universitätsstadt", false],
-    ["Babenhausen", "Babenhausen, M", true],
-    ["Heidenheim", "Heidenheim an der Brenz, Stadt", false],
-    ["Heidenheim an der Brenz", "Heidenheim an der Brenz, Stadt", true],
-    ["Steinheim", "Steinheim am Albuch", false],
-    ["Schwäbisch-Gmünd", "Schwäbisch Gmünd, Stadt", true],
+    ["Ulm", "Ulm, Universitätsstadt", "exact"],
+    ["Neu-Ulm", "Ulm, Universitätsstadt", "no"],
+    ["Ulm", "Neu-Ulm, GKSt", "no"],
+    ["Babenhausen", "Babenhausen, M", "exact"],
+    ["Heidenheim", "Heidenheim an der Brenz, Stadt", "abbreviation"],
+    ["Heidenheim an der Brenz", "Heidenheim an der Brenz, Stadt", "exact"],
+    ["Steinheim", "Steinheim am Albuch", "abbreviation"],
+    ["Schwäbisch-Gmünd", "Schwäbisch Gmünd, Stadt", "exact"],
+    ["Heiden", "Heidenheim an der Brenz, Stadt", "no"],
   ])("%s ~ %s = %s", (city, official, expected) => {
-    expect(addressMatchesMunicipality(city, official)).toBe(expected);
+    expect(matchMunicipality(city, official)).toBe(expected);
   });
 });
 
@@ -81,7 +83,8 @@ describe("verified local competitor", () => {
     ["chain without the service verified at the location", { type: "rental_chain" as const }, "service_at_location_not_verified"],
     ["mixed business without the service verified at the location", { type: "mixed" as const }, "service_at_location_not_verified"],
     ["address city does not match the municipality", { locations: [{ ...business("a").locations[0], address: address("Neu-Musterstadt") }] }, "municipality_match_unclear"],
-    ["location list not fully reviewed", { locations: [], locationsReviewed: { status: "partial" as const, sources: [] } }, "locations_not_fully_reviewed"],
+    ["only an Impressum or single address read", { locations: [], locationsReviewed: { status: "partial" as const, sources: [] } }, "no_location_found_in_reviewed_sources"],
+    ["abbreviated city without evidence", { locations: [{ ...business("a").locations[0], address: address("Musterstadt") }] }, "municipality_match_unclear"],
     ["type unknown", { type: "unknown" as const }, "type_unknown"],
   ])("is unverified (never absent): %s", (_, over, reason) => {
     expect(assess(business("a", over))).toMatchObject({ status: "unverified", reason });
@@ -91,8 +94,13 @@ describe("verified local competitor", () => {
     expect(assess(business("a", { type: "rental_chain", locations: [{ ...business("a").locations[0], serviceAtLocation: "verified" }] })).status).toBe("qualifies");
   });
 
-  it("is not listed only after a complete review of the business's own locations", () => {
-    expect(assess(business("a", { locations: [] }))).toMatchObject({ status: "not_listed", reason: "no_own_location_in_municipality" });
+  it("is not listed only after reading the business's own location list", () => {
+    expect(assess(business("a", { locations: [] }))).toMatchObject({ status: "not_listed", reason: "not_in_own_location_list" });
+  });
+
+  it("an abbreviated city counts with recorded evidence tying the address to the municipality", () => {
+    const l = { ...business("a").locations[0], address: address("Musterstadt"), municipalityEvidence: [{ url: "https://quelle.example/impressum", quote: "Industriestraße 5, 73001 Musterstadt an der Aue" }] };
+    expect(assess(business("a", { locations: [l] })).status).toBe("qualifies");
   });
 
   it("networks, portals and directories are excluded, not counted", () => {
@@ -165,10 +173,21 @@ describe("organic_gap with verified local competitors", () => {
     expect(gapCheck(e)).toMatchObject({ status: "not_met", reason: "target_in_top_10" });
   });
 
+  it("records per measurement the counted and open businesses, the maximum and the raw path", () => {
+    const ms = [m(1, organic("a.example", "kette.example", "kette2.example")), m(2, organic("a.example"))];
+    const reg = registry(business("a"), business("kette", { type: "rental_chain", domains: ["kette.example", "kette2.example"] }), ...fillers);
+    const check = gapCheck(run(ms, reg));
+    expect(check).toMatchObject({ status: "not_met" });
+    expect(check.perMeasurement![0]).toMatchObject({ taskKey: ms[0].taskKey, rawPath: ms[0].rawPath, counted: ["a"], max: 2 });
+    // One business with two domains is one open competitor.
+    expect(check.perMeasurement![0].open).toEqual([{ business: "kette", domains: ["kette.example", "kette2.example"], reasons: ["service_at_location_not_verified"] }]);
+    expect(check.perMeasurement![1]).toMatchObject({ counted: ["a"], open: [], max: 1 });
+  });
+
   it("coverage shows the business type from the registry, marked as not approved", () => {
     const e = run(every("a.example", "b.example"), registry(business("a"), business("b", { type: "rental_chain" }), ...fillers));
     const cov = e.findings.find((f) => f.rule === "competitor_coverage" && f.competitorDomain === "b.example")!;
-    expect(cov.text).toContain("Art des Anbieters (vorläufig, nicht freigegeben): Vermietkette.");
+    expect(cov.text).toContain("Art des Anbieters laut öffentlicher Quelle: Vermietkette (Einordnung noch nicht freigegeben).");
   });
 });
 

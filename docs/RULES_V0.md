@@ -261,14 +261,24 @@ Bölüm 10'a taşındı (`brand_other_location` → `brand_only`).
 - Bir **işletme** (domain değil) bir belediyede ancak aşağıdakilerin hepsi doğrulandıysa yerel rakip sayılır:
   1. **Tür:** doğrudan kiralama (`rental`, `rental_chain`, `mixed`). Ağlar (PartnerLIFT, SYSTEM LIFT, DID), portallar, dizinler ve üreticiler sayılmaz.
   2. **Faal kendi konumu:** O belediyede şube veya merkez var. Yalnızca resmi/yazışma adresi (`legal_only`) yetmez.
-  3. **Belediye eşleşmesi:** Adresteki şehir, resmi belediye adıyla (Destatis adı, ek olmadan) birebir aynı. Posta kodu tek başına anahtar değildir; „Neu-Ulm" Ulm, „Heidenheim" Heidenheim an der Brenz değildir. Belirsiz adres atanmaz.
+  3. **Belediye eşleşmesi:** Adres doğru belediyeye kanıtla bağlanmalı.
+     - Adresteki şehir resmi adla (Destatis adı, ek olmadan) aynıysa doğrudan kabul edilir.
+     - Resmi adın kısaltması („Heidenheim" → „Heidenheim an der Brenz") yalnızca o adresi o belediyeye bağlayan kayıtlı ek kanıtla kabul edilir (`municipalityEvidence`), örneğin aynı adresin tam adla geçtiği başka bir kaynak.
+     - Başka ad hiçbir koşulda eşleşmez: „Neu-Ulm" Ulm değildir.
+     - Posta kodu tek başına anahtar değildir. Kanıt yetmezse adres atanmaz ve kayıt „doğrulanmadı" kalır.
   4. **Ölçülen hizmet:** Ölçülen hizmet (Arbeitsbühne kiralama) işletmede doğrulanmış olmalı. Zincir ve karma işletmede bu ayrıca **o konumda** doğrulanmalı; genel ekipman kiralama şubesi olmak yetmez.
 - **Sayım:** Aynı işletmenin iki sitesi veya aynı belediyedeki iki şubesi tek rakiptir.
-- **Eksik kanıt** „yok" değil, **„doğrulanmadı"** olur. Kayıtta olmayan domain, eksik okunmuş konum listesi, bilinmeyen tür, doğrulanmamış hizmet ve belirsiz adres bu gruptadır. Bir işletmenin pilot belediyesinde konumu olmadığı ancak kendi konum listesi tam okunduysa söylenir (`not_listed`).
+- **Eksik kanıt** „yok" değil, **„doğrulanmadı"** olur. Kayıtta olmayan domain, bilinmeyen tür, doğrulanmamış hizmet, belirsiz adres ve tam konum envanteri olmayan işletme bu gruptadır.
+- **Konum envanteri:**
+  - `comprehensive_list`: İşletmenin kendi konum sayfası (Standorte, Niederlassungen, Mietstationen veya konum listesi içeren iletişim sayfası) tam okunduysa kullanılır. „Bu belediyede kendi konumu yok" (`not_listed`) yalnızca bu durumda söylenir.
+  - `partial`: Impressum, tek adres, ana sayfadaki sayı beyanı, JavaScript şube bulucu ve benzeri durumlar. Bunlarda sonuç „bu kaynaklarda bu belediye için konum bulunamadı" olur ve kayıt açık kalır.
+  - Kayıtta yalnızca ölçülen belediyelerdeki konumlar tutulur (`locationScope: measured_municipalities`); diğer konumlar notlarda yazılıdır.
+- **Kaynak doğrulaması ile onay ayrıdır.** „Kaynakla doğrulandı", genel bir kaynakta birebir kanıt olduğunu söyler. „Onaylandı" ise Halil'in kararıdır. Rapor ikisini ayrı gösterir. Kaynaklarda `quote` yalnızca birebir metindir; kendi açıklamamız `note` alanındadır.
 - **Eşikler değişmedi:** her geçerli ölçümde hedef ilk 10 dışında **ve** ilk 10'da en az 2 yerel rakip.
-- **Sonuçlar:**
-  - `not_met`: Koşul sağlanmadı. Bunun için en az bir ölçümde, doğrulanmamış işletmelerin hepsi yerel sayılsa bile 2'ye ulaşılamaması gerekir.
-  - `not_evaluable` (`unverified_competitors_could_change_result`): Doğrulanmamış işletmeler her ölçümde sonucu değiştirebiliyor.
+- **Sonuçlar:** Her ölçüm için azami sayı hesaplanır: kesin rakipler + sonucu değiştirebilecek açık işletmeler. Aynı işletme bir kez sayılır; kayıtta olmayan her domain ayrı bir işletme sayılır, bu da azamiyi büyüten temkinli yöndür.
+  - `not_met`: Koşul sağlanmadı. Ya hedef bir ölçümde ilk 10'dadır ya da en az bir ölçümde azami sayı 2'nin altındadır.
+  - `not_evaluable` (`unverified_competitors_could_change_result`): Her ölçümde azami sayı en az 2'dir.
+  - `ruleChecks[].perMeasurement` her ölçüm için kesin ve açık işletmeleri (gerekçeleriyle), azami sayıyı, hedefin sırasını ve ham yanıt yolunu kaydeder.
 - **Kapsam metni:** Bulgu metni ve sınır notu, sayımın yalnızca aynı belediyede doğrulanmış konumu ve hizmeti olan rakipleri kapsadığını söyler. Komşu belediyeden hizmet veren işletmeler gerçek rakip olabilir ama bu kuralda sayılmaz. Hizmet beyanları rapor ve inceleme tablosunda korunur; platformların arama sonuçlarındaki yeri rakip kapsamasında ayrı görünür.
 - **Müşteri ifadesi:** Bulgu yoksa „Bu pilotta, aynı belediyede fiziksel konumu ve ilgili hizmeti doğrulanmış en az iki rakibin her ölçümde ilk 10'da bulunması koşulu sağlanmadı." Bu ifade „organik görünürlük sorunu yok" ya da „yerel rekabet yok" anlamına gelmez.
 
@@ -283,6 +293,7 @@ Bölüm 10'a taşındı (`brand_other_location` → `brand_only`).
 
 **Pilot 1 sonucu** (30 ham yanıt, yeni istek yok; rakip kaydı onaylanmadı):
 
-- Beş belediyede de `not_met`. Heidenheim'da hedef bir ölçümde ilk 10'da; diğer dördünde her ölçümde doğrulanmış 2 yerel rakip yok.
+- **Heidenheim:** `not_met`, çünkü hedef bir ölçümde ilk 10'da. Bu sonuç rakip bilgisinden bağımsızdır.
+- **Steinheim, Aalen, Ulm, Babenhausen:** `not_evaluable`. Her ölçümde, konum envanteri eksik okunan veya sitesine erişilemeyen işletmelerle azami sayı en az 2.
 - Pilot belediyelerinde konumu kayıtlı 5 işletme var. Bir zincirin şubelerinde ölçülen hizmet doğrulanmadığı için o zincir sayılmadı.
-- Sitesine erişilemeyen bir domain doğrulanamadı; sonucu değiştiremediği için hücreler açık kalmadı.
+- **Geri alınan önceki sonuç (`592eafb`, „beş belediyede koşul sağlanmadı"):** Bu sonuç, konum sayfası okunmamış işletmelerin `complete` sayılmasından ve „Heidenheim" kısaltmasının reddedilmesinden geliyordu. İkisi de düzeltildi.

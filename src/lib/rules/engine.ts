@@ -152,6 +152,21 @@ export interface RuleCheck {
   keyword: string | null;
   status: "finding" | "not_met" | "not_evaluable" | "disabled";
   reason: string | null;
+  /**
+   * organic_gap: per valid measurement, the counted competitors (businesses), the
+   * open ones that could still count, and the maximum reachable (counted + open).
+   */
+  perMeasurement?: GapAudit[];
+}
+
+export interface GapAudit {
+  taskKey: string;
+  rawPath: string;
+  targetBestRank: number | null;
+  counted: string[];
+  open: { business: string; domains: string[]; reasons: string[] }[];
+  max: number;
+  domains: { domain: string; business: string | null; status: string; reason: string | null }[];
 }
 
 /** Per verified target profile: in which measurements it was matched, and how. */
@@ -653,6 +668,25 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
         ...(competitorIndex ? registryGapCount(m, targets, competitorIndex, s) : labelGapCount(m, targets, labels)),
       }));
       const nameOf = (b: string) => competitorIndex?.registry.businesses.find((x) => x.id === b)?.name ?? b;
+      const audit: GapAudit[] = perMeasurement.map((x) => {
+        const open = x.open.map((b) => {
+          const ds = x.details.filter((d) => ("business" in d.assessment ? d.assessment.business : d.domain) === b);
+          return { business: b, domains: ds.map((d) => d.domain), reasons: [...new Set(ds.map((d) => ("reason" in d.assessment ? d.assessment.reason ?? "" : "unlabelled")))] };
+        });
+        return {
+          taskKey: x.m.taskKey,
+          rawPath: x.m.rawPath,
+          targetBestRank: x.best,
+          counted: x.counted,
+          open,
+          max: x.counted.length + x.open.length,
+          domains: x.details.map((d) =>
+            "business" in d.assessment
+              ? { domain: d.domain, business: d.assessment.business, status: d.assessment.status, reason: d.assessment.reason }
+              : { domain: d.domain, business: null, status: d.assessment.label ?? "unlabelled", reason: null },
+          ),
+        };
+      });
       const shown = (x: (typeof perMeasurement)[number]) => (competitorIndex ? x.counted.map(nameOf) : x.counted);
       const planned = plannedCount(s.ags, keyword);
       const unapproved = competitorIndex
@@ -697,19 +731,19 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
         g.organic = true;
         organicGapKeys.add(`${s.ags}|${keyword}`);
         g.refs.push(...ms.map(ref));
-        ruleChecks.push({ rule: "organic_gap", ags: s.ags, keyword, status: "finding", reason: null });
+        ruleChecks.push({ rule: "organic_gap", ags: s.ags, keyword, status: "finding", reason: null, perMeasurement: audit });
       } else if (!hasTarget) {
         ruleChecks.push({ rule: "organic_gap", ags: s.ags, keyword, status: "not_evaluable", reason: "no_target_domain" });
       } else if (perMeasurement.some((x) => x.best !== null && x.best <= ORGANIC_TOP)) {
-        ruleChecks.push({ rule: "organic_gap", ags: s.ags, keyword, status: "not_met", reason: "target_in_top_10" });
+        ruleChecks.push({ rule: "organic_gap", ags: s.ags, keyword, status: "not_met", reason: "target_in_top_10", perMeasurement: audit });
       } else {
         // The rule needs ≥ 2 in EVERY measurement. Open (unlabelled / unverified) competitors can
         // change the result only if every measurement could still reach 2 with them.
         const undecided = perMeasurement.every((x) => x.counted.length + x.open.length >= ORGANIC_GAP_MIN_COMPETITORS);
         ruleChecks.push(
           undecided
-            ? { rule: "organic_gap", ags: s.ags, keyword, status: "not_evaluable", reason: competitorIndex ? "unverified_competitors_could_change_result" : "unlabelled_competitors_in_top_10" }
-            : { rule: "organic_gap", ags: s.ags, keyword, status: "not_met", reason: competitorIndex ? "fewer_than_2_verified_local_competitors" : "fewer_than_2_local_competitors" },
+            ? { rule: "organic_gap", ags: s.ags, keyword, status: "not_evaluable", reason: competitorIndex ? "unverified_competitors_could_change_result" : "unlabelled_competitors_in_top_10", perMeasurement: audit }
+            : { rule: "organic_gap", ags: s.ags, keyword, status: "not_met", reason: competitorIndex ? "fewer_than_2_verified_local_competitors" : "fewer_than_2_local_competitors", perMeasurement: audit },
         );
       }
 
