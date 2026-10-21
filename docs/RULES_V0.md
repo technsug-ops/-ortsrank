@@ -148,3 +148,8 @@
 3. **Kısmen ayrıştırılmış yanıt:** ayrıştırıcı bir sonuç öğesini çözemediyse (`issues`) o ölçüm bulgular için kullanılmaz; „unusable" (`parse_issues:<tür>`) olarak durum tablosunda „failed or unusable" sayılır. Yokluk çıkarımı yapılmaz.
 4. **Eksik ölçüm cümlede görünür:** geçerli < planlanan ise „in 2 gültigen von 3 geplanten Messungen" / „in keiner der 2 gültigen von 3 geplanten Messungen".
 5. **Öncelik aksiyonu:** „Prüfen Sie die Befunde für {Gemeinde}."; sıralamayı numaralar verir. İç şemada `bucket = monitoring` kalır; raporda „Prüfreihenfolge" altında gösterilir.
+
+## 9. İlk canlı yanıttan düzeltmeler (21.10.2026, `c1c9098`)
+
+- **Local Pack kimliği:** Canlı yanıtta `cid: null`, `domain: "www.google.com"`, `url` Google searchviewer linki. Google domaini işletme domaini sayılmaz (ayrıştırıcıda `null`); `cid`'siz öğe varken hedef eşleşmesi „Betriebszuordnung nicht verifiziert“ olur ve `local_pack_gap` üretilmez. Google rakip kapsamasına girmez. Hedef işletmeyi Local Pack'te tanıma yöntemi için karar bekleniyor (STATUS).
+- **„Bulunamadı“ derinliği:** depth 20 istenir ama yanıt 14–16 organik sonuç içerir. Cümle artık ölçümlerdeki en küçük organik liste uzunluğunu söyler: „unter den ersten {n} organischen Ergebnissen nicht gefunden“; hiç organik sonuç yoksa „keine organischen Ergebnisse angezeigt“.

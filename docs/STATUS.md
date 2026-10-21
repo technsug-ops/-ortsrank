@@ -68,11 +68,12 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 ### Canlı doğrulama
 
-- [~] DataForSEO hesabı açıldı (TechNS UG, 1 $ deneme kredisi; deposit henüz yok). Hesap doğrulaması bekleniyor: API `40104 Please verify your account` (21.10.2026)
+- [x] DataForSEO hesabı açıldı ve doğrulandı (TechNS UG, 1 $ deneme kredisi; deposit ve panel harcama limiti henüz yok) (21.10.2026)
 - [~] Anahtarlar `.env.local`'da, ücretsiz `user_data` çağrısıyla doğrulandı (21.10.2026); Vercel ortam değişkenleri henüz değil
-- [ ] Küçük canlı deneme: 2 belediye × 2 keyword, teknik doğrulama
-- [ ] Gerçek `cost` ile fiyat varsayımı doğrulandı
-- [ ] `local_pack` yanıt yapısı doğrulandı
+- [x] Küçük canlı deneme: 2 belediye × 2 keyword, teknik doğrulama (21.10.2026, tarama `trial-20261021`: 8/8 başarılı, kayıt bütünlüğü %100, 0,032 $)
+- [x] Gerçek `cost` ile fiyat varsayımı doğrulandı: 0,004 $ / deneme (depth 20), Advanced = Regular fiyatı (21.10.2026)
+- [x] `local_pack` yanıt yapısı doğrulandı: öğe başına tek işletme, **ama `cid: null` ve domain `www.google.com`** (21.10.2026, `c1c9098`)
+- [ ] Local Pack'te hedef işletme kimliği: `cid` yanıtta yok. Seçenekler: Google Maps SERP uç noktası (ek maliyet), doğrulanmış işletme adıyla tam eşleşme, ya da v0'da Local Pack'i yalnızca „nicht verifiziert“ göstermek
 - [ ] Tam pilot taraması (oturumlu)
 - [ ] Değişkenlik ölçümü (3 gün)
 
@@ -133,7 +134,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | İlk canlı deneme `trial-20261021`: 8 görev HTTP 403 / 40104 (hesap doğrulanmamış), maliyet 0 $, kayıt bütünlüğü %100. Düzeltme: HTTP hatasında sağlayıcı kodu kaydedilir; teknik denemede oturum sapması değerlendirilmez | bu commit |
+| 21.10.2026 | Canlı deneme başarılı (8/8, 0,032 $); local pack `cid` null + Google domaini, organik ~15 sonuç → ayrıştırıcı ve kurallar düzeltildi; bütçe defterinde Windows dosya kilidine karşı tekrar; toplam 289/289 | `c1c9098` |
+| 21.10.2026 | İlk canlı deneme `trial-20261021`: 8 görev HTTP 403 / 40104 (hesap doğrulanmamış), maliyet 0 $, kayıt bütünlüğü %100. Düzeltme: HTTP hatasında sağlayıcı kodu kaydedilir; teknik denemede oturum sapması değerlendirilmez | `c5b9f41` |
 | 21.10.2026 | Kurallar v0 inceleme düzeltmeleri: hedef domain yoksa organik bulgu yok, keyword bazlı hipotez, ayrıştırma sorunlu yanıt geçersiz, eksik ölçüm cümlede; toplam 281/281 | `babbd61` |
 | 21.10.2026 | Kurallar v0 uygulandı (0.2: cid eşleşmesi, ölçüm başına rakip koşulu, kapsama paydası, oturum bazlı reklam, öncelikte eksik nüfus → manuel); 44 yeni test; toplam 273/273 | `f787001` |
 | 21.10.2026 | Kurallar v0 tasarım taslağı (5 kural, kanıt seviyeleri, yasaklı ifadeler, test planı) | `ef08780` |

@@ -41,7 +41,7 @@ Aşağıdakiler 21.10.2026'da dokümandan kontrol edildi. Değerler değişebili
 | Ek ücretli parametreler | `load_async_ai_overview`, `calculate_rectangles`, `people_also_ask_click_depth`, `site:` gibi operatörler (×5). **Kullanılmaz.** | aynı |
 | Yanıt | Üst seviye `status_code` (20000 = başarı), `cost`, `tasks[]`; görevde `id`, `status_code`, `status_message`, `cost`, `data`, `result[]`; sonuçta `items[]`, `item_types`, `check_url`, `datetime` | aynı |
 | Öğe alanları | `organic`: type, rank_group, rank_absolute, position, domain, url, title · `paid`: type, rank_group, rank_absolute, position (top/bottom), domain, url, title · `local_pack`: type, rank_group, rank_absolute, title, domain, url, phone, is_paid, rating{value, votes_count}, cid | aynı |
-| Belirsiz | Dokümana göre her `local_pack` öğesi tek bir işletme gibi görünüyor (iç içe `items` yok). **İlk canlı yanıtla doğrulanmalı.** | – |
+| Doğrulandı (canlı, 21.10.2026) | Her `local_pack` öğesi tek işletme (iç içe `items` yok). **Ama `cid: null`, `domain: "www.google.com"` ve `url` Google searchviewer linki**; işletme sitesi ve kimliği yanıtta yok. `paid.position` `left` döner (üst/alt değil). depth 20 iken organik öğe sayısı 14–16 |
 
 ### Fiyat
 
@@ -354,14 +354,14 @@ Rapordaki her rakam gerçek komut çıktısından alınır; tahmin veya örnek d
 1. `.env.local`: `DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD`, `SCAN_MAX_USD=0.20`.
 2. `scan.ts --limit-settlements 2 --limit-keywords 2 --sessions all --back-to-back --live`.
 3. Kontrol listesi:
-   - [ ] Gönderilen parametreler (koordinat, keyword, cihaz, dil, depth) ham yanıttaki `data` alanıyla aynı.
-   - [ ] Kayıt bütünlüğü %100; her deneme ayrı dosyada.
-   - [ ] Bütçe defteri yanıtlardaki `cost` toplamıyla tutarlı; tavan aşıldıysa `priceDeviation` raporlandı.
-   - [ ] Özette `samplingMode: "technical_validation"` yazıyor; reklam sıklığı hesaplanmadı.
-   - [ ] `local_pack` öğelerinin gerçek yapısı dokümanla uyumlu; değilse ayrıştırıcı düzeltilir.
-   - [ ] Gerçek `cost` ile tahmin karşılaştırıldı; fiyat varsayımı güncellendi.
-   - [ ] 5–10 sonuç ham yanıtla elle karşılaştırıldı.
-   - [ ] Advanced uç noktasının fiyatı Regular ile aynı mı, doğrulandı.
+   - [x] Gönderilen parametreler ham yanıttaki `data` ile aynı (otomatik kontrol, 8/8) – 21.10.2026, çalıştırma `20261021-152142-…-1d4ae0`, tarama `trial-20261021`.
+   - [x] Kayıt bütünlüğü %100; her deneme ayrı dosyada.
+   - [x] Bütçe defteri `cost` toplamıyla tutarlı (0,032 $ = 8 × 0,004 $); fiyat sapması yok.
+   - [x] Özette `samplingMode: "technical_validation"`; reklam sıklığı hesaplanmadı.
+   - [x] `local_pack` yapısı: öğe başına tek işletme doğru; `cid` null ve domain Google → ayrıştırıcı ve kurallar düzeltildi (`c1c9098`).
+   - [x] Gerçek `cost` = tahmin: 0,002 $ / SERP, depth 20 = 0,004 $ / deneme.
+   - [x] 10 organik sonuç ham yanıtla karşılaştırıldı: 10/10 aynı (sıra, mutlak sıra, URL, domain).
+   - [x] Advanced fiyatı Regular ile aynı (0,002 $ / SERP).
 4. Sorun yoksa tam pilot taramasına geçilir; varsa önce düzeltilir.
 
 ---
