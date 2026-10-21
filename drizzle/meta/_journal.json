@@ -8,6 +8,13 @@
       "when": 1792533684499,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792544515452,
+      "tag": "0001_nullable_settlement_data",
+      "breakpoints": true
     }
   ]
 }

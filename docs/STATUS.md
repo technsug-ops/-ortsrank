@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 10 tamam; sıradaki adım 11 (şema: null alanlar + migration)
+> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 11 tamam (migration üretildi, Neon'a henüz uygulanmadı); sıradaki adım 12 (gerçek Destatis dosyası + `import-settlements.ts`)
 > **Son güncelleme:** 21.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.3) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2) · [Veri ihtiyacı WUA](Datenbedarf_Werbe_Umsatzanalyse.md) (sürüm 1.1)
 
@@ -59,8 +59,8 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] 7. `runlog.ts` + testler (deneme ve görev kayıtları) (21.10.2026, `768b2f0`). `attempts.jsonl` / `tasks.jsonl` zod ile; özet: kayıt bütünlüğü, geçerli sonuç oranı, confirmed/uncertain maliyet, `problems` listesi; oturum saat sapması (Europe/Berlin, ±60 dk)
 - [x] 8. Bütçe defteri + testler (eşzamanlılık, oturumlar arası, yeniden başlatma, yüksek ücret) (21.10.2026, `38c2c49`). `src/lib/budget.ts`; ek: yarıda kalan ayırmalar yeniden açılışta `uncertain` (`interrupted_run`) sayılır; kilit dosyası aynı taramada iki eşzamanlı çalıştırmayı engeller. HTTP katmanıyla uçtan uca bütçe senaryoları adım 9'da (`client.test.ts`)
 - [x] 9. `client.ts` + mock testler (21.10.2026, `0209348`). Her deneme: bütçe ayır → gönder → ham yanıtı değiştirmeden ayrı dosyaya yaz → bütçeyi kapat → kaydet. Tekrar: zaman aşımı, ağ hatası, HTTP 429/5xx, DataForSEO 5xxxx; 4xxxx tekrar edilmez. Ek: gönderilen parametre ↔ yanıttaki `data` karşılaştırması (ROADMAP 6), farklıysa `parameter_mismatch`
-- [x] 10. `scan.ts` dry-run uçtan uca (21.10.2026, bu commit). Mantık `src/lib/scan-run.ts`, CLI `scripts/scan.ts`; belediye dosyası biçimi `src/lib/settlements.ts` (adım 12 buna yazacak); örnek proje `projects/pilot-rhein-main.json`. `scanId` varsayılanı `<YYYYMMDD>-<proje>` (aynı günün oturumları bütçeyi paylaşır, `--scan-id` ile değiştirilir). Canlıda `--session` veya `--sessions all --back-to-back` zorunlu
-- [ ] 11. Şema: `lat`, `lng`, `population` null kabul eder; ayrıca `serp_results.domain` null kabul eder (web sitesi olmayan local_pack işletmesi, adım 6'da görüldü); migration
+- [x] 10. `scan.ts` dry-run uçtan uca (21.10.2026, `0bd7d5c`). Mantık `src/lib/scan-run.ts`, CLI `scripts/scan.ts`; belediye dosyası biçimi `src/lib/settlements.ts` (adım 12 buna yazacak); örnek proje `projects/pilot-rhein-main.json`. `scanId` varsayılanı `<YYYYMMDD>-<proje>` (aynı günün oturumları bütçeyi paylaşır, `--scan-id` ile değiştirilir). Canlıda `--session` veya `--sessions all --back-to-back` zorunlu
+- [x] 11. Şema: `lat`, `lng`, `population`, `population_as_of` ve `serp_results.domain` null kabul eder; migration `drizzle/0001_nullable_settlement_data.sql` (21.10.2026, bu commit). Neon'a uygulama Aşama 0'daki ayrı madde
 - [ ] 12. Gerçek Destatis dosyası indirildi, sütun eşlemesi doğrulandı, `import-settlements.ts`
 - [ ] 13. Pilot dry-run: gerçek belediye listesi + maliyet
 - [ ] 14. Teslimat raporu `docs/reports/phase1-delivery.md`
@@ -132,7 +132,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Adım 10: `scan.ts` (dry-run varsayılan, `--live`, oturum filtresi, runId, plan/summary/results.csv, teknik deneme modu), 35 test; toplam 185/185 | bu commit |
+| 21.10.2026 | Adım 11: şemada null alanlar + migration 0001 (uygulanmadı), şema testi; toplam 188/188 | bu commit |
+| 21.10.2026 | Adım 10: `scan.ts` (dry-run varsayılan, `--live`, oturum filtresi, runId, plan/summary/results.csv, teknik deneme modu), 35 test; toplam 185/185 | `0bd7d5c` |
 | 21.10.2026 | Adım 9: `client.ts` (Basic Auth, zaman aşımı, artan bekleme, eşzamanlılık 5, deneme başına ham dosya, parametre eşleşme kontrolü), 16 test; toplam 150/150 | `0209348` |
 | 21.10.2026 | Adım 8: bütçe defteri (ayırma, confirmed/uncertain, tarama başına kalıcı defter, fiyat sapması, kilit), 18 test; toplam 134/134 | `38c2c49` |
 | 21.10.2026 | Adım 7: `runlog.ts` (deneme/görev kayıtları, özet, oturum sapması), 19 test; toplam 116/116 | `768b2f0` |

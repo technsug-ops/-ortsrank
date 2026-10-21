@@ -169,16 +169,19 @@ export const settlements = pgTable(
     name: text("name").notNull(),
     state: text("state").notNull(), // Bundesland
     district: text("district"), // Kreis
-    population: integer("population").notNull(),
-    populationAsOf: text("population_as_of").notNull(), // e.g. "2025-12-31"
-    lat: doublePrecision("lat").notNull(),
-    lng: doublePrecision("lng").notNull(),
+    // Null when Destatis has no value; never filled from a neighbour.
+    // Missing coordinates → scanMode "none"; missing population → scanNote.
+    population: integer("population"),
+    populationAsOf: text("population_as_of"), // e.g. "2025-12-31"; null when population is null
+    lat: doublePrecision("lat"),
+    lng: doublePrecision("lng"),
     source: text("source").default("destatis-gv-isys").notNull(),
     // How this settlement can be queried. "coordinate" = its own centre point
     // (preferred); "location_code" = provider city code; "none" = not
     // scannable, shown as such in reports and never replaced by a neighbour.
     scanMode: scanMode("scan_mode").default("coordinate").notNull(),
-    scanNote: text("scan_note"), // reason when scanMode is "none"
+    // Comma-separated reasons, e.g. "missing_coordinates,missing_population".
+    scanNote: text("scan_note"),
   },
   (t) => [index("settlement_state_idx").on(t.state), index("settlement_pop_idx").on(t.population)],
 );
@@ -292,7 +295,7 @@ export const serpResults = pgTable(
     keywordId: uuid("keyword_id").references(() => keywords.id, { onDelete: "cascade" }).notNull(),
     type: resultType("type").notNull(),
     rank: integer("rank").notNull(),
-    domain: text("domain").notNull(),
+    domain: text("domain"), // null for a local pack business without a website
     url: text("url"),
     title: text("title"),
   },
