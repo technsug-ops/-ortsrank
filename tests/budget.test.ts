@@ -2,7 +2,7 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSy
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { BUDGET_FILE, BudgetLedger, LOCK_FILE, type OpenOptions } from "@/lib/budget";
+import { BUDGET_FILE, BudgetLedger, LOCK_FILE, renameWithRetry, type OpenOptions } from "@/lib/budget";
 
 const COST = 0.004;
 let scanDir: string;
@@ -238,5 +238,32 @@ describe("persistence", () => {
     expect(read().reserved).toHaveLength(0);
     b.close();
     expect(readdirSync(scanDir).sort()).toEqual([BUDGET_FILE]);
+  });
+});
+
+describe("renameWithRetry (Windows file locks)", () => {
+  const err = (code: string) => Object.assign(new Error(code), { code });
+
+  it("retries transient lock errors and then succeeds", () => {
+    let calls = 0;
+    const waits: number[] = [];
+    renameWithRetry("a", "b", () => {
+      calls++;
+      if (calls < 3) throw err(calls === 1 ? "EPERM" : "EBUSY");
+    }, (ms) => waits.push(ms));
+    expect(calls).toBe(3);
+    expect(waits).toEqual([10, 20]);
+  });
+
+  it("gives up after the last attempt and rethrows", () => {
+    let calls = 0;
+    expect(() => renameWithRetry("a", "b", () => { calls++; throw err("EPERM"); }, () => {}, 4)).toThrow("EPERM");
+    expect(calls).toBe(4);
+  });
+
+  it("does not retry other errors", () => {
+    let calls = 0;
+    expect(() => renameWithRetry("a", "b", () => { calls++; throw err("ENOENT"); }, () => {})).toThrow("ENOENT");
+    expect(calls).toBe(1);
   });
 });

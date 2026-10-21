@@ -146,7 +146,7 @@ describe("findings end to end (synthetic world)", () => {
   });
 
   it("keeps failed measurements apart", () => {
-    expect(cellOf(H)).toMatchObject({ validSamples: 2, failedSamples: 1, organic: "in den ersten 20 Ergebnissen nicht gefunden" });
+    expect(cellOf(H)).toMatchObject({ validSamples: 2, failedSamples: 1, organic: "unter den ersten 20 organischen Ergebnissen nicht gefunden" });
   });
 
   it("produces the expected findings", () => {

@@ -249,11 +249,37 @@ export class BudgetLedger {
     const file = join(this.dir, BUDGET_FILE);
     const tmp = `${file}.${process.pid}.tmp`;
     writeFileSync(tmp, `${JSON.stringify(this.data, null, 2)}\n`, "utf8");
-    renameSync(tmp, file);
+    renameWithRetry(tmp, file);
   }
 }
 
-const lockSchema = z.object({ pid: z.number().int(), runId: z.string(), at: z.string() });
+/** Windows error codes for a file briefly held by another process (editor, antivirus, indexer). */
+const TRANSIENT_RENAME_ERRORS = new Set(["EPERM", "EACCES", "EBUSY"]);
+
+/**
+ * Atomic replace that survives short Windows file locks: retries the rename
+ * with growing waits (about 1.3 s in total) before giving up.
+ */
+export function renameWithRetry(
+  from: string,
+  to: string,
+  rename: (a: string, b: string) => void = renameSync,
+  wait: (ms: number) => void = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms),
+  attempts = 8,
+): void {
+  for (let i = 1; ; i++) {
+    try {
+      rename(from, to);
+      return;
+    } catch (e) {
+      const code = (e as NodeJS.ErrnoException).code ?? "";
+      if (!TRANSIENT_RENAME_ERRORS.has(code) || i >= attempts) throw e;
+      wait(10 * 2 ** (i - 1));
+    }
+  }
+}
+
+const lockSchema =z.object({ pid: z.number().int(), runId: z.string(), at: z.string() });
 
 function acquireLock(dir: string, runId: string, isProcessAlive: (pid: number) => boolean): void {
   const file = join(dir, LOCK_FILE);

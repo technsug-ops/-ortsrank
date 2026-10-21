@@ -99,6 +99,21 @@ function domainOf(domain: string | null, url: string | null): string | null {
   return null;
 }
 
+/** google.de, www.google.com, … */
+export function isGoogleDomain(domain: string | null): boolean {
+  return domain !== null && /^(.+\.)?google\.[a-z.]+$/.test(domain);
+}
+
+/**
+ * Live responses (checked 21.10.2026) give local pack items domain
+ * "www.google.com" and a Google searchviewer URL instead of the business
+ * website. That is Google's link, not the business: treat it as no domain.
+ */
+function localPackDomain(domain: string | null, url: string | null): string | null {
+  const d = domainOf(domain, url);
+  return isGoogleDomain(d) ? null : d;
+}
+
 /** True if `domain` is the target or one of its subdomains. */
 export function matchesDomain(domain: string | null, target: string): boolean {
   if (!domain) return false;
@@ -149,7 +164,7 @@ function toRow(item: DfsItem): RowOutcome {
           type: "local_pack",
           rank: d.rank_group,
           rankAbsolute: d.rank_absolute,
-          domain: domainOf(d.domain, d.url),
+          domain: localPackDomain(d.domain, d.url),
           url: d.url,
           title: d.title,
           rating: d.rating?.value ?? null,

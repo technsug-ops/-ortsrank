@@ -1,7 +1,7 @@
 {
   "status": {
     "rank": "bestes Ergebnis Platz {rank}",
-    "notFound": "in den ersten {depth} Ergebnissen nicht gefunden",
+    "notFound": "unter den ersten {depth} organischen Ergebnissen nicht gefunden",
     "notMeasured": "nicht gemessen",
     "lpMatched": "im Local Pack, Platz {rank}",
     "lpNotMatched": "Local Pack angezeigt, Betrieb nicht darin",
@@ -12,7 +12,8 @@
       "mobile": "mobil",
       "desktop": "Desktop"
     },
-    "targetUndefined": "Ziel-Domain nicht festgelegt"
+    "targetUndefined": "Ziel-Domain nicht festgelegt",
+    "noOrganic": "keine organischen Ergebnisse angezeigt"
   },
   "organicGap": {
     "text": "In {settlement} war {target} bei „{keyword}“ {measurements} nicht unter den ersten 10 organischen Ergebnissen ({status}). In jeder dieser Messungen waren mindestens 2 lokale oder regionale Wettbewerber unter den ersten 10 – {perMeasurement}.",

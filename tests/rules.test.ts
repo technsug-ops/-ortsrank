@@ -112,7 +112,7 @@ describe("organic_gap", () => {
     const ms = [m(S2.ags, 1, organic("lokal-a.example", "lokal-b.example")), m(S2.ags, 2, organic("lokal-a.example", "region-c.example"))];
     const [f] = byRule(evaluate(scan([S2], ms), labels), "organic_gap");
     expect(f.text).toContain("Messung 1 (21.10.2026): lokal-a.example und lokal-b.example; Messung 2 (22.10.2026): lokal-a.example und region-c.example");
-    expect(f.text).toContain("in den ersten 20 Ergebnissen nicht gefunden");
+    expect(f.text).toContain("unter den ersten 20 organischen Ergebnissen nicht gefunden");
   });
 
   it("does not fire with one competitor, or with national/portal/unlabeled ones", () => {
@@ -357,7 +357,7 @@ describe("report wording", () => {
   });
 
   it("'not found' always names the scanned depth", () => {
-    expect(fill(reportText.status.notFound, { depth: 20 })).toBe("in den ersten 20 Ergebnissen nicht gefunden");
+    expect(fill(reportText.status.notFound, { depth: 20 })).toBe("unter den ersten 20 organischen Ergebnissen nicht gefunden");
   });
 
   it("refuses to render a template with a missing placeholder", () => {
@@ -428,5 +428,51 @@ describe("review_priority actions", () => {
     const e = evaluate(scan([S2], [m(S2.ags, 1, organic("lokal-a.example", "lokal-b.example"))]), labels);
     const id = byRule(e, "review_priority")[0].id;
     expect(e.actions.find((a) => a.findingId === id)?.text).toBe("Prüfen Sie die Befunde für Offenbach am Main.");
+  });
+});
+
+// ── live response shape (first live trial, 21.10.2026) ──────────────────
+
+describe("live local pack shape: cid null, Google as domain", () => {
+  // Shaped like the live response: no cid, domain www.google.com, Google searchviewer URL.
+  const liveItem = (rank: number, title: string) => ({
+    type: "local_pack", rank_group: rank, rank_absolute: rank, title, domain: "www.google.com",
+    url: "https://www.google.com/searchviewer/10?hl=de&gl=DE&svid=abc", cid: null, is_paid: false,
+    rating: { rating_type: "Max5", value: 4.9, votes_count: 12, rating_max: 5 }, phone: null,
+  });
+
+  it("parses Google's own domain as no business domain", async () => {
+    const { parseLiveResponse } = await import("@/lib/dataforseo/parse");
+    const raw = { status_code: 20000, status_message: "Ok.", cost: 0.004, tasks: [{ id: "t", status_code: 20000, status_message: "Ok.", cost: 0.004, data: { depth: 20 }, result: [{ keyword: KW, check_url: null, datetime: null, items: [liveItem(1, "Betrieb A"), liveItem(2, "Betrieb B")] }] }] };
+    const r = parseLiveResponse(raw);
+    if (!r.ok) throw new Error("expected ok");
+    expect(r.rows.map((x) => [x.type, x.domain, x.cid, x.title])).toEqual([["local_pack", null, null, "Betrieb A"], ["local_pack", null, null, "Betrieb B"]]);
+  });
+
+  it("items without cid make the match unverified, never 'not matched'", () => {
+    const rows = [lp(1, null, null), lp(2, null, null)];
+    expect(localPackStatus(m(S2.ags, 1, rows), [TARGET], [TARGET_CID]).status).toBe("match_unverified");
+    const e = evaluate(scan([S2], [m(S2.ags, 1, [...rows, ...organic("lokal-a.example")])]), labels);
+    expect(e.statusTable[0].localPack).toBe("Betriebszuordnung nicht verifiziert");
+    expect(byRule(e, "local_pack_gap")).toEqual([]);
+  });
+
+  it("does not count Google as a competitor", () => {
+    const e = evaluate(scan([S1], [m(S1.ags, 1, [lp(1, null, null), ...organic("lokal-a.example")])]), labels);
+    expect(byRule(e, "competitor_coverage").some((f) => f.competitorDomain?.includes("google"))).toBe(false);
+  });
+});
+
+describe("'not found' names the organic results actually returned", () => {
+  it("uses the smallest organic list of the measurements, not the requested depth", () => {
+    const fifteen = organic("lokal-a.example", "lokal-b.example").slice(0, 15);
+    const e = evaluate(scan([S2], [m(S2.ags, 1, fifteen), m(S2.ags, 2, organic("lokal-a.example", "lokal-b.example"))]), labels);
+    expect(e.statusTable[0].organic).toBe("unter den ersten 15 organischen Ergebnissen nicht gefunden");
+    expect(byRule(e, "organic_gap")[0].text).toContain("(unter den ersten 15 organischen Ergebnissen nicht gefunden)");
+  });
+
+  it("says no organic results were shown when there are none", () => {
+    const e = evaluate(scan([S2], [m(S2.ags, 1, [ad(1, "w.example")])]), labels);
+    expect(e.statusTable[0].organic).toBe("keine organischen Ergebnisse angezeigt");
   });
 });

@@ -121,6 +121,8 @@ export function localPackStatus(m: Measurement, targets: readonly string[], targ
   if (byCid) return { status: "matched", rank: byCid.rank };
   // The target's domain without a verified cid: some business claims the site, identity unclear.
   if (items.some((r) => isTarget(r.domain, targets))) return { status: "match_unverified", rank: null };
+  // An item without cid could be the target: absence cannot be concluded (live responses carry cid: null).
+  if (items.some((r) => !r.cid)) return { status: "match_unverified", rank: null };
   return { status: "not_matched", rank: null };
 }
 
@@ -135,6 +137,15 @@ function localPackCompetitors(m: Measurement, targets: readonly string[], labels
 }
 
 const hasAds = (m: Measurement) => m.rows.some((r) => r.type === "ad");
+
+/** Organic results actually returned; live SERPs give ~15 even when depth is 20. */
+export const organicCount = (m: Measurement) => Math.max(0, ...m.rows.filter((r) => r.type === "organic").map((r) => r.rank));
+
+/** "Not found" names the smallest organic list of the measurements, never the requested depth. */
+function notFoundText(ms: readonly Measurement[]): string {
+  const depth = Math.min(...ms.map(organicCount));
+  return depth > 0 ? fill(T.status.notFound, { depth }) : T.status.noOrganic;
+}
 
 // ── Priority ────────────────────────────────────────────────────────────
 
@@ -203,7 +214,7 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
           ? T.status.targetUndefined
           : best.length
             ? fill(T.status.rank, { rank: Math.min(...best) })
-            : fill(T.status.notFound, { depth: scan.depth });
+            : notFoundText(ms);
         const lp = ms.map((m) => localPackStatus(m, targets, scan.targetCids));
         const matched = lp.filter((x) => x.status === "matched").map((x) => x.rank!);
         localPack = matched.length
@@ -244,7 +255,7 @@ export function evaluate(scan: ScanData, labels: Labels): Evaluation {
       const planned = plannedCount(s.ags, keyword);
       if (hasTarget && perMeasurement.every((x) => (x.best === null || x.best > ORGANIC_TOP) && x.competitors.length >= ORGANIC_GAP_MIN_COMPETITORS)) {
         const found = perMeasurement.map((x) => x.best).filter((r): r is number => r !== null);
-        const status = found.length ? fill(T.status.rank, { rank: Math.min(...found) }) : fill(T.status.notFound, { depth: scan.depth });
+        const status = found.length ? fill(T.status.rank, { rank: Math.min(...found) }) : notFoundText(ms);
         const id = `organic_gap:${s.ags}:${keyword}`;
         findings.push({
           id,
