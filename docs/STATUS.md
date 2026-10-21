@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 7 tamam; sıradaki adım 8 (bütçe defteri + testler)
+> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 8 tamam; sıradaki adım 9 (`client.ts` + mock testler)
 > **Son güncelleme:** 21.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.3) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2) · [Veri ihtiyacı WUA](Datenbedarf_Werbe_Umsatzanalyse.md) (sürüm 1.1)
 
@@ -56,8 +56,8 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] 4. `plan.ts` + testler (beklenen / en kötü durum, oturum ataması) (21.10.2026, `c331e64`). Proje tanımı zod ile doğrulanıyor; varsayılanlar tek yerde: `src/lib/scan-defaults.ts`
 - [x] 5. Sentetik örnek yanıt fixture'ları (21.10.2026, `38842ef`). `tests/fixtures/dataforseo/`: karışık başarı, local_pack yok, boş items, görev hatası, üst seviye hata; kurgusal `.example` domainleri; tutarlılık testi
 - [x] 6. `parse.ts` + testler (21.10.2026, `17a3807`). Yanıt şeması zod ile (`dataforseo/types.ts`); geçersiz öğeler `issues` listesine, hedef yoksa `not_found_within_depth`; hatalı yanıtta hedef hükmü verilmez
-- [x] 7. `runlog.ts` + testler (deneme ve görev kayıtları) (21.10.2026, bu commit). `attempts.jsonl` / `tasks.jsonl` zod ile; özet: kayıt bütünlüğü, geçerli sonuç oranı, confirmed/uncertain maliyet, `problems` listesi; oturum saat sapması (Europe/Berlin, ±60 dk)
-- [ ] 8. Bütçe defteri + testler (eşzamanlılık, oturumlar arası, yeniden başlatma, yüksek ücret)
+- [x] 7. `runlog.ts` + testler (deneme ve görev kayıtları) (21.10.2026, `768b2f0`). `attempts.jsonl` / `tasks.jsonl` zod ile; özet: kayıt bütünlüğü, geçerli sonuç oranı, confirmed/uncertain maliyet, `problems` listesi; oturum saat sapması (Europe/Berlin, ±60 dk)
+- [x] 8. Bütçe defteri + testler (eşzamanlılık, oturumlar arası, yeniden başlatma, yüksek ücret) (21.10.2026, bu commit). `src/lib/budget.ts`; ek: yarıda kalan ayırmalar yeniden açılışta `uncertain` (`interrupted_run`) sayılır; kilit dosyası aynı taramada iki eşzamanlı çalıştırmayı engeller. HTTP katmanıyla uçtan uca bütçe senaryoları adım 9'da
 - [ ] 9. `client.ts` + mock testler
 - [ ] 10. `scan.ts` dry-run uçtan uca
 - [ ] 11. Şema: `lat`, `lng`, `population` null kabul eder; ayrıca `serp_results.domain` null kabul eder (web sitesi olmayan local_pack işletmesi, adım 6'da görüldü); migration
@@ -132,7 +132,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Adım 7: `runlog.ts` (deneme/görev kayıtları, özet, oturum sapması), 19 test; toplam 116/116 | bu commit |
+| 21.10.2026 | Adım 8: bütçe defteri (ayırma, confirmed/uncertain, tarama başına kalıcı defter, fiyat sapması, kilit), 18 test; toplam 134/134 | bu commit |
+| 21.10.2026 | Adım 7: `runlog.ts` (deneme/görev kayıtları, özet, oturum sapması), 19 test; toplam 116/116 | `768b2f0` |
 | 21.10.2026 | Impressum sayfası (DE/EN/TR); ortak header/footer bileşenleri; footer'daki 404 veren foundercheck.de linkleri kaldırıldı | `a58d027` |
 | 21.10.2026 | Vercel ↔ GitHub bağlandı; ilk production deploy canlı (`ortsrank.foundercheck.de`) | `b9034fe` |
 | 21.10.2026 | Sohbetteki ROADMAP 3.3 birleştirmesi (`7f9dc03`, `51bd25a`) VS Code dalıyla birleştirildi; Aşama 2 ürün maddeleri yerine taşındı, geçmiş tablosu sıralandı; WUA-0 alt maddelere ayrıldı | `2874124` |
