@@ -15,6 +15,15 @@ export const DEFAULT_MAX_RETRIES = 2;
 /** Assumed share of tasks retried once; used for the expected cost only. */
 export const DEFAULT_EXPECTED_RETRY_RATE = 0.2;
 
+/** A session is flagged when its tasks were sent this far from `plannedAt`. */
+export const SESSION_DRIFT_TOLERANCE_MINUTES = 60;
+
+/** Time zone in which session `plannedAt` times ("HH:MM") are meant. */
+export const SESSION_TIME_ZONE = "Europe/Berlin";
+
+/** Record integrity must be 100 %; valid result rate target (ROADMAP 6). */
+export const VALID_RESULT_RATE_TARGET = 0.98;
+
 /** DataForSEO `depth` bounds. */
 export const DEPTH_MIN = 1;
 export const DEPTH_MAX = 200;

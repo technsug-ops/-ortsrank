@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 6 tamam; sıradaki adım 7 (`runlog.ts` + testler)
+> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 7 tamam; sıradaki adım 8 (bütçe defteri + testler)
 > **Son güncelleme:** 21.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.3) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2) · [Veri ihtiyacı WUA](Datenbedarf_Werbe_Umsatzanalyse.md) (sürüm 1.1)
 
@@ -40,7 +40,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [ ] Migration uygulandı (Aşama 1 adım 11'deki şema değişikliğinden sonra)
 - [x] Vercel ↔ GitHub bağlantısı (Settings → Git → Connect) (21.10.2026)
 - [x] İlk production deploy; `https://ortsrank.foundercheck.de` açılıyor ve SSL geçerli (21.10.2026, `2874124`; `/` → `/de`, `/de` `/en` `/tr` 200)
-- [x] Impressum `/{de,en,tr}/impressum`; bilgiler foundercheck.de Impressum'undan, tek kaynak `src/config/operator.ts` (21.10.2026, bu commit)
+- [x] Impressum `/{de,en,tr}/impressum`; bilgiler foundercheck.de Impressum'undan, tek kaynak `src/config/operator.ts` (21.10.2026, `a58d027`)
 - [ ] Datenschutzerklärung (site için; footer'daki eski link foundercheck.de'de 404 verdiği için kaldırıldı)
 - [ ] Repo adı `ortsrank` olarak düzeltildi (isteğe bağlı)
 
@@ -56,7 +56,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] 4. `plan.ts` + testler (beklenen / en kötü durum, oturum ataması) (21.10.2026, `c331e64`). Proje tanımı zod ile doğrulanıyor; varsayılanlar tek yerde: `src/lib/scan-defaults.ts`
 - [x] 5. Sentetik örnek yanıt fixture'ları (21.10.2026, `38842ef`). `tests/fixtures/dataforseo/`: karışık başarı, local_pack yok, boş items, görev hatası, üst seviye hata; kurgusal `.example` domainleri; tutarlılık testi
 - [x] 6. `parse.ts` + testler (21.10.2026, `17a3807`). Yanıt şeması zod ile (`dataforseo/types.ts`); geçersiz öğeler `issues` listesine, hedef yoksa `not_found_within_depth`; hatalı yanıtta hedef hükmü verilmez
-- [ ] 7. `runlog.ts` + testler (deneme ve görev kayıtları)
+- [x] 7. `runlog.ts` + testler (deneme ve görev kayıtları) (21.10.2026, bu commit). `attempts.jsonl` / `tasks.jsonl` zod ile; özet: kayıt bütünlüğü, geçerli sonuç oranı, confirmed/uncertain maliyet, `problems` listesi; oturum saat sapması (Europe/Berlin, ±60 dk)
 - [ ] 8. Bütçe defteri + testler (eşzamanlılık, oturumlar arası, yeniden başlatma, yüksek ücret)
 - [ ] 9. `client.ts` + mock testler
 - [ ] 10. `scan.ts` dry-run uçtan uca
@@ -132,7 +132,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Impressum sayfası (DE/EN/TR); ortak header/footer bileşenleri; footer'daki 404 veren foundercheck.de linkleri kaldırıldı | bu commit |
+| 21.10.2026 | Adım 7: `runlog.ts` (deneme/görev kayıtları, özet, oturum sapması), 19 test; toplam 116/116 | bu commit |
+| 21.10.2026 | Impressum sayfası (DE/EN/TR); ortak header/footer bileşenleri; footer'daki 404 veren foundercheck.de linkleri kaldırıldı | `a58d027` |
 | 21.10.2026 | Vercel ↔ GitHub bağlandı; ilk production deploy canlı (`ortsrank.foundercheck.de`) | `b9034fe` |
 | 21.10.2026 | Sohbetteki ROADMAP 3.3 birleştirmesi (`7f9dc03`, `51bd25a`) VS Code dalıyla birleştirildi; Aşama 2 ürün maddeleri yerine taşındı, geçmiş tablosu sıralandı; WUA-0 alt maddelere ayrıldı | `2874124` |
 | 21.10.2026 | ROADMAP 3.3: Reklam ve Ciro Analizi (WUA) modülü; veri ihtiyaç belgesi 1.1 repoya alındı | `7f9dc03` |
