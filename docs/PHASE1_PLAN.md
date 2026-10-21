@@ -328,7 +328,7 @@ Notlar:
 8. Bütçe defteri + testler (eşzamanlılık, `uncertain`, bütçe bitince iptal).
 9. `client.ts` + mock testler (deneme başına ayrı ham dosya).
 10. `scan.ts` (dry-run uçtan uca; `runId` çakışmazlığı, `--session` filtresi).
-11. Şemada `lat`, `lng`, `population` alanlarını null kabul edecek şekilde güncelle; migration'ı yeniden üret.
+11. Şemada `lat`, `lng`, `population` ve `serp_results.domain` (web sitesi olmayan local_pack işletmesi) alanlarını null kabul edecek şekilde güncelle; migration'ı yeniden üret.
 12. Gerçek Destatis dosyasını indir, sütun eşlemesini doğrula, `import-settlements.ts` + testler.
 13. `scan.ts --dry-run` ile pilot projesinin gerçek belediye listesi (dört liste) ve maliyet tahmini.
 14. `docs/reports/phase1-delivery.md` teslimat raporunu bölüm 8'e göre yaz ve commit et.

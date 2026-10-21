@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 5 tamam; sıradaki adım 6 (`parse.ts` + testler)
+> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 6 tamam; sıradaki adım 7 (`runlog.ts` + testler)
 > **Son güncelleme:** 21.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.2) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2)
 
@@ -53,12 +53,12 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] 3. `geo.ts` + testler (dört liste) (21.10.2026, `37b2097`). Ek: `overLimit` listesi, `maxSettlements` sınırına takılanlar sessizce düşmesin diye
 - [x] 4. `plan.ts` + testler (beklenen / en kötü durum, oturum ataması) (21.10.2026, `c331e64`). Proje tanımı zod ile doğrulanıyor; varsayılanlar tek yerde: `src/lib/scan-defaults.ts`
 - [x] 5. Sentetik örnek yanıt fixture'ları (21.10.2026, `38842ef`). `tests/fixtures/dataforseo/`: karışık başarı, local_pack yok, boş items, görev hatası, üst seviye hata; kurgusal `.example` domainleri; tutarlılık testi
-- [ ] 6. `parse.ts` + testler
+- [x] 6. `parse.ts` + testler (21.10.2026, bu commit). Yanıt şeması zod ile (`dataforseo/types.ts`); geçersiz öğeler `issues` listesine, hedef yoksa `not_found_within_depth`; hatalı yanıtta hedef hükmü verilmez
 - [ ] 7. `runlog.ts` + testler (deneme ve görev kayıtları)
 - [ ] 8. Bütçe defteri + testler (eşzamanlılık, oturumlar arası, yeniden başlatma, yüksek ücret)
 - [ ] 9. `client.ts` + mock testler
 - [ ] 10. `scan.ts` dry-run uçtan uca
-- [ ] 11. Şema: `lat`, `lng`, `population` null kabul eder; migration
+- [ ] 11. Şema: `lat`, `lng`, `population` null kabul eder; ayrıca `serp_results.domain` null kabul eder (web sitesi olmayan local_pack işletmesi, adım 6'da görüldü); migration
 - [ ] 12. Gerçek Destatis dosyası indirildi, sütun eşlemesi doğrulandı, `import-settlements.ts`
 - [ ] 13. Pilot dry-run: gerçek belediye listesi + maliyet
 - [ ] 14. Teslimat raporu `docs/reports/phase1-delivery.md`
@@ -117,6 +117,7 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
+| 21.10.2026 | Adım 6: `parse.ts` + `types.ts` (organik/reklam/local_pack, domain normalleştirme, hedef eşleme), 28 test; toplam 97/97 | bu commit |
 | 21.10.2026 | Adım 5: 5 sentetik DataForSEO yanıtı + tutarlılık testi (25 test); toplam 69/69 | `38842ef` |
 | 21.10.2026 | Adım 4: `plan.ts` (proje doğrulama, görevler, oturum ataması, maliyet, tavan kontrolü), 30 test; toplam 44/44 | `c331e64` |
 | 21.10.2026 | Adım 3: `geo.ts` (mesafe, dört liste + `overLimit`), 12 test; toplam 14/14 | `37b2097` |
