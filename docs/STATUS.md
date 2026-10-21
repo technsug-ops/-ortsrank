@@ -41,7 +41,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] Vercel ↔ GitHub bağlantısı (Settings → Git → Connect) (21.10.2026)
 - [x] İlk production deploy; `https://ortsrank.foundercheck.de` açılıyor ve SSL geçerli (21.10.2026, `2874124`; `/` → `/de`, `/de` `/en` `/tr` 200)
 - [x] Impressum `/{de,en,tr}/impressum`; bilgiler foundercheck.de Impressum'undan, tek kaynak `src/config/operator.ts` (21.10.2026, `a58d027`)
-- [~] Datenschutzerklärung `/{de,en,tr}/datenschutz` sürüm 1.0, tek kaynak `src/content/legal/privacy.ts` (21.10.2026, yerel commit; Halil onayından sonra push edilecek)
+- [x] Datenschutzerklärung `/{de,en,tr}/datenschutz` sürüm 1.0, tek kaynak `src/content/legal/privacy.ts` (21.10.2026, `8caf246`; Halil onayıyla yayında)
 - [ ] Repo adı `ortsrank` olarak düzeltildi (isteğe bağlı)
 
 ---
@@ -133,7 +133,7 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Datenschutzerklärung taslağı (sitenin gerçek durumuna göre: çerez yok, izleyici yok, Vercel hosting, e-posta iletişimi); onay bekliyor | bu commit |
+| 21.10.2026 | Datenschutzerklärung taslağı (sitenin gerçek durumuna göre: çerez yok, izleyici yok, Vercel hosting, e-posta iletişimi); Halil onayıyla yayında | `8caf246` |
 | 21.10.2026 | Adım 14: Aşama 1 ilk teknik teslimat raporu | `d713c87` |
 | 21.10.2026 | Adım 13: pilot dry-run gerçek veriyle (30 belediye, 120 görev, 0,576 $ beklenen); pilot alanı kararı açık | `aaa3398` |
 | 21.10.2026 | Adım 12: Destatis GV 31.12.2025 içe aktarıldı (10.751 belediye, JSON + Neon), `destatis.ts` + `import-settlements.ts`, 41 test; toplam 229/229 | `10be488` |
