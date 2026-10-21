@@ -23,7 +23,7 @@ function business(id: string, over: Partial<Business> = {}): Business {
     type: "rental",
     measuredService: { status: "verified", sources: src },
     locationsReviewed: { status: "comprehensive_list", sources: src },
-    locations: [{ ags: STADT.ags, kind: "branch", address: address("Musterstadt an der Aue"), serviceAtLocation: "not_verified", sources: src }],
+    locations: [{ ags: STADT.ags, kind: "branch", address: address("Musterstadt an der Aue"), serviceAtLocation: "not_verified", operational: "verified", sources: src }],
     approved: false,
     ...over,
   };
@@ -79,6 +79,7 @@ describe("verified local competitor", () => {
 
   it.each([
     ["legal address only", { locations: [{ ...business("a").locations[0], kind: "legal_only" as const }] }, "legal_address_only"],
+    ["operation not verified (address presented, no evidence it is in operation)", { locations: [{ ...business("a").locations[0], operational: "not_verified" as const }] }, "operation_not_verified"],
     ["service not verified", { measuredService: { status: "not_verified" as const, sources: [] } }, "service_not_verified"],
     ["chain without the service verified at the location", { type: "rental_chain" as const }, "service_at_location_not_verified"],
     ["mixed business without the service verified at the location", { type: "mixed" as const }, "service_at_location_not_verified"],

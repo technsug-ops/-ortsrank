@@ -294,7 +294,9 @@ Bölüm 10'a taşındı (`brand_other_location` → `brand_only`).
 **Pilot 1 sonucu** (30 ham yanıt, yeni istek yok; rakip kaydı onaylanmadı):
 
 - **Heidenheim:** `not_met`, çünkü hedef bir ölçümde ilk 10'da. Bu sonuç rakip bilgisinden bağımsızdır.
-- **Steinheim:** `not_met`. 1. ölçümde azami sayı 1; yalnızca sitesine erişilemeyen bir domain açık. 22.10.2026'da hedefli kaynak kontrolüyle bir işletmenin konum envanteri kapandı: şirket toplam konum sayısını veriyor ve bu konumları adıyla sayıyor. Bu bir yargıdır ve inceleme tablosunda öyle işaretlidir.
-- **Aalen, Ulm, Babenhausen:** `not_evaluable`. Her ölçümde azami sayı en az 2. Kalan açık işletmelerin kendi konum listesi yok ya da sitesine erişilemiyor (ücretsiz kaynaklarla kapatılamadı).
+- **Heidenheim:** `not_met`, çünkü hedef iki ölçümde ilk 10'da. Rakip etiketlerinden bağımsızdır.
+- **Steinheim:** `not_met` (koşullu). 1. ölçümde azami sayı 1. Sonuç, bir işletmenin konum envanterine ilişkin kayda özgü bir değerlendirmeye dayanır: şirketin kendi kaynaklarında belirtilen toplam konum sayısı adlandırılmış konumlarla örtüşüyor ve incelenen kaynaklarda buna aykırı bilgi yok. Bu genel bir kural değildir; ana sayfadaki bir sayı beyanı tek başına kapsamlı liste sayılmaz.
+- **Aalen, Ulm, Babenhausen:** `not_evaluable`, incelenen kaynaklarla değerlendirilemedi. Her ölçümde azami sayı en az 2; eksik konum bilgileri sonucu iki yönde de değiştirebilir. Bu incelemede erişilen ücretsiz kaynaklar belirsizliği gidermedi; mevcut iş paketi kapsamında araştırma durduruldu.
+- **Faal konum kanıtı** (`operational`): Konumun faal olduğu bir kaynakla gösterilmelidir; örneğin açılış saatli bir profil ya da zincirin şube sayfası. Bu yoksa konum açık kalır (`operation_not_verified`). Pilot 1'de bir işletmenin konumu yalnızca kendi sitesine dayandığı için açık bırakıldı; Ulm sonucu değişmedi.
 - Pilot belediyelerinde konumu kayıtlı 5 işletme var. Bir zincirin şubelerinde ölçülen hizmet doğrulanmadığı için o zincir sayılmadı.
 - **Geri alınan önceki sonuç (`592eafb`, „beş belediyede koşul sağlanmadı"):** Bu sonuç, konum sayfası okunmamış işletmelerin `complete` sayılmasından ve „Heidenheim" kısaltmasının reddedilmesinden geliyordu. İkisi de düzeltildi.

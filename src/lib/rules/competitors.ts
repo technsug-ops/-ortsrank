@@ -45,6 +45,11 @@ const locationSchema = z.object({
     district: z.string().optional(),
   }),
   serviceAtLocation: z.enum(["verified", "not_verified"]).default("not_verified"),
+  /**
+   * Is the location in operation (e.g. a profile with opening hours, a branch page)?
+   * An address the company presents is not enough on its own; unknown stays open.
+   */
+  operational: z.enum(["verified", "not_verified"]).default("not_verified"),
   sources: z.array(sourceSchema).min(1),
   /**
    * Needed when the address city is not the official name but an abbreviation of
@@ -162,8 +167,10 @@ export class CompetitorIndex {
       return m === "exact" || (m === "abbreviation" && (l.municipalityEvidence?.length ?? 0) > 0);
     });
     if (matched.length === 0) return out("unverified", "municipality_match_unclear");
-    const operational = matched.filter((l) => l.kind !== "legal_only");
-    if (operational.length === 0) return out("unverified", "legal_address_only");
+    const ownSite = matched.filter((l) => l.kind !== "legal_only");
+    if (ownSite.length === 0) return out("unverified", "legal_address_only");
+    const operational = ownSite.filter((l) => l.operational === "verified");
+    if (operational.length === 0) return out("unverified", "operation_not_verified");
     if (b.measuredService.status !== "verified") return out("unverified", "service_not_verified");
     if (SERVICE_PER_LOCATION.includes(b.type) && !operational.some((l) => l.serviceAtLocation === "verified")) {
       return out("unverified", "service_at_location_not_verified");
