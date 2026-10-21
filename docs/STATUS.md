@@ -2,7 +2,7 @@
 
 > **Şu an:** Aşama 1 · Veri + talep pilotu · adım 6 tamam; sıradaki adım 7 (`runlog.ts` + testler)
 > **Son güncelleme:** 21.10.2026
-> **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.2) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2)
+> **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.3) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2) · [Veri ihtiyacı WUA](Datenbedarf_Werbe_Umsatzanalyse.md) (sürüm 1.1)
 
 Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncellenir: kutu işaretlenir, tarih ve commit eklenir, "Şu an" satırı değiştirilir. Hem Claude sohbeti hem VS Code bu dosyayı günceller.
 
@@ -14,6 +14,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 | Aşama | Durum | Kapı | Kapı durumu |
 | --- | --- | --- | --- |
+| 21.10.2026 | ROADMAP 3.3: Reklam ve Ciro Analizi (WUA) modülü; veri ihtiyaç belgesi 1.1 repoya alındı | `7f9dc03` |
 | 0 · Altyapı | Neredeyse tamam | – | – |
 | 1 · Veri + talep pilotu | **Devam ediyor** | Kapı 1: rapor sayesinde karar alındı mı? | Açık |
 | 2 · Ücretli pilot | Başlamadı | Kapı 2: ücretli ikinci ölçüm | – |
@@ -92,6 +93,8 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [ ] Rapor görüşmeleri yapıldı
 - [ ] Her pilot için 5 kayıt dolduruldu (yeni bilgi, değişen öncelik, işi kim yaptı, ödeme, süre)
 - [ ] Pilot sözleşmesi ve Datenschutz taslağı (Aşama 2 hazırlığı)
+- [x] WUA-0 veri sözleşmesi: müşteri veri ihtiyaç belgesi 1.1 (21.10.2026)
+- [ ] WUA pilot adayı: dosya verisi (Ads dışa aktarımı + aylık gerçek ciro) ve AVV kontrolü
 
 ### Kapı 1
 
@@ -109,6 +112,9 @@ Planlanmış başlıklar:
 
 - [ ] Aşama 2 · Admin paneli v1 (iç kullanım: müşteriler, taramalar, bütçe, rapor linkleri, pilot kayıtları, keyword setleri ve rakip etiketleri)
 - [ ] Aşama 2 · Kullanılabilirlik testi (en az 2 işletme sahibi raporu yardımsız anlıyor)
+- [ ] Aşama 2 · WUA-1 dosyadan reklam/ciro analizi pilotu (ROADMAP bölüm 12)
+- [ ] Aşama 3 · WUA-2 dosya yükleme, veri kalitesi ve yönetici raporu akışı (talep doğrulanırsa)
+- [ ] Aşama 3+ · WUA-3 otomatik Google bağlantıları (Ads, Analytics, Search Console; ayrı fizibilite)
 - [ ] Aşama 3 · Admin paneli v2 (kullanıcılar, planlar ve kota, ödeme durumu, sistem sağlığı, içerik ve hukuk metinleri, audit log)
 
 ---
