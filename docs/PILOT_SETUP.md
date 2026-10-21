@@ -1,7 +1,7 @@
 # Pilot ayarları
 
 > Güncelleme: 21.10.2026 · Rakamlar gerçek komut çıktısından.
-> **Pilot 1 (ilk pilot): Arbeitsbühnenvermietung, Heidenheim çevresi** – Halil'in kararı 21.10.2026. İşletmenin adı, domaini ve proje dosyası git dışında (`data/projects/pilot-laggner.json`).
+> **Pilot 1 (ilk pilot): Arbeitsbühnenvermietung, Heidenheim çevresi** – Halil'in kararı 21.10.2026. İşletmenin adı, domaini ve proje dosyası git dışında (`data/projects/pilot1-heidenheim.json`).
 > **Sonraki pilot: Terrassenüberdachung** – taslak aşağıda, bölüm „Sonraki pilot".
 > Tam canlı tarama, kesin keyword seti ve harcama tavanı Halil'in ayrı onayına bağlı.
 
@@ -21,7 +21,7 @@ Rapor kapsamı: **„Heidenheim çevresi pilot ölçümü"** (Pilotmessung Raum 
 | En fazla | 30 belediye, merkez dahil |
 | Kaynak | Destatis GV 31.12.2025 |
 
-**Dry-run sonucu** (`20261021-162243-pilot-laggner-heidenheim-5cf686`): 30 seçildi, 114 eşik altı, 0 üst sınır üstü, **26 sınıra takıldı (`overLimit`)**. Seçim **27,8 km'de** kesiliyor; Schwäbisch Gmünd (29,7 km) ve Ulm (33,3 km) dışarıda.
+**Dry-run sonucu** (21.10.2026, `data/projects/pilot1-heidenheim.json`): 30 seçildi, 114 eşik altı, 0 üst sınır üstü, **26 sınıra takıldı (`overLimit`)**. Seçim **27,8 km'de** kesiliyor; Schwäbisch Gmünd (29,7 km) ve Ulm (33,3 km) dışarıda.
 
 | # | Belediye | AGS | km | Nüfus |
 | --- | --- | --- | --- | --- |
@@ -66,7 +66,7 @@ Rapor kapsamı: **„Heidenheim çevresi pilot ölçümü"** (Pilotmessung Raum 
 
 ### 2. Keyword keşfi ve öneri
 
-**Keşif:** tarama `discovery-laggner-20261021`, Heidenheim merkez koordinatı, mobil, depth 20, 4 sorgu × 1 ölçüm; tavan 0,05 $ (bütçe defteriyle), harcanan **0,016 $**, 4/4 başarılı. Öneriler Google'ın „Andere suchten auch" / „Ähnliche Suchanfragen" kutularından; **arama hacmi veya talep kanıtı değildir**, aday listesidir. Sayı = 4 yanıttan kaçında görüldüğü.
+**Keşif:** yerel keşif taraması, 21.10.2026, Heidenheim merkez koordinatı, mobil, depth 20, 4 sorgu × 1 ölçüm; tavan 0,05 $ (bütçe defteriyle), harcanan **0,016 $**, 4/4 başarılı. Öneriler Google'ın „Andere suchten auch" / „Ähnliche Suchanfragen" kutularından; **arama hacmi veya talep kanıtı değildir**, aday listesidir. Sayı = 4 yanıttan kaçında görüldüğü.
 
 | Keşif sorgusu | Organik sonuç | Hedef domain (organik) | Local Pack |
 | --- | --- | --- | --- |
@@ -108,7 +108,7 @@ Sık görülen Google önerileri (4/4): „Arbeitsbühne mieten in der Nähe", �
 
 ### 4. Rakip etiket taslağı
 
-`data/competitor-labels.laggner.draft.json` (git dışı, gerçek işletme adları). Keşifteki organik domainlerden: local 1, regional 2, portal 4, directory 1, national 21; **belirsiz 12** (etiketsiz kalır). local/regional yalnızca 40 km içinde Impressum adresi olanlara önerildi; adres hizmet bölgesini kanıtlamaz. Local Pack'teki rakipler domainsiz geldiği için yalnızca adla listelendi, domain etiketlerine bağlanamaz. Taslak Halil'in onayına kadar aktif değil.
+`data/competitor-labels.pilot1.draft.json` (git dışı, gerçek işletme adları). Keşifteki organik domainlerden: local 1, regional 2, portal 4, directory 1, national 21; **belirsiz 12** (etiketsiz kalır). local/regional yalnızca 40 km içinde Impressum adresi olanlara önerildi; adres hizmet bölgesini kanıtlamaz. Local Pack'teki rakipler domainsiz geldiği için yalnızca adla listelendi, domain etiketlerine bağlanamaz. Taslak Halil'in onayına kadar aktif değil.
 
 ### 5. Maliyet ve tavan
 

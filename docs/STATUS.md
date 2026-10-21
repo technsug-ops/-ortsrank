@@ -89,11 +89,11 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 - [x] Pilot çerçevesi: Terrassenüberdachung, Frankfurt/Rhein-Main, 20–30 belediye (21.10.2026)
 - [x] **Pilot 1: Arbeitsbühnenvermietung, Heidenheim çevresi** (Halil'in kararı, 21.10.2026); Terrassenüberdachung sonraki pilot. Ayarlar ve taslaklar: [PILOT_SETUP.md](PILOT_SETUP.md)
-- [x] Pilot 1 keyword keşfi: 4 sorgu Heidenheim'dan, 0,016 $ (tarama `discovery-laggner-20261021`)
+- [x] Pilot 1 keyword keşfi: 4 sorgu Heidenheim'dan, 0,016 $ (yerel keşif taraması, 21.10.2026)
 - [ ] Pilot 1 kesin keyword seti (öneri: Arbeitsbühne mieten ×3, Hubarbeitsbühne mieten, Scherenbühne mieten, Arbeitsbühne mieten in der Nähe)
 - [ ] Pilot 1 alt nüfus eşiği (5.000'de seçim 27,8 km'de kesiliyor; 7.500 / 10.000 seçenekleri)
 - [ ] Pilot 1 Heidenheim şubesinin Google profili (tam ad, adres, bağlantı, kimlik) doğrulanmış kaynaktan
-- [ ] Pilot 1 rakip etiket taslağı onayı (`data/competitor-labels.laggner.draft.json`)
+- [ ] Pilot 1 rakip etiket taslağı onayı (`data/competitor-labels.pilot1.draft.json`)
 - [ ] DataForSEO'ya en az 50 $ ve tam tarama tavanı onayı (öneri 2,50 $ / tarama günü)
 - [~] Pilot keywordleri (3–5), işletmelerin gerçek hizmetlerine göre – taslak [PILOT_SETUP.md](PILOT_SETUP.md) bölüm 1 (Google önerilerinden), Halil'in onayı bekleniyor
 - [~] Pilot alanı kararı (taslak [PILOT_SETUP.md](PILOT_SETUP.md) bölüm 2; önce pilot işletmenin konumu): 30 km / ≥10.000 nüfusta 66 belediye var; üst sınır 30 iken seçim 17,4 km'de bitiyor. Seçenekler: üst sınırı artırmak, nüfus eşiğini yükseltmek (30 km / ≥20.000 → 34) veya yarıçapı küçültmek (25 km / ≥20.000 → 29)
