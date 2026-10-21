@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 · Veri + talep pilotu · adım 13 tamam; sıradaki adım 14 (teslimat raporu). Açık karar: pilot alanı (30 km / ≥10k → 66 belediye, üst sınır 30 ile fiilen 17 km)
+> **Şu an:** Aşama 1 · Veri + talep pilotu · Aşama 1 teknik hattı adım 1–14 tamam; teslimat raporu [docs/reports/phase1-delivery.md](reports/phase1-delivery.md) değerlendirme bekliyor. Açık karar: pilot alanı (30 km / ≥10k → 66 belediye, üst sınır 30 ile fiilen 17 km)
 > **Son güncelleme:** 21.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.3) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2) · [Veri ihtiyacı WUA](Datenbedarf_Werbe_Umsatzanalyse.md) (sürüm 1.1)
 
@@ -63,7 +63,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] 11. Şema: `lat`, `lng`, `population`, `population_as_of` ve `serp_results.domain` null kabul eder; migration `drizzle/0001_nullable_settlement_data.sql` (21.10.2026, `931d900`); Neon'a uygulandı
 - [x] 12. Gerçek Destatis dosyası indirildi, sütun eşlemesi doğrulandı, `import-settlements.ts` (21.10.2026, `10be488`). `31122025_Auszug_GV.xlsx` (sha256 `5bfb8b7a5ce0…`): 10.751 belediye, eksik koordinat 0, eksik nüfus 0; gemeindefrei 202 alan (Textkennzeichen 65/66) hariç ve raporlu. `--db` ile Neon `settlements` tablosuna yazıldı (tekrar çalıştırma çoğaltmıyor)
 - [x] 13. Pilot dry-run: gerçek belediye listesi + maliyet (21.10.2026). `pilot-rhein-main` (Frankfurt, 30 km, ≥10.000, en fazla 30): 66 uygun belediye → en yakın 30 seçildi (Frankfurt … Rodgau 17,4 km), 36 `overLimit` (Darmstadt 26,6 km, Rüsselsheim 23,3 km dahil), 23 eşik altı, 0 nüfusu bilinmeyen, 0 konumsuz. Mevcut 2 keyword ile 120 görev: beklenen 0,576 $, en kötü 1,44 $; 5 keyword ile 210 görev ≈ 1,01 $ / 2,52 $
-- [ ] 14. Teslimat raporu `docs/reports/phase1-delivery.md`
+- [x] 14. Teslimat raporu `docs/reports/phase1-delivery.md` (21.10.2026, bu commit): 229/229 test, Destatis 10.751 belediye, pilot dry-run 30 belediye / 120 görev / 0,576 $
 - [ ] Teslimat raporu bu sohbette değerlendirildi
 
 ### Canlı doğrulama
@@ -133,7 +133,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Adım 13: pilot dry-run gerçek veriyle (30 belediye, 120 görev, 0,576 $ beklenen); pilot alanı kararı açık | bu commit |
+| 21.10.2026 | Adım 14: Aşama 1 ilk teknik teslimat raporu | bu commit |
+| 21.10.2026 | Adım 13: pilot dry-run gerçek veriyle (30 belediye, 120 görev, 0,576 $ beklenen); pilot alanı kararı açık | `aaa3398` |
 | 21.10.2026 | Adım 12: Destatis GV 31.12.2025 içe aktarıldı (10.751 belediye, JSON + Neon), `destatis.ts` + `import-settlements.ts`, 41 test; toplam 229/229 | `10be488` |
 | 21.10.2026 | Neon Frankfurt doğrulandı; migration 0000 + 0001 uygulandı (19 tablo); `npm run db:migrate` | `75739d4` |
 | 21.10.2026 | Adım 11: şemada null alanlar + migration 0001, şema testi; toplam 188/188 | `931d900` |
