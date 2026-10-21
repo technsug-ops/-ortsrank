@@ -1,6 +1,6 @@
 # Aşama 1 – Teknik Uygulama Planı
 
-> Kapsam: ROADMAP sürüm 3.1, Aşama 1'in **teknik** kısmı (veri + tarama scriptleri).
+> Kapsam: ROADMAP sürüm 3.1, Aşama 1'in **teknik** kısmı (veri + tarama scriptleri). ROADMAP 3.3'teki Reklam ve Ciro Analizi (WUA) modülü bu planın kapsamında değildir (ROADMAP bölüm 12).
 > Müşteri bulma, hesap açma, para yatırma ve işletme katılımı bu planın dışında; Halil tarafından ayrı takip edilir.
 > Hazırlanma: 21.10.2026 · Sürüm 1.2 · Uygulama: VS Code'da
 >

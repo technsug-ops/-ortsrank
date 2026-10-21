@@ -223,6 +223,10 @@ flowchart LR
 
 - [ ] Salt-okunur web raporu (Almanca): harita, belediye tablosu, rakip özeti
 - [ ] Kullanılabilirlik testi: en az 2 pilot işletme sahibi raporu yardımsız açıp ana bulguyu kendi cümlesiyle söyleyebiliyor
+- [ ] Belediye detayı ve rakip özeti; her öneride kanıt seviyesi ve kaynak
+- [ ] Planlı ikinci tarama ve önceki ölçümle karşılaştırma, dönem karşılaştırma şartlarına göre (bölüm 6)
+- [ ] Değişim gösterimi: "işlem + sonrasındaki değişim", nedensellik iddiası olmadan
+- [ ] Fiyat testi: tek rapor ve ikinci ölçüm için en az iki fiyat noktası
 
 **Admin paneli v1 (iç kullanım)**
 
@@ -233,10 +237,6 @@ flowchart LR
 - [ ] Pilot kayıtları (5 soru) ve açıklama süresi girişi
 - [ ] Keyword setleri ve rakip etiket listesi: tek yerden düzenleme
 - [ ] Müşteri verisine her erişim audit log'da
-- [ ] Belediye detayı ve rakip özeti; her öneride kanıt seviyesi ve kaynak
-- [ ] Planlı ikinci tarama ve önceki ölçümle karşılaştırma, dönem karşılaştırma şartlarına göre (bölüm 6)
-- [ ] Değişim gösterimi: "işlem + sonrasındaki değişim", nedensellik iddiası olmadan
-- [ ] Fiyat testi: tek rapor ve ikinci ölçüm için en az iki fiyat noktası
 
 **Ayrı kaydedilecek sinyaller**
 
@@ -341,10 +341,10 @@ Yalnızca mevcut müşterilerden doğrulanmış talep varsa:
 | --- | --- | --- |
 | 20.10.2026 | 1 | İlk sürüm (9 teknik faz) |
 | 20.10.2026 | 2 | Bağımlılıklar düzeltildi; koordinatla sorgu; `serp_raw`; Better Auth hizası; SCC/DPF; kötüye kullanım koruması |
-| 21.10.2026 | 3.3 | Reklam ve Ciro Analizi (WUA) modülü eklendi (bölüm 12): dosyadan pilot, gerçek ciro ile Ads atfının ayrımı, veri kalite kuralları, yönetici raporu, aşamalı bağlantılar; tarama pilotu kapsamı ve 3.2 ilkeleri korundu. Müşteri veri belgesi: `docs/Datenbedarf_Werbe_Umsatzanalyse.md` (1.1) |
-| 21.10.2026 | 3.2 | İlkelere eklendi: kullanım kolaylığı, tek yerden yönetim, admin paneli; admin paneli v1 (Aşama 2) ve v2 (Aşama 3) görevleri; Aşama 2'ye kullanılabilirlik testi |
-| 21.10.2026 | 3.1 | Başarı ölçütü ikiye ayrıldı (kayıt bütünlüğü, geçerli sonuç oranı); kanıt seviyesi tanımları düzeltildi (kaynak türü seviyeyi belirlemez); "rakipte var, sizde yok → sayfa açın" yerine önce inceleme; müşterinin kendi sitesi de kontrol edilir; dönem karşılaştırma şartları eklendi |
 | 20.10.2026 | 3 | Dış değerlendirmeye göre yeniden yapılandırıldı: ilk hedef "ödeme + somut karar"; 4 aşama; veri ve talep pilotu birleşti; kanıt seviyeleri ve aksiyon türleri; ölçüm ölçütleri (sistem doğruluğu ≠ değişkenlik); "±2 sıra" vaadi kaldırıldı; "her yerleşim" yerine "belediyeler" ve temsilî ölçüm noktası; tekrar ölçüm ilk ücretli sürüme alındı; erişim kontrolü ve pilot hukuku ilk dış erişimden önceye bağlandı; pilot kayıtları ve açıklama süresi; sinyaller ayrı kaydediliyor |
+| 21.10.2026 | 3.1 | Başarı ölçütü ikiye ayrıldı (kayıt bütünlüğü, geçerli sonuç oranı); kanıt seviyesi tanımları düzeltildi (kaynak türü seviyeyi belirlemez); "rakipte var, sizde yok → sayfa açın" yerine önce inceleme; müşterinin kendi sitesi de kontrol edilir; dönem karşılaştırma şartları eklendi |
+| 21.10.2026 | 3.2 | İlkelere eklendi: kullanım kolaylığı, tek yerden yönetim, admin paneli; admin paneli v1 (Aşama 2) ve v2 (Aşama 3) görevleri; Aşama 2'ye kullanılabilirlik testi |
+| 21.10.2026 | 3.3 | Reklam ve Ciro Analizi (WUA) modülü eklendi (bölüm 12): dosyadan pilot, gerçek ciro ile Ads atfının ayrımı, veri kalite kuralları, yönetici raporu, aşamalı bağlantılar; tarama pilotu kapsamı ve 3.2 ilkeleri korundu. Müşteri veri belgesi: `docs/Datenbedarf_Werbe_Umsatzanalyse.md` (1.1) |
 
 ## 12. Reklam ve Ciro Analizi modülü (WUA)
 
