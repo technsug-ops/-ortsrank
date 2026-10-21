@@ -1,8 +1,8 @@
 # Ortsrank – Yol Haritası
 
-> Bölgesel hizmet veren işletmelerin Google'da hangi belediyelerde rekabetin gerisinde kaldığını ve önce nerede çalışması gerektiğini gösterir.
+> Bölgesel hizmet veren işletmelerin Google görünürlüğünü, reklam harcamalarını ve gerçek şirket cirosunu birlikte değerlendirerek kanıtı gösterilen çalışma öncelikleri üretir.
 > İşleten: TechNS UG (haftungsbeschränkt), Oberursel · Adres: https://ortsrank.foundercheck.de
-> Son güncelleme: 21.10.2026 (sürüm 3.2)
+> Son güncelleme: 21.10.2026 (sürüm 3.3)
 
 ---
 
@@ -13,6 +13,8 @@
 > **Bir müşteri, rapor sayesinde somut bir karar aldı ve devamı için ödeme yaptı.**
 
 Otomasyona, hesap sistemine ve plan yönetimine yapılacak yatırım bu kanıttan sonra gelir. Mimari SaaS'a hazır kurulur (çok kiracılı şema, çok dilli altyapı); ekranlar ve özellikler ise talep geldikçe eklenir.
+
+**Kapsam eki (3.3):** Reklam ve Ciro Analizi (WUA) modülü bölüm 12'de tanımlandı. Mevcut tarama pilotu sürer; yeni modül önce dosyadan ve TechNS incelemesiyle denenir. Otomatik bağlantılar sonraki teslimatlardır.
 
 ## 2. Müşteri ne satın alıyor?
 
@@ -129,6 +131,8 @@ flowchart LR
 | 3. İlk SaaS sürümü | Hesap, organizasyon, ödeme, kota, planlı yeniden tarama, tam hukuk metinleri | Müşteri temel akışı yardımsız tamamlıyor; ilk abonelik yenilemesi | 6–8 hafta |
 | 4. Genişleme | Ajans özellikleri, white-label, ek sektörler, çok noktalı ölçüm, API, AT/CH | Mevcut müşterilerden doğrulanmış talep | sürekli |
 
+Bu süreler mevcut bölgesel tarama kapsamı içindir; WUA modülünün ek eforu veri pilotundan sonra ayrı tahmin edilir.
+
 Süreler akşam/hafta sonu temposuna göredir. Veri üretimi ile müşteri bulma, görüşme ve geri bildirim ayrı planlanır; ikincisi genellikle daha uzun sürer.
 
 ---
@@ -203,6 +207,8 @@ flowchart LR
 
 **Hedef:** Gerçek ödeme ve tekrar kullanım kanıtı.
 
+- [ ] Ayrı iş paketi olarak WUA-1 dosyadan reklam/ciro analizi pilotu (bölüm 12); modül bazında ödeme ve emek kaydı.
+
 **İlk dış erişimden önce zorunlu**
 
 - [ ] Erişim kontrolü: müşteri yalnızca kendi raporunu görür (imzalı, süreli link veya basit giriş)
@@ -247,6 +253,8 @@ flowchart LR
 ### Aşama 3 – İlk SaaS sürümü
 
 **Hedef:** Müşteri temel akışı yardımsız tamamlıyor.
+
+- [ ] WUA talebi doğrulanırsa dosya yükleme, veri kalitesi ve yönetici raporu akışı; otomatik bağlantılar ayrı fizibilite ve teslimatla (bölüm 12).
 
 - [ ] Better Auth: e-posta doğrulamalı giriş, organizasyon, davet; roller pilot bulgularına göre (başlangıçta owner + member)
 - [ ] Postgres RLS (ek savunma katmanı)
@@ -333,12 +341,106 @@ Yalnızca mevcut müşterilerden doğrulanmış talep varsa:
 | --- | --- | --- |
 | 20.10.2026 | 1 | İlk sürüm (9 teknik faz) |
 | 20.10.2026 | 2 | Bağımlılıklar düzeltildi; koordinatla sorgu; `serp_raw`; Better Auth hizası; SCC/DPF; kötüye kullanım koruması |
+| 21.10.2026 | 3.3 | Reklam ve Ciro Analizi (WUA) modülü eklendi (bölüm 12): dosyadan pilot, gerçek ciro ile Ads atfının ayrımı, veri kalite kuralları, yönetici raporu, aşamalı bağlantılar; tarama pilotu kapsamı ve 3.2 ilkeleri korundu. Müşteri veri belgesi: `docs/Datenbedarf_Werbe_Umsatzanalyse.md` (1.1) |
 | 21.10.2026 | 3.2 | İlkelere eklendi: kullanım kolaylığı, tek yerden yönetim, admin paneli; admin paneli v1 (Aşama 2) ve v2 (Aşama 3) görevleri; Aşama 2'ye kullanılabilirlik testi |
 | 21.10.2026 | 3.1 | Başarı ölçütü ikiye ayrıldı (kayıt bütünlüğü, geçerli sonuç oranı); kanıt seviyesi tanımları düzeltildi (kaynak türü seviyeyi belirlemez); "rakipte var, sizde yok → sayfa açın" yerine önce inceleme; müşterinin kendi sitesi de kontrol edilir; dönem karşılaştırma şartları eklendi |
 | 20.10.2026 | 3 | Dış değerlendirmeye göre yeniden yapılandırıldı: ilk hedef "ödeme + somut karar"; 4 aşama; veri ve talep pilotu birleşti; kanıt seviyeleri ve aksiyon türleri; ölçüm ölçütleri (sistem doğruluğu ≠ değişkenlik); "±2 sıra" vaadi kaldırıldı; "her yerleşim" yerine "belediyeler" ve temsilî ölçüm noktası; tekrar ölçüm ilk ücretli sürüme alındı; erişim kontrolü ve pilot hukuku ilk dış erişimden önceye bağlandı; pilot kayıtları ve açıklama süresi; sinyaller ayrı kaydediliyor |
 
+## 12. Reklam ve Ciro Analizi modülü (WUA)
+
+### Amaç ve mevcut kapsamla ilişkisi
+
+Ortsrank iki analiz alanını birlikte sunar:
+
+1. **Bölgesel görünürlük:** Hangi belediyede, hangi sorguda ve hangi rakibe karşı görünürlük var?
+2. **Reklam ve iş sonuçları:** Harcama, gerçek şirket cirosu, talepler ve işletme kararları zaman içinde nasıl değişti; hangi inceleme veya aksiyon öncelikli?
+
+İkinci alan, 21.10.2026 tarihli “Datenbedarf – Werbe- und Umsatzanalyse” belgesinden eklenmiştir. Bu bir ürün kapsamı kararıdır; entegrasyonların veya hesaplamaların uygulanmış olduğu anlamına gelmez. İlgili müşteri veri ihtiyaç belgesi Almancadır.
+
+Mevcut `PHASE1_PLAN.md` teknik teslimatı (belediye importu, tarama, bütçe, deneme kayıtları, dry-run) kendi kapsamıyla tamamlanır. WUA ayrı iş paketidir; mevcut tarama scriptlerine Ads bağlantısı veya ciro importu eklemek ilk teslimatın koşulu değildir. Veri toplama görüşmeleri paralel başlayabilir. Yeni modülün eforu mevcut süre tahminlerine dahil değildir.
+
+### Kapsam ve aşamalar
+
+| Paket | Zamanlama | Teslimat | Kabul ölçütü |
+| --- | --- | --- | --- |
+| WUA-0: Veri sözleşmesi | Aşama 1 boyunca, tarama geliştirmesinden bağımsız | Aylık veri alanları, kaynak/kapsam tanımları, görüşme formu ve kalite kuralları | Net/brüt, para birimi, tarih temeli, dönem ve kanal kapsamı belirli; gerçek müşteri verisi kullanılmadan önce erişim ve işleme koşulları belirlenmiş |
+| WUA-1: Dosyadan analiz pilotu | İlk tarama teslimatından sonra; Aşama 2 içinde | Ads dışa aktarımı + aylık ciro + faaliyet takvimi; TechNS tarafından kontrol edilen Almanca yönetici raporu | Kaynak toplamları uzlaştırıldı; eksikler ve kısmi aylar işaretli; metrikler yeniden hesaplanabilir; müşteri kararı ve toplam emek kaydedildi |
+| WUA-2: Tekrarlanabilir ürün akışı | Aşama 3; WUA-1 talebi doğrulanırsa | Dosya yükleme, eşleme önizlemesi, sürümleme, dönem karşılaştırması, inceleme/onay akışı | Müşteri veri yükleyebiliyor; tekrar yükleme çift saymıyor; organizasyon izolasyonu ve rapor kaynak izi testli |
+| WUA-3: Otomatik bağlantılar | Aşama 3–4; kullanım ve fizibiliteye göre | Önce Google Ads; sonra gerekliyse GA4, Search Console ve Unternehmensprofil | Her bağlantı için erişim, hesap kimliği, geçmiş veri kapsamı, yenileme/hata/iptal akışı ayrı doğrulanmış |
+
+Pilot bağlantı erişimine bağımlı değildir; CSV/XLSX dışa aktarımlarıyla başlayabilir. “Bağlandıktan sonra her şey otomatik” veya sabit kurulum süresi vaat edilmez. API izinleri, tarihsel veri kapsamı ve erişim düzeyleri uygulama sırasında resmi dokümanlarla doğrulanır.
+
+### Başlangıç veri sözleşmesi
+
+Hedef 24–36 aylık geçmiş veridir. Daha kısa geçmiş kabul edilir; 12 ay öncesi eşleşme yoksa yıllık karşılaştırma yapılmaz, mevsimsellik iddiaları sınırlandırılır. Ads dönüşüm verisi yoksa ciro/harcama karşılaştırması yapılabilir; lead maliyeti ve dönüşüm verimliliği hesaplanamaz.
+
+| Veri grubu | Gerekli alanlar / ilk pilot yaklaşımı |
+| --- | --- |
+| Şirket cirosu | Ay, tutar, para birimi, net/brüt, sipariş/fatura/montaj gibi tarih temeli, iptal/iade işleme biçimi, veri kesim tarihi, tam/kısmi ay, kaynak |
+| Reklam harcaması | Ay, kanal, hesap kimliği, maliyet ve maliyet kapsamı; mevcutsa kampanya, gösterim, tıklama; ajans/üretim ücretleri medya bütçesinden ayrı |
+| Dönüşümler | Mevcutsa dönüşüm eylemi, tanımı, sayısı, değerin gerçek satış/atanmış lead değeri oluşu, sayım ve atıf ayarları, takip değişiklikleri; eksikliği açıkça gösterilir |
+| Satış süreci | Mevcutsa aylık talep, teklif, kazanılmış sipariş, ortalama sipariş tutarı, iptal; tanımlar ve kayıt tarihleri |
+| İş bağlamı | Hedef, ürün/hizmet, hizmet alanı, bütçe kararları, kampanya/indirim tarihleri, fiyat ve kapasite değişiklikleri; ilk görüşmede kaydedilebilir |
+| Ek kırılımlar | Mevcutsa ürün grubu, satış kanalı ve toplulaştırılmış bölge; kişisel müşteri isim/adresleri alınmaz |
+| Karlılık | Yalnızca müşteri kârlılık analizi istiyorsa ürün maliyeti, katkı payı veya uygun maliyet verisi; yoksa kâr/ROI iddiası yok |
+
+Firma, yıl/ay, kaynak, ölçü birimi ve para birimi her veri setinde açık olmalıdır. “Bin EUR” tutarı EUR'ya yalnızca doğrulanmış birim bilgisiyle dönüştürülür; dönüşüm kayda alınır. Bölge cirosu yoksa firma toplamı belediyelere tahminen dağıtılmaz.
+
+### Metrikler ve yorum sınırları
+
+| Metrik | Hesap | İzin verilen yorum |
+| --- | --- | --- |
+| Google Ads harcamasının ciroya oranı | Ads medya harcaması / gerçek şirket net cirosu × 100 | Aynı dönem şirket düzeyinde oran; toplam pazarlama maliyeti değildir |
+| Toplam reklam harcamasının ciroya oranı | Kapsama alınan tüm medya harcamaları / gerçek şirket net cirosu × 100 | Yalnızca kanalların kapsama durumu açıkça belirtilerek |
+| Ads harcaması başına şirket cirosu | Gerçek şirket net cirosu / Google Ads medya harcaması | Şirket düzeyinde betimleyici oran; Ads ROAS veya reklamın yarattığı gelir değildir |
+| Toplam medya harcaması başına şirket cirosu | Gerçek şirket net cirosu / tüm medya harcamaları | Toplu verimlilik oranı; eksik kanal varsa kısmi kapsam etiketli |
+| Google Ads raporlanan ROAS | Ads'e atfedilmiş dönüşüm değeri / Ads maliyeti | Ayrı metrik; değerin satış mı atanmış lead değeri mi olduğu belirtilir. Şirket cirosunun yerine kullanılmaz |
+| CPC / CTR / CPL | Maliyet/tıklama; tıklama/gösterim; maliyet/tanımlı lead | Pay ve payda aynı kapsamda; CPL yalnızca lead tanımı ve sayımı doğrulanmışsa |
+| Aylık/yıllık değişim | Karşılaştırılabilir döneme göre yüzde ve mutlak değişim | Kısmi ay tam ayla eşitmiş gibi karşılaştırılmaz; sıfır bazda yüzde yerine açıklama |
+
+Payda sıfırsa “hesaplanamaz”; eksik veri sıfır sayılmaz. Net ve brüt tutarlar karıştırılmaz. Ajans ve içerik maliyeti dahil bir toplam pazarlama oranı ayrıca istenirse maliyet kapsamı ayrı tanımlanır.
+
+**Nedensellik:** Toplam ciro ile harcamanın birlikte değişmesi reklamın etkisini tek başına kanıtlamaz. Satış gecikmesi, kapasite, fiyat, sezon, organik trafik, tavsiyeler ve diğer kanallar alternatif açıklamalar olarak ele alınır. Gecikmeli karşılaştırmalar keşif amaçlıdır. Günlük veri yoksa ayın ilk 20 günü önceki yılın ilk 20 günüyle karşılaştırılmış gibi sunulmaz.
+
+**Satış hunisi:** Aynı ayın talep, teklif ve sipariş toplamları farklı müşterilere ait olabilir. Kohort/eşleşme yoksa kesin tekliften satışa dönüşüm oranı üretilmez. Platform dönüşüm sayıları ile işletmenin talepleri/satışları uzlaştırılır; birbirine eklenmez.
+
+**Coğrafi bağlantı:** SERP'te bir belediyede zayıf görünürlük ile şirket toplam cirosu aynı raporda gösterilebilir. Belediye düzeyinde satış/lead verisi olmadan “bu şehir şu kadar ciro kaybettirdi” sonucu üretilmez. Google Ads konum kırılımlarının anlamı ayrıca doğrulanır; belediye anahtarına zorla eşlenmez.
+
+### Veri kalitesi ve teknik kabul
+
+- [ ] İçe aktarma öncesi alan ve birim eşleme önizlemesi; kaynak dosyası ve import sürümü korunur.
+- [ ] Eksik ay, tekrar kayıt, kısmi ay, para birimi ve tarih temeli uyumsuzlukları raporlanır; sessizce doldurulmaz.
+- [ ] Kaynak toplamlarıyla aylık/yıllık toplamlar uzlaştırılır; hatalı veya yinelenen import çift sayılmaz.
+- [ ] Sıfır payda, eksik ay, iade/storno, kısmi ay, binlik birim ve aynı dosyanın tekrar yüklenmesi için anlamlı testler.
+- [ ] Müşteriye özel gelir/harcama tabloları organizasyona bağlıdır; rapor, dosya erişimi ve dışa aktarmada izolasyon testlidir.
+- [ ] Hesaplamalar deterministik kodla yapılır. LLM yalnızca doğrulanmış metrikleri ve kanıt seviyeli bulguları anlatır; sayı veya nedensellik eklemez.
+- [ ] Gerçekleşmiş olaylar ile müşterinin yorumu ayrılır; her öneri kaynak, gerekçe, sorumlu ve sonraki kontrol tarihi taşır.
+- [ ] Pilot raporu insan kontrolünden geçmeden müşteriye yayımlanmaz.
+- [ ] Müşteri verilerinin saklama/silme, erişim ve hizmet sağlayıcı kapsamı gerçek akışa göre belirlenir. Ham SERP için seçilen süre gelir dosyalarına otomatik uygulanmaz.
+
+Önerilen yeni veri alanları: `imports`, `monthly_revenue`, `monthly_ad_metrics`, `business_events`, `business_goals`, `sales_funnel_metrics`, `analysis_reports`. Bunlar tasarım önerisidir; mevcut şemayla karşılaştırılmadan ikinci kullanıcı/organizasyon yapısı oluşturulmaz.
+
+### Yönetici raporu ve iş modeli
+
+Raporda önce kısa yönetici özeti, sonra gerçek ciro ve reklam harcaması trendi, kapsamı açık oranlar, veri varsa satış süreci, faaliyet/karar zaman çizgisi, bölgesel görünürlük ve en fazla 3–5 öncelikli aksiyon bulunur. Her aksiyon gözlem/çıkarım/hipotez seviyesini ve eksik veriyi gösterir.
+
+İlk ticari test: “Yerel Görünürlük”, “Reklam ve Ciro Analizi” ve “Birleşik Yönetici Raporu” için müşterinin hangi çıktıya ödeme yaptığı ayrı kaydedilir. Bunlar henüz fiyatlandırılmış planlar değildir. TechNS danışmanlığına verilen ödeme, otomatik yazılım talebinin tek başına kanıtı sayılmaz. Görüşme ve rapor hazırlama süresi maliyete dahil edilir.
+
+**WUA pilot kapısı:** En az bir rapor gerçek verilerle kaynak toplamlarına uzlaştırılmış ve müşteriyle incelenmiş olmalı; hangi kararın alındığı kaydedilmelidir. WUA'yı otomatikleştirmek için modülün kendisine ödeme veya ücretli tekrar talebi ayrıca gösterilmelidir. Bölgesel tarama için mevcut Kapı 1–3 koşulları korunur.
+
+### Kaynak ve uygulama notları
+
+- Kullanıcı belgesi: “Datenbedarf – Werbe- und Umsatzanalyse”, 21.10.2026; bu sürümle pilot diline uyarlanmıştır.
+- Google Ads dönüşüm değerleri sabit veya işleme özgü atanabilir; kontrol: https://support.google.com/google-ads/answer/7197048
+- Google Ads erişim düzeyleri ayrı doğrulanmalı: https://support.google.com/google-ads/answer/9978556
+- Search Console geçmiş kapsamı Ads/ciro ile aynı varsayılmaz; mevcut geçmiş ve önceki dışa aktarımlar ayrı kaydedilir: https://developers.google.com/search/docs/monitor-debug/debugging-search-traffic-drops
+
+---
+
 ## İlgili belgeler
 
 - Proje dokümanı (senaryolar, rakip analizleri): https://claude.ai/code/artifact/f682b20a-5ad9-4b55-9f46-ec5a13133c32
+- Müşteri veri ihtiyaç belgesi: [`Datenbedarf_Werbe_Umsatzanalyse.md`](Datenbedarf_Werbe_Umsatzanalyse.md) (21.10.2026, sürüm 1.1)
+- Teknik tarama planı: `PHASE1_PLAN.md`; WUA ilk teknik teslimata dahil değildir.
 - Veri modeli: `src/db/schema.ts`
 - Kurulum: `README.md`

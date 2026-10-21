@@ -7,7 +7,8 @@ Bu repo Ortsrank'ın kodudur: bölgesel hizmet veren işletmelerin Google'da han
 ## Önce oku
 
 - `docs/STATUS.md` – **nerede olduğumuz ve checklist.** Her tamamlanan adımdan sonra güncelle: kutuyu işaretle, tarih ve commit ekle, "Şu an" satırını ve günlüğü güncelle. Güncellemeyi o adımın commit'ine dahil et.
-- `docs/ROADMAP.md` – aşamalar, ilkeler, kanıt seviyeleri, ölçüm ölçütleri (sürüm 3.1)
+- `docs/ROADMAP.md` – aşamalar, ilkeler, kanıt seviyeleri, ölçüm ölçütleri, WUA modülü bölüm 12 (sürüm 3.3)
+- `docs/Datenbedarf_Werbe_Umsatzanalyse.md` – müşteriden istenen reklam/ciro verisi (WUA, sürüm 1.1); Aşama 1 teknik işine dahil değil
 - `docs/PHASE1_PLAN.md` – şu anki teknik iş: Aşama 1 scriptleri
 - `src/db/schema.ts` – veri modeli
 
