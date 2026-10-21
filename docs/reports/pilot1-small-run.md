@@ -53,6 +53,14 @@ Messungen: planlı / geçerli / başarısız. Local Pack'teki marka adı `[Marke
 
 Rakip kapsaması: 17 gözlem; sınıflandırmalar onaylanmamış („vorläufig"). Organik boşluk 4 belediyede **değerlendirilemedi** (ilk 10'da etiketsiz rakipler), Heidenheim'da **değerlendirildi, koşul sağlanmadı** (hedef bir ölçümde ilk 10'da).
 
+## Local Pack: Google Maps ile profil eşleştirmesi
+
+Arama sonuçlarındaki Local Pack öğeleri çoğunlukla kimlik (`cid`) ve adres taşımıyor. Halil'in onayıyla 2 Google Maps sorgusu yapıldı (0,004 $): hedef işletmenin **iki profili** (ofis ve ikinci adres) kimlik ve adresiyle doğrulandı; işletmenin şubeleri Google'da **aynı adı** taşıyor, bu yüzden ad eşleştirmesi (yöntem A) bu işletmede kullanılmıyor, yalnızca `cid`.
+
+- Local Pack'teki marka kayıtlarının 6'sı büyük olasılıkla ofis profili (**çıkarım**: aynı ad, aynı puan ve yorum sayısı); 2'si öğedeki telefon numarasıyla işletmenin başka şubelerine bağlandı (**gözlem**).
+- İkinci adresin profili 30 ölçümün hiçbirinde Local Pack'te görülmedi (bu ölçümler için gözlem).
+- Raporda bilgi notu: Google profil kuralları (yalnızca personelli konumlar); işletmenin diğer konumları için durum bilinmiyor.
+
 ## Gözlem: zamana yakın ölçümlerde farklı sonuç sayfası
 
 Aynı belediye/keyword/koordinat için aynı saniyede gönderilen ölçümlerde Google iki farklı sayfa döndürdü (birinde AI Overview ve farklı bir ilk 10). Eşleme doğrulandı. Bu, gün içi değişkenliğin kanıtı değil; yakın zamanlı ölçümler arasındaki fark.
