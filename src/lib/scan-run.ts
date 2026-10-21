@@ -458,7 +458,8 @@ export async function runLiveScan(
         worstCaseUsd: p.estimate.worstCaseUsd,
       }),
       budget: ledger.snapshot(),
-      sessionDrift: sessionDrift(tasks, attempts),
+      // Back-to-back trials run sessions at once on purpose; drift is not meaningful there.
+      sessionDrift: p.samplingMode === "technical_validation" ? [] : sessionDrift(tasks, attempts),
       parameterMismatches: outcomes
         .filter((o) => o.parameterMismatches.length)
         .map((o) => ({ taskKey: o.record.taskKey, issues: o.parameterMismatches })),

@@ -68,8 +68,8 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 ### Canlı doğrulama
 
-- [ ] DataForSEO hesabı açıldı, deposit yatırıldı, panel harcama limiti ayarlandı
-- [ ] Anahtarlar `.env.local` ve Vercel ortam değişkenlerinde
+- [~] DataForSEO hesabı açıldı (TechNS UG, 1 $ deneme kredisi; deposit henüz yok). Hesap doğrulaması bekleniyor: API `40104 Please verify your account` (21.10.2026)
+- [~] Anahtarlar `.env.local`'da, ücretsiz `user_data` çağrısıyla doğrulandı (21.10.2026); Vercel ortam değişkenleri henüz değil
 - [ ] Küçük canlı deneme: 2 belediye × 2 keyword, teknik doğrulama
 - [ ] Gerçek `cost` ile fiyat varsayımı doğrulandı
 - [ ] `local_pack` yanıt yapısı doğrulandı
@@ -78,7 +78,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 ### Rapor
 
-- [x] Kurallar v0 (kanıt seviyeli) – [RULES_V0.md](RULES_V0.md) sürüm 0.2 onaylı ve uygulandı (21.10.2026, `f787001`): `src/lib/rules/`, `scripts/findings.ts`; sentetik örnek çıktı [reports/rules-v0-sample.md](reports/rules-v0-sample.md); kod incelemesi düzeltmeleri bu commit (RULES_V0 bölüm 8) – canlı pilota hazır. Gerçek veriyle çalıştırma canlı taramadan sonra; rakip etiket listesi `data/competitor-labels.json` (gitignore) elle hazırlanacak
+- [x] Kurallar v0 (kanıt seviyeli) – [RULES_V0.md](RULES_V0.md) sürüm 0.2 onaylı ve uygulandı (21.10.2026, `f787001`): `src/lib/rules/`, `scripts/findings.ts`; sentetik örnek çıktı [reports/rules-v0-sample.md](reports/rules-v0-sample.md); kod incelemesi düzeltmeleri `babbd61` (RULES_V0 bölüm 8) – canlı pilota hazır. Gerçek veriyle çalıştırma canlı taramadan sonra; rakip etiket listesi `data/competitor-labels.json` (gitignore) elle hazırlanacak
 - [ ] Sayfa taraması (rakip + müşteri sitesi)
 - [ ] Almanca PDF rapor şablonu
 - [ ] İlk rapor elle gözden geçirildi
@@ -133,7 +133,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Kurallar v0 inceleme düzeltmeleri: hedef domain yoksa organik bulgu yok, keyword bazlı hipotez, ayrıştırma sorunlu yanıt geçersiz, eksik ölçüm cümlede; toplam 281/281 | bu commit |
+| 21.10.2026 | İlk canlı deneme `trial-20261021`: 8 görev HTTP 403 / 40104 (hesap doğrulanmamış), maliyet 0 $, kayıt bütünlüğü %100. Düzeltme: HTTP hatasında sağlayıcı kodu kaydedilir; teknik denemede oturum sapması değerlendirilmez | bu commit |
+| 21.10.2026 | Kurallar v0 inceleme düzeltmeleri: hedef domain yoksa organik bulgu yok, keyword bazlı hipotez, ayrıştırma sorunlu yanıt geçersiz, eksik ölçüm cümlede; toplam 281/281 | `babbd61` |
 | 21.10.2026 | Kurallar v0 uygulandı (0.2: cid eşleşmesi, ölçüm başına rakip koşulu, kapsama paydası, oturum bazlı reklam, öncelikte eksik nüfus → manuel); 44 yeni test; toplam 273/273 | `f787001` |
 | 21.10.2026 | Kurallar v0 tasarım taslağı (5 kural, kanıt seviyeleri, yasaklı ifadeler, test planı) | `ef08780` |
 | 21.10.2026 | Datenschutzerklärung taslağı (sitenin gerçek durumuna göre: çerez yok, izleyici yok, Vercel hosting, e-posta iletişimi); Halil onayıyla yayında | `8caf246` |

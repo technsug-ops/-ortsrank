@@ -116,11 +116,14 @@ function classifyResponse(httpStatus: number, body: string, targetDomains: reado
   }
   const retryHttp = httpStatus === 429 || httpStatus >= 500;
   if (httpStatus < 200 || httpStatus >= 300) {
-    const cost = (raw as { cost?: unknown } | null)?.cost;
+    const body = raw as { cost?: unknown; status_code?: unknown; status_message?: unknown } | null;
+    const cost = body?.cost;
+    // Keep the provider's own code and message (e.g. 40104 "Please verify your account") for diagnosis.
+    const provider = typeof body?.status_code === "number" ? ` · ${body.status_code} ${String(body.status_message ?? "")}`.trimEnd() : "";
     return {
       outcome: "api_error",
       statusCode: httpStatus,
-      statusMessage: `HTTP ${httpStatus}`,
+      statusMessage: `HTTP ${httpStatus}${provider}`,
       costUsd: typeof cost === "number" ? cost : null,
       retry: retryHttp,
       parsed: null,

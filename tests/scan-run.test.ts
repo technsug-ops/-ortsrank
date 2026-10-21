@@ -245,6 +245,7 @@ describe("main", () => {
     expect(summary.run.cost).toMatchObject({ confirmedUsd: 0.032, uncertainUsd: 0 });
     expect(summary.budget).toMatchObject({ confirmedUsd: 0.032, remainingUsd: 0.168, overCapUsd: 0 });
     expect(summary.parameterMismatches).toEqual([]);
+    expect(summary.sessionDrift).toEqual([]); // back-to-back: drift not evaluated
     expect(summary.targets).toEqual([{ domain: "ziel-betrieb.example", foundIn: ["06412000", "99000001"], notFoundWithinDepthIn: [] }]);
     expect(existsSync(join(runs, "scans", "20261021-pilot-rhein-main", "budget.json"))).toBe(true);
     expect(existsSync(join(runs, "scans", "20261021-pilot-rhein-main", "budget.lock"))).toBe(false);

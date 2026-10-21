@@ -217,6 +217,7 @@ describe("single task", () => {
     out = await r.c.runTask(makeTask(), ctx);
     expect(r.calls).toHaveLength(1);
     expect(out.record.reason).toBe("api_error_401");
+    expect(readAttempts(runDir)[0].statusMessage).toBe("HTTP 401 · 40100 Unauthorized");
   });
 
   it("marks a response whose echoed parameters differ as parameter_mismatch", async () => {
