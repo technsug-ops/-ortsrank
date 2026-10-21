@@ -265,6 +265,8 @@ export function planDocument(p: PreparedScan, meta: { runId: string; scanId: str
     device: p.project.device,
     depth: p.project.depth,
     pointRadiusMm: p.project.pointRadiusMm,
+    targetDomains: p.project.targetDomains,
+    targetLocalBusinesses: p.project.targetLocalBusinesses,
     samplingMode: p.samplingMode,
     session: p.session,
     sessions: p.project.sessions,

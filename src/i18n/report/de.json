@@ -1,0 +1,47 @@
+{
+  "status": {
+    "rank": "bestes Ergebnis Platz {rank}",
+    "notFound": "in den ersten {depth} Ergebnissen nicht gefunden",
+    "notMeasured": "nicht gemessen",
+    "lpMatched": "im Local Pack, Platz {rank}",
+    "lpNotMatched": "Local Pack angezeigt, Betrieb nicht darin",
+    "lpNone": "kein Local Pack angezeigt",
+    "lpUnverified": "Betriebszuordnung nicht verifiziert",
+    "unlabeled": "nicht eingeordnet",
+    "device": {
+      "mobile": "mobil",
+      "desktop": "Desktop"
+    },
+    "targetFallback": "Ihr Betrieb"
+  },
+  "organicGap": {
+    "text": "In {settlement} war {target} bei „{keyword}“ in {n} von {n} gültigen Messungen nicht unter den ersten 10 organischen Ergebnissen ({status}). In jeder dieser Messungen waren mindestens 2 lokale oder regionale Wettbewerber unter den ersten 10 – {perMeasurement}.",
+    "measurement": "Messung {sample} ({date}): {competitors}",
+    "action": "Prüfen Sie, ob Ihre bestehende Seite den Bedarf für „{keyword}“ in {settlement} abdeckt."
+  },
+  "localPackGap": {
+    "text": "In {settlement} erschien Ihr Betrieb bei „{keyword}“ in keiner der {n} gültigen Messungen im Local Pack (Karten-Ergebnisse). {packs} Lokale Wettbewerber im Local Pack: {competitors}.",
+    "limit": "Das Local Pack hängt stark von der Entfernung zum Messpunkt ab; gemessen wurde von einem repräsentativen Punkt in der Gemeindemitte. Google berücksichtigt bei lokalen Ergebnissen Relevanz, Entfernung und Bekanntheit; die Prüfung des Profils ist keine Zusage für eine Platzierung in dieser Gemeinde.",
+    "action": "Prüfen Sie, ob Profilangaben, Kategorie und das tatsächlich bediente Einzugsgebiet in Ihrem Google-Unternehmensprofil zutreffend sind.",
+    "packsAll": "In allen {n} Messungen wurde ein Local Pack angezeigt.",
+    "packsSome": "In {withPack} Messungen wurde ein Local Pack angezeigt, in {withoutPack} nicht."
+  },
+  "competitorCoverage": {
+    "text": "Von {planned} geplanten Gemeinden konnten {measured} für „{keyword}“ gemessen werden. {domain} wurde in {any} dieser {measured} Gemeinden in mindestens einer Messung unter den ersten 10 organischen Ergebnissen oder im Local Pack beobachtet (organisch: {organic}, Local Pack: {localPack}).",
+    "label": "Eingeordnet von TechNS als: {label}.",
+    "unlabeled": "Nicht eingeordnet.",
+    "meaning": "„In mindestens einer Messung beobachtet“ bedeutet nicht, dass die Domain dort dauerhaft sichtbar ist."
+  },
+  "adObservation": {
+    "seen": "In {settlement} wurden bei „{keyword}“ in {k} von {n} Messungen aus {n} verschiedenen Sitzungen Anzeigen gesehen ({dates}, {device}, Gemeindemitte).",
+    "none": "In {settlement} wurden bei „{keyword}“ in keiner der {n} Messungen aus {n} verschiedenen Sitzungen Anzeigen gesehen ({dates}, {device}, Gemeindemitte).",
+    "hypothesis": "Hypothese, zu prüfen: Eine kleine Testkampagne für „{keyword}“ in {settlement} könnte zeigen, zu welchen Kosten dort Sichtbarkeit über Anzeigen möglich ist.",
+    "action": "Planen Sie eine Testkampagne mit kleinem Budget für „{keyword}“ in {settlement} und erfassen Sie die Kosten."
+  },
+  "reviewPriority": {
+    "intro": "Prüfreihenfolge (Ableitung aus den Beobachtungen oben). Das ist ein für diese erste Version gewähltes Verfahren, um eine Reihenfolge für die Prüfung festzulegen – keine Bewertung des Geschäftspotenzials: Einwohnerzahl ist kein Suchvolumen, Nähe ist keine Rentabilität. Formel: 100 × (0,5 × Lücke + 0,3 × Einwohneranteil + 0,2 × Nähe).",
+    "item": "{position}. {settlement} – Wert {score} (Lücke {gap}, Einwohneranteil {population}, Nähe {proximity})",
+    "manual": "{settlement}: Einwohnerzahl fehlt in den Daten, daher kein Wert – bitte manuell einordnen.",
+    "action": "Prüfen Sie zuerst die Lage in {settlement} (siehe Beobachtungen oben)."
+  }
+}

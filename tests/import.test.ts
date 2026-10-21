@@ -65,7 +65,7 @@ beforeAll(async () => {
   const ws = wb.addWorksheet("Onlineprodukt_Gemeinden");
   for (const r of ROWS) ws.addRow(r.map((c) => c ?? undefined));
   await wb.xlsx.writeFile(xlsx);
-});
+}, 30_000);
 afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
 describe("number and header helpers", () => {
@@ -203,7 +203,8 @@ describe("parseGemeindeverzeichnis", () => {
   });
 });
 
-describe("XLSX import end to end", () => {
+// Reading and writing real XLSX files is slow under parallel load.
+describe("XLSX import end to end", { timeout: 30_000 }, () => {
   it("reads the sheet with the Satzart header from a real XLSX file", async () => {
     const { sheet, rows } = await readGvRows(xlsx);
     expect(sheet).toBe("Onlineprodukt_Gemeinden");

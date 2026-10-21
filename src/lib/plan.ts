@@ -38,6 +38,10 @@ export const projectSchema = z
     pointRadiusMm: z.number().int().min(POINT_RADIUS_MM_MIN).max(POINT_RADIUS_MM_MAX),
     keywords: z.array(keywordSchema).min(1),
     targetDomains: z.array(z.string()).default([]),
+    /** Verified Google business ids (DataForSEO `local_pack.cid`) of the target business. */
+    targetLocalBusinesses: z
+      .array(z.object({ cid: z.string().regex(/^\d+$/, "cid must be digits"), name: z.string().optional() }))
+      .default([]),
     sessions: z.array(sessionSchema).min(1),
   })
   .superRefine((p, ctx) => {

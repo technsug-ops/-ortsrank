@@ -1,7 +1,7 @@
 # Kurallar v0 – Tasarım (taslak)
 
 > Kapsam: ROADMAP 3.3, Aşama 1 › Rapor › „Kurallar v0 (5 kural), her bulgu kanıt seviyesiyle".
-> Durum: **taslak, onay bekliyor** · 21.10.2026 · Sürüm 0.1
+> Durum: **onaylandı, uygulamada** · 21.10.2026 · Sürüm 0.2 (Halil'in kararları ve ölçüm ayrıntıları, bölüm 7)
 > Girdi yalnızca SERP taraması (`serp_raw` / `runs/`). Sayfa taraması gerektiren kurallar („rakibin Hanau sayfası var") sayfa taraması eklendiğinde gelir.
 
 ---
@@ -84,7 +84,7 @@
 
 - `runs/scans/<scanId>/findings.json`: bulgular (şemadaki `findings` alanlarıyla aynı adlar: `rule`, `kind`, `score`, `evidenceLevel`, `dataSources`, `ags`, `keyword`, `competitorDomain`, `evidence`) ve aksiyon önerileri (`type`, `bucket`, metin anahtarı + parametreler).
 - `--db` ile `findings` / `actions` tablolarına yazım Aşama 2'de (müşteri organizasyonu gerektirir).
-- Komut: `npx tsx scripts/findings.ts --scan-id <id> --project <file>` (yalnızca okur, API isteği yok).
+- Komut: `npx tsx scripts/findings.ts --scan-id <id> [--runs-dir runs] [--labels data/competitor-labels.json]` (yalnızca okur, API isteği yok). Hedef domain ve doğrulanmış `cid`'ler taramanın `plan.json` dosyalarından okunur (proje dosyasında `targetDomains`, `targetLocalBusinesses`).
 
 ## 5. Testler
 
@@ -107,3 +107,36 @@
 | Öncelik formülü ağırlıkları | 0,5 / 0,3 / 0,2 | işletmeyle konuşulduktan sonra |
 | Rakip etiketleri kaynağı | `competitor_labels` tablosu, v0'da `data/competitor-labels.json` | yalnızca dosya |
 | Rapor dili | Almanca (pilot) | – |
+
+---
+
+## 7. Onaylanan kararlar ve ölçüm ayrıntıları (sürüm 0.2)
+
+| Karar | Onaylanan |
+| --- | --- |
+| Organik eşik | İlk 10 |
+| `organic_gap` rakip koşulu | **Her** geçerli ölçümde ayrı ayrı en az 2 farklı `local`/`regional` rakip ilk 10'da |
+| `competitor_coverage` | ≥ %50, tam %50 dahil |
+| Öncelik ağırlıkları | 0,5 boşluk / 0,3 nüfus / 0,2 yakınlık – pilot varsayımı |
+| Rakip etiketleri | Elle hazırlanan, gözden geçirilmiş liste; bilinmeyen domain „nicht eingeordnet" |
+| Reklam gözlemi | En az 3 **farklı oturumda** geçerli ölçüm |
+
+**Örneklem:** Bir görevin tekrar denemeleri ayrı örneklem değildir. Belediye × keyword × oturum başına tek geçerli sonuç (görevin son başarılı denemesi) kullanılır. Aynı görev birden fazla çalıştırmada başarılıysa ilk başarılı olan seçilir.
+
+**Local Pack işletme eşleştirmesi:** Hedef işletme proje dosyasındaki doğrulanmış `targetLocalBusinesses[].cid` ile tanınır (DataForSEO `local_pack.cid`). Ölçüm başına durum:
+
+| Durum | Koşul |
+| --- | --- |
+| `matched` | Local Pack'te `cid` doğrulanmış listede |
+| `not_matched` | Local Pack var, doğrulanmış `cid` tanımlı, hiçbir öğe ne `cid` ne hedef domain ile eşleşiyor |
+| `no_local_pack` | Ölçüm başarılı, Local Pack gösterilmemiş |
+| `match_unverified` | Doğrulanmış `cid` tanımlı değil, ya da bir öğe hedef domaini taşıyor ama `cid`'i listede değil |
+| (ölçülemedi) | Ölçüm başarısız; örneklem sayılmaz |
+
+`local_pack_gap` yalnızca hiçbir ölçüm `matched` / `match_unverified` değilse ve en az bir ölçümde Local Pack içinde `local` rakip varsa üretilir. Herhangi bir ölçüm `match_unverified` ise durum „Betriebszuordnung nicht verifiziert" olur, bulgu üretilmez.
+
+**Local Pack aksiyon metni:** „Prüfen Sie, ob Profilangaben, Kategorie und das tatsächlich bediente Einzugsgebiet in Ihrem Google-Unternehmensprofil zutreffend sind." Sınır metni: Google yerel sonuçlarda alaka, mesafe ve bilinirliği esas alır; profil kontrolü o belediyede sıralanma garantisi değildir.
+
+**Kapsama paydası:** İlgili keyword'de en az bir geçerli ölçümü olan belediyeler. Rapor planlanan ve ölçülen sayıyı birlikte verir; organik kapsama, Local Pack kapsaması ve birleşik „en az bir kez gözlenen kapsama" ayrı gösterilir. Birleşik oran sürekli görünürlük anlamına gelmez.
+
+**Öncelik skoru:** İş potansiyeli değil, inceleme sırası üretmek için seçilmiş bir yöntemdir; rapor bunu yazar (nüfus ≠ arama talebi, yakınlık ≠ kârlılık). Nüfus eksikse skor üretilmez, belediye „manuel inceleme" listesine girer. Bileşenler 0–1 aralığına sınırlanır; yarıçap ≤ 0 geçersizdir.
