@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:migrate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs migrate"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.9.0",

@@ -43,4 +43,5 @@ npm run build      # production build
 npm run lint
 npm test           # vitest (tek sefer); npm run test:watch izleme modu
 npx drizzle-kit generate
+npm run db:migrate # migration'ları .env.local'daki DATABASE_URL'e uygular (canlı Neon)
 ```
