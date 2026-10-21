@@ -14,7 +14,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 | Aşama | Durum | Kapı | Kapı durumu |
 | --- | --- | --- | --- |
-| 21.10.2026 | ROADMAP 3.3: Reklam ve Ciro Analizi (WUA) modülü; veri ihtiyaç belgesi 1.1 repoya alındı | (bu commit) |
+| 21.10.2026 | ROADMAP 3.3: Reklam ve Ciro Analizi (WUA) modülü; veri ihtiyaç belgesi 1.1 repoya alındı | `7f9dc03` |
 | 0 · Altyapı | Neredeyse tamam | – | – |
 | 1 · Veri + talep pilotu | **Devam ediyor** | Kapı 1: rapor sayesinde karar alındı mı? | Açık |
 | 2 · Ücretli pilot | Başlamadı | Kapı 2: ücretli ikinci ölçüm | – |
