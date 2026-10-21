@@ -208,13 +208,36 @@ export function prepareScan(projectInput: unknown, settlementFile: SettlementFil
   // With includeCenter the centre takes the first slot whatever its population;
   // the remaining slots are filled by the usual selection without it.
   const candidates = project.includeCenter ? settlementFile.settlements.filter((s) => s.ags !== centerRow.ags) : settlementFile.settlements;
+  const explicit = project.settlementAgs?.filter((a) => !(project.includeCenter && a === centerRow.ags));
   const selection = selectSettlements(candidates, {
     center,
     radiusKm: project.radiusKm,
     populationMin: project.populationMin,
     populationMax: project.populationMax,
-    limit: project.includeCenter ? project.maxSettlements - 1 : project.maxSettlements,
+    limit: explicit ? undefined : project.includeCenter ? project.maxSettlements - 1 : project.maxSettlements,
   });
+  if (explicit) {
+    // Explicit list: every entry must qualify; qualified ones not listed are reported as not selected (overLimit).
+    const total = explicit.length + (project.includeCenter ? 1 : 0);
+    if (total > project.maxSettlements) throw new Error(`settlementAgs has ${total} settlements (centre included), more than maxSettlements ${project.maxSettlements}`);
+    for (const ags of explicit) {
+      if (selection.selected.some((s) => s.ags === ags)) continue;
+      const row = settlementFile.settlements.find((s) => s.ags === ags);
+      const why = !row
+        ? "not in the settlement file"
+        : row.lat === null
+          ? "has no coordinates"
+          : selection.belowThreshold.some((s) => s.ags === ags) || selection.aboveMaximum.some((s) => s.ags === ags)
+            ? "is outside the population bounds"
+            : selection.unknownPopulation.some((s) => s.ags === ags)
+              ? "has no population"
+              : "is outside the radius";
+      throw new Error(`settlementAgs: ${ags}${row ? ` (${row.name})` : ""} ${why}`);
+    }
+    const chosen = selection.selected.filter((s) => explicit.includes(s.ags));
+    selection.overLimit = selection.selected.filter((s) => !explicit.includes(s.ags));
+    selection.selected = chosen;
+  }
   if (project.includeCenter) selection.selected.unshift({ ...centerRow, distanceKm: 0 });
 
   const toScanned = (s: Selection<Settlement>["selected"][number], unknownPopulation: boolean): ScannedSettlement => ({
@@ -268,6 +291,7 @@ export function planDocument(p: PreparedScan, meta: { runId: string; scanId: str
     populationMin: p.project.populationMin,
     populationMax: p.project.populationMax ?? null,
     includeCenter: p.project.includeCenter,
+    selectionMode: p.project.settlementAgs ? "explicit_list" : "nearest_first",
     brandNames: p.project.brandNames,
     maxSettlements: p.project.maxSettlements,
     device: p.project.device,
@@ -492,7 +516,7 @@ export function formatPlan(p: PreparedScan, runId: string, scanId: string, live:
   const lines = [
     `${live ? "LIVE" : "DRY-RUN (no requests sent)"} · run ${runId} · scan ${scanId}`,
     `Project ${p.project.name}: centre ${p.center.name} (${p.center.ags})${p.project.includeCenter ? " always included" : ""}, radius ${p.project.radiusKm} km, population ≥ ${p.project.populationMin}${p.project.populationMax !== undefined ? ` and ≤ ${p.project.populationMax}` : ""}, max ${p.project.maxSettlements}`,
-    `Settlements: ${p.selection.selected.length} selected · ${p.selection.unknownPopulation.length} unknown population · ${p.selection.unlocatable.length} unlocatable · ${p.selection.belowThreshold.length} below threshold · ${p.selection.aboveMaximum.length} above maximum · ${p.selection.overLimit.length} over limit`,
+    `Settlements${p.project.settlementAgs ? " (explicit list; qualified but not listed count as over limit)" : ""}: ${p.selection.selected.length} selected · ${p.selection.unknownPopulation.length} unknown population · ${p.selection.unlocatable.length} unlocatable · ${p.selection.belowThreshold.length} below threshold · ${p.selection.aboveMaximum.length} above maximum · ${p.selection.overLimit.length} over limit`,
     `Scanned: ${p.scanned.length}${p.scanned.some((s) => s.unknownPopulation) ? " (incl. unknown population, flagged)" : ""}`,
     ...p.scanned.map((s) => `  ${s.ags}  ${s.name.padEnd(28)} ${s.distanceKm.toFixed(1).padStart(5)} km  ${s.population ?? "population unknown"}`),
     `Keywords: ${p.keywords.map((k) => `${k.term} (${k.type}, ${k.samples}×)`).join(" · ")}`,

@@ -4,6 +4,7 @@
 > **Pilot 1 (ilk pilot): Arbeitsbühnenvermietung, Heidenheim çevresi** – Halil'in kararı 21.10.2026. İşletmenin adı, domaini ve proje dosyası git dışında (`data/projects/pilot1-heidenheim.json`).
 > **Sonraki pilot: Terrassenüberdachung** – taslak aşağıda, bölüm „Sonraki pilot".
 > Tam canlı tarama, kesin keyword seti ve harcama tavanı Halil'in ayrı onayına bağlı.
+> **Güncelleme:** Halil'in sonraki talimatıyla 30 belediyelik tarama bu pilot için geçersiz; yerine 5 belediyelik küçük gerçek veri denemesi yapıldı (60 km aday alan, açık liste, tavan 0,40 $). Sonuç: [reports/pilot1-small-run.md](reports/pilot1-small-run.md). Aşağıdaki 30 belediyelik plan referans olarak kalıyor.
 
 ---
 

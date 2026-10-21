@@ -358,3 +358,28 @@ describe("prepareScan: centre always included (includeCenter)", () => {
     expect(text).toContain("  total 12");
   });
 });
+
+describe("prepareScan: explicit settlement list (settlementAgs)", () => {
+  const project = (over: Record<string, unknown> = {}) => ({ ...projectJson, includeCenter: true, settlementAgs: ["99000002", "99000008"], ...over });
+
+  it("scans the centre plus exactly the listed settlements, nearest first", () => {
+    const p = prepareScan(project(), settlementFile, args(), env);
+    expect(p.scanned.map((s) => s.ags)).toEqual(["06412000", "99000002", "99000008"]);
+    expect(p.selection.overLimit.map((s) => s.ags).sort()).toEqual(["99000001", "99000007"]);
+    expect(p.tasks).toHaveLength(12);
+  });
+
+  it.each([
+    ["99000003", /outside the population bounds/],
+    ["99000006", /outside the radius/],
+    ["99000005", /has no coordinates/],
+    ["99000004", /has no population/],
+    ["12345678", /not in the settlement file/],
+  ])("rejects %s with a clear reason", (ags, error) => {
+    expect(() => prepareScan(project({ settlementAgs: [ags] }), settlementFile, args(), env)).toThrow(error);
+  });
+
+  it("respects maxSettlements, the centre included", () => {
+    expect(() => prepareScan(project({ maxSettlements: 2 }), settlementFile, args(), env)).toThrow(/more than maxSettlements 2/);
+  });
+});

@@ -556,3 +556,30 @@ describe("other locations of the brand in the Local Pack", () => {
     expect(hasBrand("Schbeispielmiet Bau", "Beispielmiet")).toBe(false);
   });
 });
+
+describe("unapproved competitor labels (draft)", () => {
+  it("marks coverage labels and organic gaps as provisional", () => {
+    const ms = [1, 2, 3].map((s) => m(S2.ags, s, organic("lokal-a.example", "lokal-b.example")));
+    const e = evaluate(scan([S2], ms), labels, { labelsApproved: false });
+    expect(e.labelsApproved).toBe(false);
+    const cov = byRule(e, "competitor_coverage").find((f) => f.competitorDomain === "lokal-a.example")!;
+    expect(cov.text).toContain("Vorläufige Einordnung durch TechNS (nicht freigegeben): local.");
+    expect(cov.text).not.toContain("Eingeordnet von TechNS als");
+    expect(byRule(e, "organic_gap")[0].limits[0]).toContain("vorläufig und noch nicht freigegeben");
+  });
+
+  it("approved labels keep the normal wording", () => {
+    const e = evaluate(scan([S2], [m(S2.ags, 1, organic("lokal-a.example"))]), labels);
+    expect(e.labelsApproved).toBe(true);
+    expect(byRule(e, "competitor_coverage").find((f) => f.competitorDomain === "lokal-a.example")!.text).toContain("Eingeordnet von TechNS als: local.");
+  });
+});
+
+describe("ads cell in technical validation", () => {
+  it("shows no ratio for back-to-back trials, only for session sampling", () => {
+    const tech = [1, 2, 3].map((s) => m(S2.ags, s, [ad(1, "w.example")], { samplingMode: "technical_validation" }));
+    expect(evaluate(scan([S2], tech), labels).statusTable[0].ads).toBe("nicht ausgewertet (technische Validierung)");
+    const real = [1, 2, 3].map((s) => m(S2.ags, s, s === 2 ? organic("x.example") : [ad(1, "w.example")]));
+    expect(evaluate(scan([S2], real), labels).statusTable[0].ads).toBe("2/3");
+  });
+});

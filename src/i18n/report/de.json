@@ -16,12 +16,14 @@
     "lpMatchedName": "im Local Pack, Platz {rank} (Abgleich über den Profilnamen)",
     "lpNameNotFound": "im angezeigten Local Pack kein Eintrag mit dem Profilnamen gefunden",
     "lpNotMeasurable": "Local Pack nicht auswertbar",
-    "lpBrandOther": "Eintrag der Marke im Local Pack (Platz {rank}: {title}), nicht dem Zielstandort zugeordnet"
+    "lpBrandOther": "Eintrag der Marke im Local Pack (Platz {rank}: {title}), nicht dem Zielstandort zugeordnet",
+    "adsNotEvaluated": "nicht ausgewertet (technische Validierung)"
   },
   "organicGap": {
     "text": "In {settlement} war {target} bei „{keyword}“ {measurements} nicht unter den ersten 10 organischen Ergebnissen ({status}). In jeder dieser Messungen waren mindestens 2 lokale oder regionale Wettbewerber unter den ersten 10 – {perMeasurement}.",
     "measurement": "Messung {sample} ({date}): {competitors}",
-    "action": "Prüfen Sie, ob Ihre bestehende Seite den Bedarf für „{keyword}“ in {settlement} abdeckt."
+    "action": "Prüfen Sie, ob Ihre bestehende Seite den Bedarf für „{keyword}“ in {settlement} abdeckt.",
+    "labelsDraft": "Die Einordnung der Wettbewerber als lokal oder regional ist vorläufig und noch nicht freigegeben; diese Beobachtung gilt nur unter diesem Vorbehalt."
   },
   "localPackGap": {
     "text": "In {settlement} erschien Ihr Betrieb bei „{keyword}“ {measurements} im Local Pack (Karten-Ergebnisse). {packs} Lokale Wettbewerber im Local Pack: {competitors}.",
@@ -34,7 +36,8 @@
     "text": "Von {planned} geplanten Gemeinden konnten {measured} für „{keyword}“ gemessen werden. {domain} wurde in {any} dieser {measured} Gemeinden in mindestens einer Messung unter den ersten 10 organischen Ergebnissen oder im Local Pack beobachtet (organisch: {organic}, Local Pack: {localPack}).",
     "label": "Eingeordnet von TechNS als: {label}.",
     "unlabeled": "Nicht eingeordnet.",
-    "meaning": "„In mindestens einer Messung beobachtet“ bedeutet nicht, dass die Domain dort dauerhaft sichtbar ist."
+    "meaning": "„In mindestens einer Messung beobachtet“ bedeutet nicht, dass die Domain dort dauerhaft sichtbar ist.",
+    "labelDraft": "Vorläufige Einordnung durch TechNS (nicht freigegeben): {label}."
   },
   "adObservation": {
     "seen": "In {settlement} wurden bei „{keyword}“ in {k} von {n} Messungen aus {n} verschiedenen Sitzungen Anzeigen gesehen ({dates}, {device}, Gemeindemitte).",

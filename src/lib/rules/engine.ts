@@ -108,6 +108,7 @@ export interface StatusCell {
 
 export interface Evaluation {
   rulesVersion: string;
+  labelsApproved: boolean;
   scanId: string;
   plannedSettlements: number;
   statusTable: StatusCell[];
@@ -263,10 +264,13 @@ const labelText = (labels: Labels, domain: string) => labels.get(domain) ?? null
 export interface EvaluateOptions {
   /** Off in the pilot (RULES_V0 section 10). */
   localPackGap?: boolean;
+  /** False when labels come from an unapproved draft: wording and limits say so. */
+  labelsApproved?: boolean;
 }
 
 export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOptions = {}): Evaluation {
   const localPackGapEnabled = options.localPackGap ?? LOCAL_PACK_GAP_ENABLED;
+  const labelsApproved = options.labelsApproved ?? true;
   const identity: TargetIdentity = {
     domains: scan.targetDomains.map(normalizeDomain),
     cids: scan.targetCids,
@@ -326,7 +330,9 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
               : lp.some((x) => x.status === "not_found_in_pack")
                 ? T.status.lpNameNotFound
                 : T.status.lpNone;
-        ads = `${ms.filter(hasAds).length}/${ms.length}`;
+        // Back-to-back technical trials say nothing about ad frequency: no ratio shown.
+        const sessionMs = ms.filter((m) => m.samplingMode === "sessions");
+        ads = sessionMs.length ? `${sessionMs.filter(hasAds).length}/${sessionMs.length}` : T.status.adsNotEvaluated;
       }
       statusTable.push({
         ags: s.ags,
@@ -381,10 +387,10 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
               .map((x) => fill(T.organicGap.measurement, { sample: x.m.session, date: deDate(x.m.datetime), competitors: deList(x.competitors) }))
               .join("; "),
           }),
-          limits: [],
+          limits: labelsApproved ? [] : [T.organicGap.labelsDraft],
           evidence: {
             measurements: ms.map(ref),
-            details: { perMeasurement: perMeasurement.map((x) => ({ taskKey: x.m.taskKey, targetBestRank: x.best, competitors: x.competitors })) },
+            details: { labelsApproved, perMeasurement: perMeasurement.map((x) => ({ taskKey: x.m.taskKey, targetBestRank: x.best, competitors: x.competitors })) },
           },
         });
         actions.push({ findingId: id, type: "review", bucket: "website", text: fill(T.organicGap.action, { keyword, settlement: s.name }) });
@@ -529,7 +535,7 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
             organic: r.organic.size,
             localPack: r.localPack.size,
           }),
-          label ? fill(T.competitorCoverage.label, { label }) : T.competitorCoverage.unlabeled,
+          label ? fill(labelsApproved ? T.competitorCoverage.label : T.competitorCoverage.labelDraft, { label }) : T.competitorCoverage.unlabeled,
         ].join(" "),
         limits: [T.competitorCoverage.meaning],
         evidence: {
@@ -592,6 +598,7 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
 
   return {
     rulesVersion: RULES_VERSION,
+    labelsApproved,
     scanId: scan.scanId,
     plannedSettlements: scan.settlements.length,
     statusTable,

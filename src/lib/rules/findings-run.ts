@@ -16,9 +16,25 @@ export const FINDINGS_USAGE = `Usage:
   npx tsx scripts/findings.ts --scan-id <id> [--runs-dir runs] [--labels ${DEFAULT_LABELS_FILE}]
 
 Labels file: {"domain.de": "local" | "regional" | "national" | "portal" | "directory" | "manufacturer", ...}
+--labels-draft <file>: unapproved draft {"domain.de": {"suggested": "...", "evidence": "..."}}; findings are marked provisional.
 Domains without a label stay "nicht eingeordnet".`;
 
 const labelsFileSchema = z.record(z.string(), z.enum(competitorLabel.enumValues));
+
+const draftFileSchema = z.record(z.string(), z.unknown());
+
+/** Reads `suggested` labels from an unapproved draft ({domain: {suggested, evidence}}); keys starting with "_" are notes. */
+export function readDraftLabels(path: string): Labels {
+  const raw = draftFileSchema.parse(JSON.parse(readFileSync(path, "utf8")));
+  const labels = new Map<string, CompetitorLabel>();
+  for (const [domain, value] of Object.entries(raw)) {
+    if (domain.startsWith("_")) continue;
+    const r = z.object({ suggested: z.enum(competitorLabel.enumValues) }).safeParse(value);
+    if (!r.success) throw new Error(`invalid draft entry ${domain} in ${path}`);
+    labels.set(normalizeDomain(domain), r.data.suggested);
+  }
+  return labels;
+}
 
 /** Reads the curated label list; a missing file means no labels. */
 export function readLabels(path: string): { labels: Labels; found: boolean } {
@@ -34,7 +50,7 @@ export function readLabels(path: string): { labels: Labels; found: boolean } {
 }
 
 export function formatEvaluation(e: Evaluation): string {
-  const lines: string[] = [`Rules v${e.rulesVersion} · scan ${e.scanId} · ${e.plannedSettlements} planned settlements`, ""];
+  const lines: string[] = [`Rules v${e.rulesVersion} · scan ${e.scanId} · ${e.plannedSettlements} planned settlements${e.labelsApproved ? "" : " · competitor labels NOT approved (draft)"}`, ""];
   lines.push("Status (settlement · keyword · valid/planned · organic · local pack · ads):");
   for (const c of e.statusTable) {
     lines.push(`  ${c.settlement} · ${c.keyword} · ${c.validSamples}/${c.plannedSamples}${c.failedSamples ? ` (${c.failedSamples} failed or unusable)` : ""} · ${c.organic} · ${c.localPack} · ${c.ads}`);
@@ -61,15 +77,18 @@ export async function findingsMain(argv: string[], deps: { out?: (l: string) => 
     const { values } = parseArgs({
       args: argv,
       strict: true,
-      options: { "scan-id": { type: "string" }, "runs-dir": { type: "string" }, labels: { type: "string" } },
+      options: { "scan-id": { type: "string" }, "runs-dir": { type: "string" }, labels: { type: "string" }, "labels-draft": { type: "string" } },
     });
     if (!values["scan-id"]) throw new Error("--scan-id is required");
     const runsDir = values["runs-dir"] ?? "runs";
-    const labelsPath = values.labels ?? DEFAULT_LABELS_FILE;
-    const { labels, found } = readLabels(labelsPath);
+    if (values.labels && values["labels-draft"]) throw new Error("use either --labels or --labels-draft");
+    const draft = values["labels-draft"];
+    const labelsPath = draft ?? values.labels ?? DEFAULT_LABELS_FILE;
+    const { labels, found } = draft ? { labels: readDraftLabels(draft), found: true } : readLabels(labelsPath);
     if (!found) out(`No labels file at ${labelsPath}: every competitor stays "nicht eingeordnet" and gap rules cannot fire.`);
+    if (draft) out(`Labels from an UNAPPROVED draft (${draft}): findings that depend on them are marked as provisional.`);
     const scan = loadScan(runsDir, values["scan-id"]);
-    const evaluation = evaluate(scan, labels);
+    const evaluation = evaluate(scan, labels, { labelsApproved: !draft });
     const dir = join(runsDir, "scans", scan.scanId);
     mkdirSync(dir, { recursive: true });
     const file = join(dir, "findings.json");

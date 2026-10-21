@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 · Veri + talep pilotu · Aşama 1 teknik hattı adım 1–14 tamam; teslimat raporu [docs/reports/phase1-delivery.md](reports/phase1-delivery.md) değerlendirme bekliyor. Açık karar: pilot alanı (30 km / ≥10k → 66 belediye, üst sınır 30 ile fiilen 17 km)
+> **Şu an:** Pilot 1 küçük gerçek veri denemesi tamamlandı (5 belediye, 0,12 $); sıradaki: etiket onayı, Heidenheim profil kimliği, planlı oturumlar. Önceki: Aşama 1 · Veri + talep pilotu · Aşama 1 teknik hattı adım 1–14 tamam; teslimat raporu [docs/reports/phase1-delivery.md](reports/phase1-delivery.md) değerlendirme bekliyor. Açık karar: pilot alanı (30 km / ≥10k → 66 belediye, üst sınır 30 ile fiilen 17 km)
 > **Son güncelleme:** 21.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.3) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2) · [Veri ihtiyacı WUA](Datenbedarf_Werbe_Umsatzanalyse.md) (sürüm 1.1)
 
@@ -91,10 +91,12 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] **Pilot 1: Arbeitsbühnenvermietung, Heidenheim çevresi** (Halil'in kararı, 21.10.2026); Terrassenüberdachung sonraki pilot. Ayarlar ve taslaklar: [PILOT_SETUP.md](PILOT_SETUP.md)
 - [x] Pilot 1 keyword keşfi: 4 sorgu Heidenheim'dan, 0,016 $ (yerel keşif taraması, 21.10.2026)
 - [ ] Pilot 1 kesin keyword seti (öneri: Arbeitsbühne mieten ×3, Hubarbeitsbühne mieten, Scherenbühne mieten, Arbeitsbühne mieten in der Nähe)
-- [ ] Pilot 1 alt nüfus eşiği (5.000'de seçim 27,8 km'de kesiliyor; 7.500 / 10.000 seçenekleri)
+- [-] Pilot 1 alt nüfus eşiği / 30 belediyelik tarama – Halil'in kararıyla bu pilot için geçersiz; yerine küçük gerçek veri denemesi
+- [x] **Pilot 1 küçük gerçek veri denemesi** (21.10.2026): 5 belediye (Heidenheim, Steinheim, Aalen, Ulm, Babenhausen), 30/30 görev, 0,12 $ (0,024 $ / belediye), bakiye 0,94 → 0,82 $; oturumlar peş peşe → `technical_validation`. Özet [reports/pilot1-small-run.md](reports/pilot1-small-run.md); tam rapor git dışında
+- [ ] Pilot 1 planlı oturumlarla ölçüm (09:00 / 13:00 / 18:00) – reklam gözlemi için
 - [ ] Pilot 1 Heidenheim şubesinin Google profili (tam ad, adres, bağlantı, kimlik) doğrulanmış kaynaktan
 - [ ] Pilot 1 rakip etiket taslağı onayı (`data/competitor-labels.pilot1.draft.json`)
-- [ ] DataForSEO'ya en az 50 $ ve tam tarama tavanı onayı (öneri 2,50 $ / tarama günü)
+- [-] DataForSEO'ya 50 $ yükleme – Halil'in talimatıyla uygulanmadı; yalnızca mevcut bakiye kullanılıyor (kalan 0,82 $)
 - [~] Pilot keywordleri (3–5), işletmelerin gerçek hizmetlerine göre – taslak [PILOT_SETUP.md](PILOT_SETUP.md) bölüm 1 (Google önerilerinden), Halil'in onayı bekleniyor
 - [~] Pilot alanı kararı (taslak [PILOT_SETUP.md](PILOT_SETUP.md) bölüm 2; önce pilot işletmenin konumu): 30 km / ≥10.000 nüfusta 66 belediye var; üst sınır 30 iken seçim 17,4 km'de bitiyor. Seçenekler: üst sınırı artırmak, nüfus eşiğini yükseltmek (30 km / ≥20.000 → 34) veya yarıçapı küçültmek (25 km / ≥20.000 → 29)
 - [ ] Pilot işletme 1 (aday: UG-ALU – katılım netleşmeli)
@@ -142,7 +144,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Pilot 1 hazırlığı (Arbeitsbühnenvermietung, Heidenheim): `includeCenter`, `populationMax`, marka şubesi durumu; keşif 4 sorgu 0,016 $; dry-run 30 belediye / 180 görev / 0,86–2,16 $; toplam 316/316 | bu commit |
+| 21.10.2026 | Pilot 1 küçük canlı deneme: 5 belediye, 30/30, 0,12 $; 17 rakip kapsaması bulgusu (etiketler taslak); organik boşluk etiket onayı olmadan üretilemedi; SERP varyantı gözlemi. Kod: açık belediye listesi, `--labels-draft`, teknik denemede reklam oranı gizli; toplam 326/326 | bu commit |
+| 21.10.2026 | Pilot 1 hazırlığı (Arbeitsbühnenvermietung, Heidenheim): `includeCenter`, `populationMax`, marka şubesi durumu; keşif 4 sorgu 0,016 $; dry-run 30 belediye / 180 görev / 0,86–2,16 $; toplam 316/316 | `9f761c3` |
 | 21.10.2026 | Pilot ayarları taslağı: keywordler (Google önerilerinden), alan seçenekleri ve maliyet; rakip etiket taslağı `data/` içinde (31 öneri, 18 belirsiz) | `84e6540` |
 | 21.10.2026 | Local Pack profil adıyla eşleştirme (5 durum, ham ad + yöntem kaydı), `local_pack_gap` pilotta kapalı; toplam 304/304 | `94e850e` |
 | 21.10.2026 | Canlı deneme başarılı (8/8, 0,032 $); local pack `cid` null + Google domaini, organik ~15 sonuç → ayrıştırıcı ve kurallar düzeltildi; bütçe defterinde Windows dosya kilidine karşı tekrar; toplam 289/289 | `c1c9098` |

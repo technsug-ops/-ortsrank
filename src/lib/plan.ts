@@ -34,6 +34,12 @@ export const projectSchema = z
     populationMin: z.number().int().nonnegative(),
     /** Optional upper population bound (inclusive). */
     populationMax: z.number().int().positive().optional(),
+    /**
+     * Explicit settlement list (AGS) instead of "nearest first", e.g. for a small
+     * pilot with chosen examples. Each must lie in the radius and population
+     * bounds; the centre is added by includeCenter.
+     */
+    settlementAgs: z.array(z.string().regex(/^\d{8}$/)).optional(),
     /** Always scan the centre settlement, whatever its population; it takes one of the maxSettlements slots. */
     includeCenter: z.boolean().default(false),
     /**
