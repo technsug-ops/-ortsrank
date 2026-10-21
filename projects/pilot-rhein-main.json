@@ -1,0 +1,20 @@
+{
+  "name": "pilot-rhein-main",
+  "centerAgs": "06412000",
+  "radiusKm": 30,
+  "populationMin": 10000,
+  "maxSettlements": 30,
+  "device": "mobile",
+  "depth": 20,
+  "pointRadiusMm": 200,
+  "keywords": [
+    { "term": "Terrassenüberdachung", "type": "main", "samples": 3 },
+    { "term": "Terrassenüberdachung mit Montage", "type": "intent", "samples": 1 }
+  ],
+  "targetDomains": [],
+  "sessions": [
+    { "id": 1, "plannedAt": "09:00" },
+    { "id": 2, "plannedAt": "13:00" },
+    { "id": 3, "plannedAt": "18:00" }
+  ]
+}

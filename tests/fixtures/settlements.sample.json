@@ -1,0 +1,116 @@
+{
+  "source": "synthetic test fixture: only the centre (06412000, Frankfurt am Main) is a real AGS with rounded coordinates; all 99xxxxxx rows are invented",
+  "sourceFile": "tests/fixtures/settlements.sample.json",
+  "asOf": "2024-12-31",
+  "generatedAt": "2026-10-21T00:00:00.000Z",
+  "settlements": [
+    {
+      "ags": "06412000",
+      "name": "Frankfurt am Main",
+      "state": "Hessen",
+      "district": null,
+      "lat": 50.110644,
+      "lng": 8.682092,
+      "population": 770000,
+      "populationAsOf": "2024-12-31",
+      "scanMode": "coordinate",
+      "scanNote": null
+    },
+    {
+      "ags": "99000001",
+      "name": "Beispielstadt A",
+      "state": "Hessen",
+      "district": null,
+      "lat": 50.164603,
+      "lng": 8.682092,
+      "population": 130000,
+      "populationAsOf": "2024-12-31",
+      "scanMode": "coordinate",
+      "scanNote": null
+    },
+    {
+      "ags": "99000002",
+      "name": "Beispielstadt B",
+      "state": "Hessen",
+      "district": null,
+      "lat": 50.245542,
+      "lng": 8.682092,
+      "population": 25000,
+      "populationAsOf": "2024-12-31",
+      "scanMode": "coordinate",
+      "scanNote": null
+    },
+    {
+      "ags": "99000003",
+      "name": "Beispieldorf C",
+      "state": "Hessen",
+      "district": null,
+      "lat": 50.290508,
+      "lng": 8.682092,
+      "population": 8000,
+      "populationAsOf": "2024-12-31",
+      "scanMode": "coordinate",
+      "scanNote": null
+    },
+    {
+      "ags": "99000004",
+      "name": "Beispielstadt D",
+      "state": "Hessen",
+      "district": null,
+      "lat": 50.335474,
+      "lng": 8.682092,
+      "population": null,
+      "populationAsOf": null,
+      "scanMode": "coordinate",
+      "scanNote": "missing_population"
+    },
+    {
+      "ags": "99000005",
+      "name": "Beispielstadt E",
+      "state": "Hessen",
+      "district": null,
+      "lat": null,
+      "lng": null,
+      "population": 40000,
+      "populationAsOf": "2024-12-31",
+      "scanMode": "none",
+      "scanNote": "missing_coordinates"
+    },
+    {
+      "ags": "99000006",
+      "name": "Beispielstadt F",
+      "state": "Hessen",
+      "district": null,
+      "lat": 50.470372,
+      "lng": 8.682092,
+      "population": 50000,
+      "populationAsOf": "2024-12-31",
+      "scanMode": "coordinate",
+      "scanNote": null
+    },
+    {
+      "ags": "99000007",
+      "name": "Beispielstadt G",
+      "state": "Hessen",
+      "district": null,
+      "lat": 50.362454,
+      "lng": 8.682092,
+      "population": 12000,
+      "populationAsOf": "2024-12-31",
+      "scanMode": "coordinate",
+      "scanNote": null
+    },
+    {
+      "ags": "99000008",
+      "name": "Beispielstadt H",
+      "state": "Hessen",
+      "district": null,
+      "lat": 50.371447,
+      "lng": 8.682092,
+      "population": 11000,
+      "populationAsOf": "2024-12-31",
+      "scanMode": "coordinate",
+      "scanNote": null
+    }
+  ]
+}
