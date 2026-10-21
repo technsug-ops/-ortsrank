@@ -8,6 +8,7 @@
  */
 import type { z } from "zod";
 import type { resultType } from "@/db/schema";
+import { profileIdFromUrl, type ProfileIdStatus } from "@/lib/dataforseo/local-identity";
 import {
   STATUS_OK,
   localPackItemSchema,
@@ -36,7 +37,15 @@ export interface SerpRow {
   votesCount?: number | null;
   phone?: string | null;
   isPaid?: boolean;
+  /** Local pack only: profile ids kept apart with their source values (RULES_V0 section 10). */
   cid?: string | null;
+  /** svid query parameter of the Google searchviewer URL, unchanged. */
+  svid?: string | null;
+  /** "/g/…" decoded from svid; null when absent or undecodable (never guessed). */
+  googleId?: string | null;
+  profileIdStatus?: ProfileIdStatus;
+  /** Snippet as returned (address parts are read from it, not from the title). */
+  description?: string | null;
 }
 
 export interface ItemIssue {
@@ -159,6 +168,7 @@ function toRow(item: DfsItem): RowOutcome {
       const r = localPackItemSchema.safeParse(item);
       if (!r.success) return { error: issuesText(r.error) };
       const d = r.data;
+      const id = profileIdFromUrl(d.url);
       return {
         row: {
           type: "local_pack",
@@ -172,6 +182,10 @@ function toRow(item: DfsItem): RowOutcome {
           phone: d.phone,
           isPaid: d.is_paid,
           cid: d.cid,
+          svid: id.svid,
+          googleId: id.googleId,
+          profileIdStatus: id.status,
+          description: d.description,
         },
       };
     }

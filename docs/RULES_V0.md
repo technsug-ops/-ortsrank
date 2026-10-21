@@ -1,7 +1,7 @@
 # Kurallar v0 – Tasarım (taslak)
 
 > Kapsam: ROADMAP 3.3, Aşama 1 › Rapor › „Kurallar v0 (5 kural), her bulgu kanıt seviyesiyle".
-> Durum: **onaylandı, uygulandı** · 21.10.2026 · Sürüm 0.2 (kararlar bölüm 7; kod incelemesi bölüm 8; canlı yanıt bölüm 9; Local Pack ad eşleştirmesi bölüm 10)
+> Durum: **onaylandı, uygulandı** · 21.10.2026 · Sürüm 0.2 (kararlar bölüm 7; kod incelemesi bölüm 8; canlı yanıt bölüm 9; Local Pack kimlik/adres/marka bölüm 10)
 > Girdi yalnızca SERP taraması (`serp_raw` / `runs/`). Sayfa taraması gerektiren kurallar („rakibin Hanau sayfası var") sayfa taraması eklendiğinde gelir.
 
 ---
@@ -123,7 +123,7 @@
 
 **Örneklem:** Bir görevin tekrar denemeleri ayrı örneklem değildir. Belediye × keyword × oturum başına tek geçerli sonuç (görevin son başarılı denemesi) kullanılır. Aynı görev birden fazla çalıştırmada başarılıysa ilk başarılı olan seçilir.
 
-**Local Pack işletme eşleştirmesi:** Hedef işletme proje dosyasındaki doğrulanmış `targetLocalBusinesses[].cid` ile tanınır (DataForSEO `local_pack.cid`). Ölçüm başına durum:
+**Local Pack işletme eşleştirmesi** (ilk tasarım; güncel kurallar bölüm 10)**:** Hedef işletme proje dosyasındaki doğrulanmış `targetLocalBusinesses[].cid` ile tanınır (DataForSEO `local_pack.cid`). Ölçüm başına durum:
 
 | Durum | Koşul |
 | --- | --- |
@@ -154,27 +154,93 @@
 - **Local Pack kimliği:** Canlı yanıtta `cid: null`, `domain: "www.google.com"`, `url` Google searchviewer linki. Google domaini işletme domaini sayılmaz (ayrıştırıcıda `null`); `cid`'siz öğe varken hedef eşleşmesi „Betriebszuordnung nicht verifiziert“ olur ve `local_pack_gap` üretilmez. Google rakip kapsamasına girmez. Hedef işletmeyi Local Pack'te tanıma yöntemi için karar bekleniyor (STATUS).
 - **„Bulunamadı“ derinliği:** depth 20 istenir ama yanıt 14–16 organik sonuç içerir. Cümle artık ölçümlerdeki en küçük organik liste uzunluğunu söyler: „unter den ersten {n} organischen Ergebnissen nicht gefunden“; hiç organik sonuç yoksa „keine organischen Ergebnisse angezeigt“.
 
-## 10. Local Pack: profil adıyla eşleştirme, pilot (Halil'in kararı, 21.10.2026)
+## 10. Local Pack: profil kimliği, adres ve marka gözlemi (21.10.2026, Halil'in onayıyla; bölüm 10'un ilk hali ve bölüm 11 yerine)
 
-Canlı yanıtta `cid` gelmediği için pilotta yöntem A: hedef işletme, **doğrulanmış kaynaktan** alınan Google profil adıyla tanınır (`targetLocalBusinesses[].profileName` + zorunlu `source`; domain veya şirket unvanından tahmin edilmez). Ad eşleşmesi kesin kimlik doğrulaması sayılmaz.
+Önceki yöntem A (doğrulanmış profil adıyla `matched`) **kaldırıldı**: unvan, puan ve yorum sayısı tek başına profil kimliği değildir. Aynı adı, aynı puanı ve aynı yorum sayısını taşıyan farklı şubeler pilot 1'de gerçekten görüldü.
 
-| Ölçüm başına durum | Koşul | Durum tablosu |
+**Kaynak alanlar (ayrıştırıcı, `src/lib/dataforseo/parse.ts` + `local-identity.ts`).** Her Local Pack kaydında ayrı ayrı saklanır:
+
+- `cid`: sağlayıcı alanı, değiştirilmeden.
+- `svid`: Google searchviewer URL'sindeki ham değer.
+- `googleId`: `svid` içinden çözülen `/g/…` değeri.
+- `profileIdStatus`: `decoded`, `absent` ya da `undecodable`.
+- `description`: ham snippet.
+
+Google'ın kendi domaini işletme domaini sayılmaz (bölüm 9).
+
+**`svid` çözümü varsayımdır.** Canlı yanıtlardan (21.10.2026) çıkarılan yapı şöyle:
+
+1. base64url protobuf → alan 2 → alan 2 → `{1: "pvq", 2: base64 protobuf}`
+2. İçteki protobufun alan 1'i: `/g/…`
+
+Bu yapı belgelenmiş değil. Yapı farklıysa değer `undecodable` olur; tahmin yapılmaz. `/g/` değerinin zaman içinde kalıcı ve profil başına tekil olduğu pilot gözlemiyle (30 yanıt, 21 farklı `/g/` değeri, her biri tek bir unvanla) desteklenir ama **doğrulanmamıştır**.
+
+**Hedef kimliği.** Kimlik `targetLocalBusinesses[]` listesinden okunur:
+
+- Alanlar: `label`, `cid`, `googleId`, `address` (`street`, `houseNumber`, `postalCode`, `city`) ve zorunlu `source`.
+- Aynı kayıtta birlikte verilen `cid` ve `googleId`, ikisinin aynı profil olduğunun kanıtıdır. Başka bir bağlantı kurulmaz.
+- Çalıştırmadan sonra doğrulanan kimlik `findings --project <dosya>` ile verilir. Çalıştırma dosyaları değişmez; `findings.json` içindeki `identitySource` kimliğin nereden geldiğini kaydeder.
+
+**Kayıt bazında değerlendirme (`assessLocalPackItem`).** Kurallar sırayla uygulanır:
+
+| Sıra | Koşul | Sonuç (`assessment`) | Yöntem |
+| --- | --- | --- | --- |
+| 1 | Kaydın kendi `cid`'i veya `googleId`'si tek bir doğrulanmış profille aynı | `identity_match`. Aynı profilin adresiyle çelişki varsa ya da başka bir profilin tam adresi tutuyorsa `ambiguous` (`identity_address_conflict`). Birden fazla aday varsa `ambiguous` | `cid` / `google_id` |
+| 2 | Kimlik eşleşmesi yok; snippet adresi **tek bir** profilin doğrulanmış adresiyle tam tutuyor (sokak, bina no, posta kodu, şehir) **ve** unvanda marka var | `address_match`. O profilin doğrulanmış kimliği varken kayıt başka bir kimlik taşıyorsa `ambiguous` (`address_identity_conflict`). Marka yoksa `ambiguous` (`address_without_brand`) | `address_full` |
+| 3 | Birden fazla adres adayı (tam veya kısmi) | `ambiguous` (`several_address_candidates`) | – |
+| 4 | Unvanda marka var, kimlik ve tam adres yok | `brand_only`. Gerekçe: `partial_address` · `address_differs` · `cid_not_verified` · `profile_id_undecodable` · `no_verified_identity` | – |
+| 5 | Unvan profil adıyla aynı (`name_only`) veya benzer (`similar_name`); hedef domaini kimliksiz (`target_domain_without_identity`); markasız kısmi adres | `ambiguous` | – |
+| 6 | Diğerleri | `not_target` | – |
+
+**Adres karşılaştırması (`compareAddress`).** Dört alan tek tek karşılaştırılır:
+
+- **Normalizasyon yalnızca yazımı birleştirir:** büyük-küçük harf, NFKC, ß/ss, "Str." → "Straße", tire ve boşluk. Kelime silinmez. Bina numarası ekiyle birlikte korunur, yani 25 ≠ 25/7 ≠ 25a.
+- **Sonuçlar:**
+  - `full`: dört alan da var ve aynı.
+  - `partial`: bina numarası ve sokak aynı (ya da sokak yalnızca "belirsiz"), eksik alan var, farklı alan yok.
+  - `conflict`: iki tarafta da bulunan bir alan farklı. Örnek: aynı sokak ve numara, başka şehir.
+  - `insufficient`: sokak veya bina numarası yok.
+- **Belirsiz sokak:** Snippet'ler kategoriyi sokağın önüne yapıştırıyor ("Ausrüstungsverleih Mühlweg 21"). Doğrulanmış sokak yalnızca metnin son kelimeleri olarak geçiyorsa sokak `uncertain` sayılır, çünkü "Alte Hauptstraße" ile "Hauptstraße" de böyle görünür. Belirsiz sokak hiçbir zaman `full` olmaz.
+- Yalnızca şehir adı (posta kodu olmadan) okunmaz.
+
+**Ölçüm başına durum (`localPackStatus`).** Öncelik sırası: `matched` > `address_match` > `match_unverified` > `brand_only` > `not_measurable` > `not_found_in_pack` > `no_local_pack`.
+
+| Durum | Kanıt | Durum tablosu metni |
 | --- | --- | --- |
-| `matched` (`profile_name_exact`) | Normalleştirilmiş ad birebir aynı, tek sonuç | „im Local Pack, Platz {n} (Abgleich über den Profilnamen)" |
-| `match_unverified` | Benzer ama farklı ad · aynı ad birden fazla · hedef domaini başka adla · doğrulanmış ad/kimlik yok | „Betriebszuordnung nicht verifiziert" |
-| `not_found_in_pack` | Local Pack gösterildi, adla eşleşen sonuç yok | „im angezeigten Local Pack kein Eintrag mit dem Profilnamen gefunden" |
+| `matched` | Doğrulanmış kimlik | „im Local Pack, Platz {n}: {Profil} (Abgleich über verifizierte Kennung)" |
+| `address_match` | Doğrulanmış tam adres + marka; kimlikten **zayıf** | „… Eintrag mit der vollständigen verifizierten Adresse von {Profil} (Adressabgleich, keine verifizierte Kennung)" |
+| `match_unverified` | Belirsiz veya çelişkili kayıt. Ayrıca marka kelimesi tanımsızken kimliği karşılaştırılamayan kayıt (`no_id_in_response`), ya da doğrulanmış profil yok | „Betriebszuordnung nicht verifiziert" |
+| `brand_only` | Yalnızca marka gözlemi | „Eintrag mit dem Markennamen im Local Pack (Platz {n}: {ham ad}); Standort nicht verifiziert" |
+| `not_measurable` | Adsız kayıt, ya da `svid`'i çözülemeyen ve `cid`'i olmayan kayıt | „Local Pack nicht auswertbar" |
+| `not_found_in_pack` | Gösterilen kayıtlarda doğrulanmış eşleşme yok. **Yokluk kanıtı değildir** | „unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb" |
 | `no_local_pack` | Local Pack gösterilmedi | „kein Local Pack angezeigt" |
-| `not_measurable` | Local Pack öğelerinde ad yok | „Local Pack nicht auswertbar" |
 
-- **Normalizasyon (eşleşme için):** Unicode NFKC, küçük harf, boşlukların teke indirilmesi ve kırpılması. Kelime silme, noktalama temizleme, benzerlik eşleşmesi **yok**.
-- **Benzerlik (yalnızca „doğrulanamadı"ya düşürmek için):** biri diğerini içeriyor, noktalama/boşluk yok sayılınca aynı, ya da en az iki ortak kelime (≥ 3 harf).
-- **Kayıt:** her ölçümde ham işletme adı (`rawTitle`), yöntem (`method`) ve neden (`reason`) durum tablosunda (`localPackDetails`) saklanır.
-- **`local_pack_gap` pilotta kapalı** (`LOCAL_PACK_GAP_ENABLED = false`); eşleşme bulunmaması işletmenin yokluğunu kanıtlamaz. Öncelik skoru yalnızca organik boşluktan beslenir. Organik kurallar değişmedi.
-- **B (Google Maps uç noktası) ertelendi.** Değerlendirilirken Maps'te bulunan kimlik ile ölçülen aramanın Local Pack'indeki işletmenin aynı olduğu ayrıca doğrulanmalı.
+**Kayıt ve özetler.** `localPackDetails[].items` her kayıt için şunları saklar: ham ad, `cid`, `svid`, `googleId`, kendi domaini, değerlendirme, yöntem, kullanılan alanlar, okunan adres, profil bazında adres karşılaştırması ve gerekçe.
 
-## 11. Markanın başka şubeleri (21.10.2026)
+- `targetProfiles`: Doğrulanmış her profil için kimlik, adres ve belirsiz eşleşmelerin ölçüm listesi.
+- `localPackProfiles`: Kayıtlar kendi kimliğine göre gruplanır (`cid:` / `gid:`). Kanıt yokken `cid` ve `gid` anahtarları birleştirilmez; iki anahtar aynı profil olabilir, bu yüzden toplanmaz. Sayılar farklı ölçüm sayısıdır.
 
-Projede `brandNames` (ör. markanın adı) tanımlıysa, Local Pack'te markayı tam kelime olarak taşıyan ama doğrulanmış profil adıyla birebir eşleşmeyen kayıt **`brand_other_location`** olur: „Eintrag der Marke im Local Pack (Platz {n}: {ham ad}), nicht dem Zielstandort zugeordnet". Hedef şubeyle asla eşleştirilmez; doğrulanmış profil adı yoksa da aynı durum gösterilir. Sıralama: `matched` > `brand_other_location` > `match_unverified` > `not_measurable` > `not_found_in_pack` > `no_local_pack`.
+**Domain ayrı bir işlemdir.** Local Pack kaydına domain yalnızca kaydın kendi web sitesi alanından verilir.
+
+- Profil eşleşmesi, aynı unvan ya da başka bir kayıt üzerinden domain atanmaz; zincirleme bağlantı kurulmaz.
+- Rakip kapsamasının Local Pack sütunu bu yüzden yalnızca kendi web sitesini taşıyan kayıtları sayar.
+
+**Değişmeyenler.**
+
+- `local_pack_gap` kapalı kalır (`LOCAL_PACK_GAP_ENABLED = false`). Adres yöntemi onu açmaz; açmak ayrı bir karardır.
+- Organik kurallar ve eşikler değişmedi.
+- Öncelik skoru yalnızca organik boşluktan beslenir.
+
+**Pilot 1 sonucu (30 ham yanıt, yeni istek yok).** Marka 8 kayıtta görüldü; hepsi `brand_only`, hiçbiri doğrulanmış profile bağlanmadı:
+
+- **6 kayıt (`gid`, Heidenheim ve Steinheim):** Snippet'te ofis profilinin sokak adı ve bina numarası var. Bina numarası ofis adresiyle aynı, sokak belirsiz, posta kodu ve şehir yok; yani `partial`. Heidenheim adresiyle sokak ve numara farklı.
+- **2 kayıt (`cid`):** Kimlikleri doğrulanmış listede yok. Snippet'te yalnızca yer adı geçiyor.
+
+Bu ölçümlerde dönen kayıtlar arasında Heidenheim profiline doğrulanmış bir eşleşme bulunamadı.
+
+## 11. Markanın başka şubeleri
+
+Bölüm 10'a taşındı (`brand_other_location` → `brand_only`).
 
 ## 12. Ölçüm bazında gösterim ve kural kontrolleri (Pilot 1 değerlendirmesi, 21.10.2026)
 

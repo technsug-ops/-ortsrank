@@ -95,6 +95,10 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [x] **Pilot 1 küçük gerçek veri denemesi** (21.10.2026): 5 belediye (Heidenheim, Steinheim, Aalen, Ulm, Babenhausen), 30/30 görev, 0,12 $ (0,024 $ / belediye), bakiye 0,94 → 0,82 $; oturumlar peş peşe → `technical_validation`. Özet [reports/pilot1-small-run.md](reports/pilot1-small-run.md); tam rapor git dışında
 - [ ] Pilot 1 planlı oturumlarla ölçüm (09:00 / 13:00 / 18:00) – reklam gözlemi için
 - [x] Pilot 1 Google profilleri: 2 Maps sorgusu (0,004 $) ile hedef işletmenin iki profili `cid` ve adresle doğrulandı; şubeler aynı adı taşıdığı için eşleştirme yalnızca `cid` ile (21.10.2026)
+- [x] **Local Pack kanıta dayalı eşleştirme** (Halil'in onayı, 21.10.2026; [RULES_V0.md](RULES_V0.md) bölüm 10): `cid` ve `svid`'den çözülen `/g/` kimliği ayrı; tam adres eşleşmesi kimlikten ayrı ve zayıf; ad/puan/yorum kimlik değil; domain yalnızca kaydın kendi web sitesinden; `local_pack_gap` kapalı. Pilot 1: 8 marka kaydı yalnızca marka gözlemi, hedef şubeye doğrulanmış eşleşme yok; organik sonuçlar, kural kontrolleri ve 17 kapsama bulgusu değişmedi
+- [x] Konum mantığı ham istek/yanıtla doğrulandı: keyword şehir adı olmadan, konum `location_coordinate` (merkez, 200 mm), 30/30 aynen dönüyor; `check_url` içindeki Google konumu (`uule`) 20–110 m kaydırılmış ve başka yarıçap değeri taşıyor ([reports/pilot1-small-run.md](reports/pilot1-small-run.md))
+- [ ] Öneri: `uule` noktası ve yarıçapını her ölçümde kaydetmek; `compareEchoedParameters`'a `os` eklemek
+- [ ] Pilot 1 marka kayıtlarının şube ataması: kayıtlarda doğrulanmış kimlik veya tam adres yok; `/g/` ↔ `cid` bağlantısı için kanıt kaynağı yok
 - [ ] Pilot 1 rakip etiket onayı – inceleme tablosu `data/competitor-review.pilot1.md` (34 domain, kamuya açık kaynaklar, hiçbiri onaylanmadı)
 - [x] Pilot 1 müşteri raporu taslağı (Almanca, git dışı `data/reports/pilot1-kundenbericht-20261021.md`), Halil'in incelemesine hazır
 - [-] DataForSEO'ya 50 $ yükleme – Halil'in talimatıyla uygulanmadı; yalnızca mevcut bakiye kullanılıyor (kalan 0,82 $)
@@ -145,7 +149,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 21.10.2026 | Pilot 1 Maps profil eşleştirmesi (2 sorgu, 0,004 $): local pack marka kayıtları ofis profili (çıkarım) ve diğer şubeler (telefonla gözlem); ikinci adres profili 30 ölçümde görülmedi; müşteri raporu güncellendi (git dışı) | bu commit |
+| 21.10.2026 | Local Pack kanıta dayalı eşleştirme (yalnızca 30 ham yanıt, yeni istek yok): `svid` → `/g/`, adres karşılaştırması, kayıt bazında kanıt, `targetProfiles` / `localPackProfiles`, `findings --project`; profil adıyla eşleşme (yöntem A) kaldırıldı; önceki „ofis profili (çıkarım)" ve „telefonla gözlem" atamaları geri alındı (yalnızca marka gözlemi). Konum mantığı denetimi. Raporlar yeniden üretildi (git dışı); toplam 367/367 | bu commit |
+| 21.10.2026 | Pilot 1 Maps profil eşleştirmesi (2 sorgu, 0,004 $): local pack marka kayıtları ofis profili (çıkarım) ve diğer şubeler (telefonla gözlem); ikinci adres profili 30 ölçümde görülmedi; müşteri raporu güncellendi (git dışı) | `66a33ff` |
 | 21.10.2026 | Pilot 1 değerlendirme raporu (mevcut ham veriden, yeni istek yok): Almanca müşteri raporu ve etiket inceleme tablosu git dışında; ölçüm bazında organik hücre, rakip kapsamasında belediye başına ölçüm, `ruleChecks` (değerlendirilemedi / koşul sağlanmadı), Markdown düzeltmeleri; toplam 336/336 | `4fe77c6` |
 | 21.10.2026 | Pilot 1 küçük canlı deneme: 5 belediye, 30/30, 0,12 $; 17 rakip kapsaması bulgusu (etiketler taslak); organik boşluk etiket onayı olmadan üretilemedi; SERP varyantı gözlemi. Kod: açık belediye listesi, `--labels-draft`, teknik denemede reklam oranı gizli; toplam 326/326 | `eb5bf65` |
 | 21.10.2026 | Pilot 1 hazırlığı (Arbeitsbühnenvermietung, Heidenheim): `includeCenter`, `populationMax`, marka şubesi durumu; keşif 4 sorgu 0,016 $; dry-run 30 belediye / 180 görev / 0,86–2,16 $; toplam 316/316 | `9f761c3` |

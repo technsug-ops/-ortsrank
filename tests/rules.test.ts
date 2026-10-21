@@ -68,6 +68,8 @@ function scan(settlements: PlannedSettlement[], measurements: Measurement[], ove
     targetDomains: [TARGET],
     targetCids: [TARGET_CID],
     targetProfileNames: [],
+    targetProfiles: [{ key: TARGET_CID, label: null, cid: TARGET_CID, googleId: null, address: null, source: "Testdaten" }],
+    identitySource: "plan",
     brandNames: [],
     keywords: [{ term: KW, type: "main", samples: 3 }],
     settlements,
@@ -137,7 +139,7 @@ describe("organic_gap", () => {
   });
 });
 
-// ── local pack (RULES_V0 section 10: profile name, pilot) ───────────────
+// ── local pack (RULES_V0 section 10) ────────────────────────────────────
 
 const PROFILE = "Ziel Betrieb GmbH – Terrassendächer";
 const identity = (over: Partial<TargetIdentity> = {}): TargetIdentity => ({ domains: [TARGET], cids: [], profileNames: [PROFILE], ...over });
@@ -163,16 +165,16 @@ describe("isSimilarName (downgrade only)", () => {
   });
 });
 
-describe("local pack matching by profile name", () => {
+describe("local pack: the profile name alone never matches", () => {
   const status = (rows: SerpRow[], id: TargetIdentity = identity()) => localPackStatus(m(S2.ags, 1, rows), id);
 
-  it("matches the exact profile name, keeping the raw name and the method", () => {
-    expect(status([named(1, "Mitbewerber A"), named(2, "  ziel betrieb gmbh –  TERRASSENDÄCHER ")])).toEqual({
-      status: "matched",
+  it("keeps an exact profile name ambiguous, with the raw name and no method", () => {
+    expect(status([named(1, "Mitbewerber A"), named(2, "  ziel betrieb gmbh –  TERRASSENDÄCHER ")])).toMatchObject({
+      status: "match_unverified",
       rank: 2,
-      method: "profile_name_exact",
+      method: null,
       rawTitle: "  ziel betrieb gmbh –  TERRASSENDÄCHER ",
-      reason: null,
+      reason: "name_only",
     });
   });
 
@@ -183,12 +185,17 @@ describe("local pack matching by profile name", () => {
     }
   });
 
-  it("marks the same name appearing more than once as unverified", () => {
-    expect(status([named(1, PROFILE), named(3, PROFILE.toUpperCase())])).toMatchObject({ status: "match_unverified", reason: "duplicate_name" });
+  it("keeps the same name appearing more than once ambiguous", () => {
+    expect(status([named(1, PROFILE), named(3, PROFILE.toUpperCase())])).toMatchObject({ status: "match_unverified", reason: "name_only", rank: 1 });
   });
 
-  it("reports no name match in a shown pack as not found in the pack", () => {
-    expect(status([named(1, "Mitbewerber A"), named(2, "Mitbewerber B")])).toMatchObject({ status: "not_found_in_pack", method: null });
+  it("without brand words, entries without a comparable id leave the match unverified", () => {
+    expect(status([named(1, "Mitbewerber A"), named(2, "Mitbewerber B")], identity({ cids: [TARGET_CID] }))).toMatchObject({ status: "match_unverified", reason: "no_id_in_response" });
+  });
+
+  it("reports 'no verified match' when every entry has another cid", () => {
+    const rows = [named(1, "Mitbewerber A", null, "2000000000000000002"), named(2, "Mitbewerber B", null, "2000000000000000003")];
+    expect(status(rows, identity({ cids: [TARGET_CID] }))).toMatchObject({ status: "not_found_in_pack", method: null });
   });
 
   it("is not measurable when pack items come without a name", () => {
@@ -200,8 +207,8 @@ describe("local pack matching by profile name", () => {
     expect(status(organic("lokal-a.example")).status).toBe("no_local_pack");
   });
 
-  it("is unverified without a verified profile name or cid", () => {
-    expect(status([named(1, PROFILE)], identity({ profileNames: [] }))).toMatchObject({ status: "match_unverified", reason: "no_verified_identity" });
+  it("is unverified without a verified profile", () => {
+    expect(status([named(1, "Mitbewerber A")], identity({ profileNames: [] }))).toMatchObject({ status: "match_unverified", reason: "no_verified_identity" });
   });
 
   it("is unverified when the target domain shows up under another name", () => {
@@ -220,16 +227,17 @@ describe("local pack matching by profile name", () => {
 
 describe("local pack in the status table", () => {
   it("shows the method and keeps raw names per measurement", () => {
-    const e = evaluate(scan([S2], [m(S2.ags, 1, [named(2, PROFILE)]), m(S2.ags, 2, [named(1, "Mitbewerber A")])], { targetProfileNames: [PROFILE] }), labels);
-    expect(e.statusTable[0].localPack).toBe("im Local Pack, Platz 2 (Abgleich über den Profilnamen)");
+    const ms = [m(S2.ags, 1, [named(2, "Irgendein Name", null, TARGET_CID)]), m(S2.ags, 2, [named(1, "Mitbewerber A", null, "2000000000000000002")])];
+    const e = evaluate(scan([S2], ms, { targetProfileNames: [PROFILE] }), labels);
+    expect(e.statusTable[0].localPack).toBe(`im Local Pack, Platz 2: ${TARGET_CID} (Abgleich über verifizierte Kennung)`);
     expect(e.statusTable[0].localPackDetails).toEqual([
-      expect.objectContaining({ taskKey: `${S2.ags}-k1-s1`, status: "matched", method: "profile_name_exact", rawTitle: PROFILE }),
+      expect.objectContaining({ taskKey: `${S2.ags}-k1-s1`, status: "matched", method: "cid", rawTitle: "Irgendein Name", profile: TARGET_CID }),
       expect.objectContaining({ taskKey: `${S2.ags}-k1-s2`, status: "not_found_in_pack" }),
     ]);
   });
 
   it.each([
-    [[named(1, "Mitbewerber A")], "im angezeigten Local Pack kein Eintrag mit dem Profilnamen gefunden"],
+    [[named(1, "Mitbewerber A", null, "2000000000000000002")], "unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb"],
     [[named(1, null)], "Local Pack nicht auswertbar"],
     [[named(1, "Ziel Betrieb GmbH")], "Betriebszuordnung nicht verifiziert"],
     [organic("x.example"), "kein Local Pack angezeigt"],
@@ -240,7 +248,7 @@ describe("local pack in the status table", () => {
 });
 
 describe("local_pack_gap", () => {
-  const notFound = () => [1, 2, 3].map((s) => m(S2.ags, s, [named(1, "lokal-a", "lokal-a.example"), ...organic("x.example")]));
+  const notFound = () => [1, 2, 3].map((s) => m(S2.ags, s, [named(1, "lokal-a", "lokal-a.example", "2000000000000000002"), ...organic("x.example")]));
 
   it("is off in the pilot: no finding even when every measurement lacks the name", () => {
     const e = evaluate(scan([S2], notFound(), { targetProfileNames: [PROFILE] }), labels);
@@ -536,19 +544,19 @@ describe("other locations of the brand in the Local Pack", () => {
   const id = (over: Partial<TargetIdentity> = {}): TargetIdentity => ({ domains: [TARGET], cids: [], profileNames: [HDH], brandNames: ["Beispielmiet"], ...over });
   const named = (rank: number, title: string): SerpRow => ({ ...lp(rank, null, null), title });
 
-  it("matches only the verified profile name of the target location", () => {
-    expect(localPackStatus(m(S2.ags, 1, [named(1, "Beispielmiet Ravensburg"), named(2, HDH)]), id())).toMatchObject({ status: "matched", rank: 2, rawTitle: HDH });
+  it("an entry with the brand and the profile name is still only a brand observation", () => {
+    expect(localPackStatus(m(S2.ags, 1, [named(1, "Mitbewerber"), named(2, HDH)]), id())).toMatchObject({ status: "brand_only", rank: 2, rawTitle: HDH });
   });
 
-  it("shows another location of the brand on its own, never as the target", () => {
+  it("shows a brand entry on its own, never as the target", () => {
     const r = localPackStatus(m(S2.ags, 1, [named(1, "Mitbewerber"), named(3, "Lift Beispielmiet Ravensburg")]), id());
-    expect(r).toMatchObject({ status: "brand_other_location", rank: 3, rawTitle: "Lift Beispielmiet Ravensburg" });
+    expect(r).toMatchObject({ status: "brand_only", rank: 3, rawTitle: "Lift Beispielmiet Ravensburg" });
     const e = evaluate(scan([S2], [m(S2.ags, 1, [named(3, "Lift Beispielmiet Ravensburg")])], { targetProfileNames: [HDH], brandNames: ["Beispielmiet"] }), labels);
-    expect(e.statusTable[0].localPack).toBe("Eintrag der Marke im Local Pack (Platz 3: Lift Beispielmiet Ravensburg), nicht dem Zielstandort zugeordnet");
+    expect(e.statusTable[0].localPack).toBe("Eintrag mit dem Markennamen im Local Pack (Platz 3: Lift Beispielmiet Ravensburg); Standort nicht verifiziert");
   });
 
-  it("without a verified profile name, a brand entry is still not the target", () => {
-    expect(localPackStatus(m(S2.ags, 1, [named(1, "Beispielmiet Service")]), id({ profileNames: [] })).status).toBe("brand_other_location");
+  it("without a verified profile, a brand entry is still not the target", () => {
+    expect(localPackStatus(m(S2.ags, 1, [named(1, "Beispielmiet Service")]), id({ profileNames: [] })).status).toBe("brand_only");
   });
 
   it("needs the brand as a whole word", () => {

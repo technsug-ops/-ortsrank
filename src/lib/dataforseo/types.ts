@@ -37,6 +37,8 @@ export const localPackItemSchema = organicItemSchema.extend({
     .nullish()
     .transform((v) => v ?? null),
   cid: nullableString,
+  /** Snippet text; may carry category, street and house number, opening hours. */
+  description: nullableString,
 });
 
 export const resultSchema = z.object({

@@ -10,14 +10,17 @@ import { competitorLabel } from "@/db/schema";
 import { normalizeDomain } from "@/lib/dataforseo/parse";
 import { DEFAULT_LABELS_FILE, type CompetitorLabel } from "@/lib/rules/config";
 import { evaluate, type Evaluation, type Labels } from "@/lib/rules/engine";
-import { loadScan } from "@/lib/rules/measurements";
+import { loadScan, withProjectIdentity } from "@/lib/rules/measurements";
+import { parseProject } from "@/lib/plan";
 
 export const FINDINGS_USAGE = `Usage:
-  npx tsx scripts/findings.ts --scan-id <id> [--runs-dir runs] [--labels ${DEFAULT_LABELS_FILE}]
+  npx tsx scripts/findings.ts --scan-id <id> [--runs-dir runs] [--labels ${DEFAULT_LABELS_FILE}] [--project <file>]
 
 Labels file: {"domain.de": "local" | "regional" | "national" | "portal" | "directory" | "manufacturer", ...}
 --labels-draft <file>: unapproved draft {"domain.de": {"suggested": "...", "evidence": "..."}}; findings are marked provisional.
-Domains without a label stay "nicht eingeordnet".`;
+Domains without a label stay "nicht eingeordnet".
+--project <file>: target identity (domains, brand words, verified Google profiles) from this project
+file instead of the run plans, e.g. profiles verified after the run. Run files are not changed.`;
 
 const labelsFileSchema = z.record(z.string(), z.enum(competitorLabel.enumValues));
 
@@ -77,7 +80,13 @@ export async function findingsMain(argv: string[], deps: { out?: (l: string) => 
     const { values } = parseArgs({
       args: argv,
       strict: true,
-      options: { "scan-id": { type: "string" }, "runs-dir": { type: "string" }, labels: { type: "string" }, "labels-draft": { type: "string" } },
+      options: {
+        "scan-id": { type: "string" },
+        "runs-dir": { type: "string" },
+        labels: { type: "string" },
+        "labels-draft": { type: "string" },
+        project: { type: "string" },
+      },
     });
     if (!values["scan-id"]) throw new Error("--scan-id is required");
     const runsDir = values["runs-dir"] ?? "runs";
@@ -87,7 +96,11 @@ export async function findingsMain(argv: string[], deps: { out?: (l: string) => 
     const { labels, found } = draft ? { labels: readDraftLabels(draft), found: true } : readLabels(labelsPath);
     if (!found) out(`No labels file at ${labelsPath}: every competitor stays "nicht eingeordnet" and gap rules cannot fire.`);
     if (draft) out(`Labels from an UNAPPROVED draft (${draft}): findings that depend on them are marked as provisional.`);
-    const scan = loadScan(runsDir, values["scan-id"]);
+    const loaded = loadScan(runsDir, values["scan-id"]);
+    const project = values.project ? parseProject(JSON.parse(readFileSync(values.project, "utf8"))) : null;
+    if (project && project.name !== loaded.project) throw new Error(`project file ${values.project} is "${project.name}", scan belongs to "${loaded.project}"`);
+    const scan = project ? withProjectIdentity(loaded, project, values.project!) : loaded;
+    if (project) out(`Target identity from ${values.project} (${scan.targetProfiles.length} verified profiles), not from the run plans.`);
     const evaluation = evaluate(scan, labels, { labelsApproved: !draft });
     const dir = join(runsDir, "scans", scan.scanId);
     mkdirSync(dir, { recursive: true });

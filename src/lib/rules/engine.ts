@@ -4,7 +4,8 @@
  * fixed evidence level and carries the measurements it rests on.
  */
 import type { actionBucket, actionType, evidenceLevel, findingKind } from "@/db/schema";
-import { matchesDomain, normalizeDomain } from "@/lib/dataforseo/parse";
+import { addressFromSnippet, compareAddress, type AddressComparison, type PostalAddress, type ProfileIdStatus } from "@/lib/dataforseo/local-identity";
+import { matchesDomain, normalizeDomain, type SerpRow } from "@/lib/dataforseo/parse";
 import {
   AD_MIN_SESSIONS,
   COVERAGE_MIN_SHARE,
@@ -21,20 +22,48 @@ import {
   RULES_VERSION,
   type CompetitorLabel,
 } from "@/lib/rules/config";
-import type { Measurement, PlannedSettlement, ScanData } from "@/lib/rules/measurements";
+import type { Measurement, PlannedSettlement, ScanData, TargetProfile } from "@/lib/rules/measurements";
 import { deDate, deList, deNumber, fill, reportText as T } from "@/lib/rules/text";
 
 export type Labels = ReadonlyMap<string, CompetitorLabel>;
 
 /**
  * Target business in the Local Pack, per measurement (RULES_V0 section 10):
- * matched (by cid or exact profile name) · match_unverified (no verified
- * identity, similar but different name, duplicate name, or target domain
- * without matching identity) · not_found_in_pack (pack shown, no entry with
- * the profile name) · no_local_pack · not_measurable (items without name).
+ * matched (verified id: cid or googleId) · address_match (verified full
+ * address, weaker than an id) · match_unverified (ambiguous or conflicting) ·
+ * brand_only (brand in the name, location not verified) · not_measurable ·
+ * not_found_in_pack (no verified match among the entries; not proof of
+ * absence) · no_local_pack.
  */
-export type LocalPackStatus = "matched" | "brand_other_location" | "match_unverified" | "not_found_in_pack" | "no_local_pack" | "not_measurable";
-export type LocalPackMethod = "cid" | "profile_name_exact" | null;
+export type LocalPackStatus = "matched" | "address_match" | "match_unverified" | "brand_only" | "not_found_in_pack" | "no_local_pack" | "not_measurable";
+export type LocalPackMethod = "cid" | "google_id" | "address_full" | null;
+
+/** One Local Pack entry judged against the target profiles. */
+export type ItemAssessment = "identity_match" | "address_match" | "ambiguous" | "brand_only" | "not_target";
+
+export interface AddressCheck extends AddressComparison {
+  profile: string;
+}
+
+export interface LocalPackItemEvidence {
+  rank: number;
+  rawTitle: string | null;
+  cid: string | null;
+  svid: string | null;
+  googleId: string | null;
+  profileIdStatus: ProfileIdStatus | null;
+  /** Business website as given in the entry itself; Google's own links are null. */
+  domain: string | null;
+  assessment: ItemAssessment;
+  method: LocalPackMethod;
+  /** Target profile key the entry was assigned to, if any. */
+  profile: string | null;
+  /** Entry fields the decision rests on. */
+  fields: string[];
+  observedAddress: PostalAddress | null;
+  addressChecks: AddressCheck[];
+  reason: string | null;
+}
 
 export interface LocalPackResult {
   status: LocalPackStatus;
@@ -43,14 +72,19 @@ export interface LocalPackResult {
   /** Business name exactly as returned by the provider (matched or causing the doubt). */
   rawTitle: string | null;
   reason: string | null;
+  profile: string | null;
+  items: LocalPackItemEvidence[];
 }
 
 export interface TargetIdentity {
   domains: readonly string[];
   cids: readonly string[];
+  /** Never a match on their own; an equal or similar name only makes the entry ambiguous. */
   profileNames: readonly string[];
-  /** Brand words; entries carrying them but not the profile name are other locations of the brand. */
+  /** Brand words; entries carrying them without verified identity are brand observations only. */
   brandNames?: readonly string[];
+  /** Verified profiles; when absent, built from `cids`. */
+  profiles?: readonly TargetProfile[];
 }
 
 /** True if the brand appears as a whole word (or word sequence) in the name. */
@@ -119,8 +153,47 @@ export interface RuleCheck {
   reason: string | null;
 }
 
+/** Per verified target profile: in which measurements it was matched, and how. */
+export interface TargetProfileSummary {
+  profile: string;
+  label: string | null;
+  cid: string | null;
+  googleId: string | null;
+  address: PostalAddress | null;
+  source: string | null;
+  measurements: number;
+  /** Measurements with a Local Pack shown. */
+  withLocalPack: number;
+  identityMatches: string[];
+  addressMatches: string[];
+  /** Measurements where an entry pointed at this profile but stayed ambiguous. */
+  ambiguous: string[];
+}
+
+/**
+ * Local Pack entries grouped by their own profile id. A cid key and a googleId
+ * key are never merged without evidence, so two keys can be one profile:
+ * counts of different keys must not be added up.
+ */
+export interface LocalPackProfileSummary {
+  key: string;
+  idKind: "cid" | "google_id" | "none";
+  titles: string[];
+  /** Websites given in the entries themselves (never inferred from the name). */
+  domains: string[];
+  /** Distinct measurements (task keys); one entry per measurement at most. */
+  measurements: string[];
+  settlements: string[];
+  keywords: string[];
+  assessments: ItemAssessment[];
+}
+
 export interface Evaluation {
   rulesVersion: string;
+  /** "plan" or the project file the target identity was taken from. */
+  identitySource: string;
+  targetProfiles: TargetProfileSummary[];
+  localPackProfiles: LocalPackProfileSummary[];
   ruleChecks: RuleCheck[];
   labelsApproved: boolean;
   scanId: string;
@@ -182,44 +255,131 @@ export function isSimilarName(a: string, b: string): boolean {
   return [...words(a)].filter((w) => wb.has(w)).length >= 2;
 }
 
-const result = (status: LocalPackStatus, extra: Partial<LocalPackResult> = {}): LocalPackResult => ({
+const result = (status: LocalPackStatus, items: LocalPackItemEvidence[], extra: Partial<LocalPackResult> = {}): LocalPackResult => ({
   status,
   rank: null,
   method: null,
   rawTitle: null,
   reason: null,
+  profile: null,
+  items,
   ...extra,
 });
 
-export function localPackStatus(m: Measurement, target: TargetIdentity): LocalPackResult {
-  const items = m.rows.filter((r) => r.type === "local_pack");
-  if (items.length === 0) return result("no_local_pack");
+const profilesOf = (t: TargetIdentity): readonly TargetProfile[] =>
+  t.profiles ?? t.cids.map((cid) => ({ key: cid, label: null, cid, googleId: null, address: null, source: null }));
 
-  const byCid = items.find((r) => r.cid && target.cids.includes(r.cid));
-  if (byCid) return result("matched", { rank: byCid.rank, method: "cid", rawTitle: byCid.title });
+/**
+ * One entry against the verified target profiles. Identity (cid / googleId),
+ * address and domain are separate questions; nothing is chained: an entry is
+ * never tied to a profile or domain through another entry.
+ */
+export function assessLocalPackItem(r: SerpRow, target: TargetIdentity): LocalPackItemEvidence {
+  const profiles = profilesOf(target);
+  const title = r.title ?? "";
+  const brand = !!title && (target.brandNames ?? []).some((b) => hasBrand(title, b));
+  const observedAddress = addressFromSnippet(r.description ?? null);
+  const addressChecks: AddressCheck[] = profiles
+    .filter((p) => p.address)
+    .map((p) => ({ profile: p.key, ...compareAddress(observedAddress, p.address!) }));
+  const base = {
+    rank: r.rank,
+    rawTitle: r.title,
+    cid: r.cid ?? null,
+    svid: r.svid ?? null,
+    googleId: r.googleId ?? null,
+    profileIdStatus: r.profileIdStatus ?? null,
+    domain: r.domain,
+    observedAddress,
+    addressChecks,
+  };
+  const out = (assessment: ItemAssessment, reason: string | null, extra: Partial<LocalPackItemEvidence> = {}): LocalPackItemEvidence => ({
+    ...base,
+    assessment,
+    method: null,
+    profile: null,
+    fields: [],
+    reason,
+    ...extra,
+  });
 
-  const wanted = target.profileNames.map(normalizeBusinessName);
-  const exact = items.filter((r) => r.title && wanted.includes(normalizeBusinessName(r.title)));
-  if (exact.length > 1) return result("match_unverified", { reason: "duplicate_name", rawTitle: exact[0].title });
-  if (exact.length === 1) return result("matched", { rank: exact[0].rank, method: "profile_name_exact", rawTitle: exact[0].title });
-
-  // Another location of the same brand: shown on its own, never matched to the target location.
-  const brand = items.find((r) => r.title && (target.brandNames ?? []).some((b) => hasBrand(r.title!, b)));
-  if (brand) return result("brand_other_location", { rank: brand.rank, rawTitle: brand.title, reason: "brand_without_profile_name" });
-
-  if (target.profileNames.length === 0) {
-    return result("match_unverified", { reason: target.cids.length ? "no_cid_in_response" : "no_verified_identity" });
+  // 1. Identity: the entry's own cid or googleId equals a verified one.
+  const byId = profiles.filter((p) => (r.cid && p.cid === r.cid) || (r.googleId && p.googleId === r.googleId));
+  if (byId.length > 1) return out("ambiguous", "several_profiles_share_id", { fields: ["cid", "googleId"] });
+  if (byId.length === 1) {
+    const p = byId[0];
+    const fields = r.cid && p.cid === r.cid ? ["cid"] : ["googleId"];
+    const own = addressChecks.find((c) => c.profile === p.key);
+    const elsewhere = addressChecks.find((c) => c.profile !== p.key && c.result === "full");
+    if (own?.result === "conflict" || elsewhere) return out("ambiguous", "identity_address_conflict", { profile: p.key, fields: [...fields, "description"] });
+    return out("identity_match", null, { method: fields[0] === "cid" ? "cid" : "google_id", profile: p.key, fields });
   }
-  const untitled = items.filter((r) => !r.title || !r.title.trim());
-  if (untitled.length) return result("not_measurable", { reason: "items_without_name" });
 
-  // Similar but different names only downgrade to "unverified", they never match.
-  const similar = items.find((r) => wanted.some((w) => isSimilarName(normalizeBusinessName(r.title!), w)));
-  if (similar) return result("match_unverified", { reason: "similar_name", rawTitle: similar.title });
-  const byDomain = items.find((r) => isTarget(r.domain, target.domains));
-  if (byDomain) return result("match_unverified", { reason: "target_domain_without_identity", rawTitle: byDomain.title });
+  // 2. Address: a verified full address, supported by the brand in the name.
+  const full = addressChecks.filter((c) => c.result === "full");
+  const partial = addressChecks.filter((c) => c.result === "partial");
+  if (full.length + partial.length > 1) return out("ambiguous", "several_address_candidates", { fields: ["description"] });
+  if (full.length === 1) {
+    const p = profiles.find((x) => x.key === full[0].profile)!;
+    // That profile has a verified id, the entry carries a different one: another profile.
+    if ((r.cid && p.cid) || (r.googleId && p.googleId)) {
+      return out("ambiguous", "address_identity_conflict", { profile: p.key, fields: ["description", r.cid ? "cid" : "googleId"] });
+    }
+    if (!brand) return out("ambiguous", "address_without_brand", { profile: p.key, fields: ["description"] });
+    return out("address_match", null, { method: "address_full", profile: p.key, fields: ["street", "houseNumber", "postalCode", "city", "title:brand"] });
+  }
 
-  return result("not_found_in_pack");
+  // 3. Brand in the name only: an observation, never the target location.
+  if (brand) {
+    const reason = partial.length
+      ? "partial_address"
+      : addressChecks.some((c) => c.result === "conflict")
+        ? "address_differs"
+        : r.cid
+          ? "cid_not_verified"
+          : r.profileIdStatus === "undecodable"
+            ? "profile_id_undecodable"
+            : "no_verified_identity";
+    return out("brand_only", reason, { fields: ["title:brand", ...(partial.length ? ["description"] : [])] });
+  }
+
+  // 4. Name or domain without identity: never a match, only doubt.
+  const wanted = target.profileNames.map(normalizeBusinessName);
+  const name = title ? normalizeBusinessName(title) : "";
+  if (name && wanted.includes(name)) return out("ambiguous", "name_only", { fields: ["title"] });
+  if (name && wanted.some((w) => isSimilarName(name, w))) return out("ambiguous", "similar_name", { fields: ["title"] });
+  if (isTarget(r.domain, target.domains)) return out("ambiguous", "target_domain_without_identity", { fields: ["domain"] });
+  if (partial.length === 1) return out("ambiguous", "partial_address_without_brand", { fields: ["description"] });
+  return out("not_target", null);
+}
+
+export function localPackStatus(m: Measurement, target: TargetIdentity): LocalPackResult {
+  const rows = m.rows.filter((r) => r.type === "local_pack");
+  if (rows.length === 0) return result("no_local_pack", []);
+  const items = rows.map((r) => assessLocalPackItem(r, target));
+  const first = (a: ItemAssessment) => items.filter((i) => i.assessment === a).sort((x, y) => x.rank - y.rank)[0];
+  const pick = (status: LocalPackStatus, i: LocalPackItemEvidence) =>
+    result(status, items, { rank: i.rank, method: i.method, rawTitle: i.rawTitle, reason: i.reason, profile: i.profile });
+
+  const id = first("identity_match");
+  if (id) return pick("matched", id);
+  const address = first("address_match");
+  if (address) return pick("address_match", address);
+  const doubt = first("ambiguous");
+  if (doubt) return pick("match_unverified", doubt);
+  const brand = first("brand_only");
+  if (brand) return pick("brand_only", brand);
+
+  if (profilesOf(target).length === 0 && target.profileNames.length === 0) return result("match_unverified", items, { reason: "no_verified_identity" });
+  if (items.some((i) => !i.rawTitle || !i.rawTitle.trim())) return result("not_measurable", items, { reason: "items_without_name" });
+  // An entry whose profile id cannot be read could be the target: no "not found".
+  if (items.some((i) => !i.cid && i.profileIdStatus === "undecodable")) return result("not_measurable", items, { reason: "profile_id_undecodable" });
+  // Without brand words, an entry whose id cannot be compared with a verified one
+  // (no cid, or only a googleId while no googleId is verified) could be the target.
+  const profiles = profilesOf(target);
+  const comparable = (i: LocalPackItemEvidence) => (!!i.cid && profiles.some((p) => p.cid)) || (!!i.googleId && profiles.some((p) => p.googleId));
+  if (!(target.brandNames ?? []).length && items.some((i) => !comparable(i))) return result("match_unverified", items, { reason: "no_id_in_response" });
+  return result("not_found_in_pack", items);
 }
 
 function localPackCompetitors(m: Measurement, targets: readonly string[], labels: Labels, wanted: readonly CompetitorLabel[]): string[] {
@@ -263,6 +423,78 @@ export function organicCellText(ms: readonly Measurement[], targets: readonly st
   if (found.length === 0) return fill(T.status.organicNone, { n: ms.length, counts: countsText(ms) });
   const some = missing.length === 1 ? T.status.organicSomeOne : T.status.organicSome;
   return fill(some, { k: found.length, n: ms.length, ranks: deList(found.map(String)), m: missing.length, counts: countsText(missing) });
+}
+
+// ── Local Pack summaries ──────────────────────────────────────────────────
+
+const LP_CELL_ORDER: LocalPackStatus[] = ["matched", "address_match", "match_unverified", "brand_only", "not_measurable", "not_found_in_pack", "no_local_pack"];
+
+/** Status-table text for one settlement × keyword: the strongest status over its measurements. */
+export function localPackCellText(lp: readonly LocalPackResult[]): string {
+  const best = [...lp].sort((a, b) => LP_CELL_ORDER.indexOf(a.status) - LP_CELL_ORDER.indexOf(b.status) || (a.rank ?? 99) - (b.rank ?? 99))[0];
+  switch (best?.status) {
+    case "matched":
+      return fill(T.status.lpMatched, { rank: best.rank!, profile: best.profile ?? "" });
+    case "address_match":
+      return fill(T.status.lpAddressMatch, { rank: best.rank!, profile: best.profile ?? "" });
+    case "match_unverified":
+      return T.status.lpUnverified;
+    case "brand_only":
+      return fill(T.status.lpBrandOnly, { rank: best.rank!, title: best.rawTitle ?? "" });
+    case "not_measurable":
+      return T.status.lpNotMeasurable;
+    case "not_found_in_pack":
+      return T.status.lpNoVerifiedMatch;
+    default:
+      return T.status.lpNone;
+  }
+}
+
+function targetProfileSummary(scan: ScanData, all: { m: Measurement; lp: LocalPackResult }[]): TargetProfileSummary[] {
+  return scan.targetProfiles.map((p) => {
+    const hits = (a: ItemAssessment) => all.filter((x) => x.lp.items.some((i) => i.profile === p.key && i.assessment === a)).map((x) => x.m.taskKey).sort();
+    return {
+      profile: p.key,
+      label: p.label,
+      cid: p.cid,
+      googleId: p.googleId,
+      address: p.address,
+      source: p.source,
+      measurements: all.length,
+      withLocalPack: all.filter((x) => x.lp.status !== "no_local_pack").length,
+      identityMatches: hits("identity_match"),
+      addressMatches: hits("address_match"),
+      ambiguous: hits("ambiguous"),
+    };
+  });
+}
+
+function localPackProfileSummary(all: { m: Measurement; lp: LocalPackResult }[]): LocalPackProfileSummary[] {
+  const groups = new Map<string, LocalPackProfileSummary>();
+  for (const { m, lp } of all) {
+    lp.items.forEach((i) => {
+      const key = i.cid ? `cid:${i.cid}` : i.googleId ? `gid:${i.googleId}` : `none:${m.taskKey}:${i.rank}`;
+      const g: LocalPackProfileSummary = groups.get(key) ?? {
+        key,
+        idKind: i.cid ? "cid" : i.googleId ? "google_id" : "none",
+        titles: [],
+        domains: [],
+        measurements: [],
+        settlements: [],
+        keywords: [],
+        assessments: [],
+      };
+      const add = <T>(list: T[], v: T | null) => v !== null && !list.includes(v) && list.push(v);
+      add(g.titles, i.rawTitle);
+      add(g.domains, i.domain);
+      add(g.measurements, m.taskKey);
+      add(g.settlements, m.ags);
+      add(g.keywords, m.keyword);
+      add(g.assessments, i.assessment);
+      groups.set(key, g);
+    });
+  }
+  return [...groups.values()].sort((a, b) => b.measurements.length - a.measurements.length || a.key.localeCompare(b.key));
 }
 
 // ── Priority ────────────────────────────────────────────────────────────
@@ -312,6 +544,7 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
     cids: scan.targetCids,
     profileNames: scan.targetProfileNames,
     brandNames: scan.brandNames,
+    profiles: scan.targetProfiles,
   };
   const targets = scan.targetDomains.map(normalizeDomain);
   // Without a target domain nothing can be "not found": organic findings about the target are skipped.
@@ -346,21 +579,7 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
         organic = hasTarget ? organicCellText(ms, targets) : T.status.targetUndefined;
         const lp = ms.map((m) => ({ taskKey: m.taskKey, ...localPackStatus(m, identity) }));
         localPackDetails = lp;
-        const matched = lp.filter((x) => x.status === "matched").sort((a, b) => a.rank! - b.rank!);
-        localPack = matched.length
-          ? fill(matched[0].method === "cid" ? T.status.lpMatched : T.status.lpMatchedName, { rank: matched[0].rank! })
-          : lp.some((x) => x.status === "brand_other_location")
-            ? fill(T.status.lpBrandOther, {
-                rank: lp.find((x) => x.status === "brand_other_location")!.rank!,
-                title: lp.find((x) => x.status === "brand_other_location")!.rawTitle ?? "",
-              })
-          : lp.some((x) => x.status === "match_unverified")
-            ? T.status.lpUnverified
-            : lp.some((x) => x.status === "not_measurable")
-              ? T.status.lpNotMeasurable
-              : lp.some((x) => x.status === "not_found_in_pack")
-                ? T.status.lpNameNotFound
-                : T.status.lpNone;
+        localPack = localPackCellText(lp);
         // Back-to-back technical trials say nothing about ad frequency: no ratio shown.
         const sessionMs = ms.filter((m) => m.samplingMode === "sessions");
         ads = sessionMs.length ? `${sessionMs.filter(hasAds).length}/${sessionMs.length}` : T.status.adsNotEvaluated;
@@ -672,8 +891,13 @@ export function evaluate(scan: ScanData, labels: Labels, options: EvaluateOption
   const scoreByAgs = new Map(ranked.map((r) => [r.s.ags, r.p.score]));
   for (const f of findings) if ((f.rule === "organic_gap" || f.rule === "local_pack_gap") && f.ags) f.score = scoreByAgs.get(f.ags) ?? 0;
 
+  const lpByMeasurement = scan.measurements.map((m) => ({ m, lp: localPackStatus(m, identity) }));
+
   return {
     rulesVersion: RULES_VERSION,
+    identitySource: scan.identitySource,
+    targetProfiles: targetProfileSummary(scan, lpByMeasurement),
+    localPackProfiles: localPackProfileSummary(lpByMeasurement),
     ruleChecks,
     labelsApproved,
     scanId: scan.scanId,

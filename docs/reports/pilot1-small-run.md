@@ -19,26 +19,26 @@ Messungen: planlı / geçerli / başarısız. Local Pack'teki marka adı `[Marke
 
 | Belediye | Keyword | Messungen | Organik (hedef domain) | Local Pack |
 | --- | --- | --- | --- | --- |
-| Heidenheim an der Brenz | Arbeitsbühne mieten | 3 / 3 / 0 | in 2 von 3 Messungen gefunden (Platz 8 und 8); in 1 Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Heidenheim an der Brenz | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Heidenheim an der Brenz | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Eintrag der Marke im Local Pack (Platz 3: [Markenname]), nicht dem Zielstandort zugeordnet |
-| Heidenheim an der Brenz | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Steinheim am Albuch | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (19, 19 und 19 Ergebnisse) | Eintrag der Marke im Local Pack (Platz 2: [Markenname]), nicht dem Zielstandort zugeordnet |
-| Steinheim am Albuch | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | Eintrag der Marke im Local Pack (Platz 2: [Markenname]), nicht dem Zielstandort zugeordnet |
+| Heidenheim an der Brenz | Arbeitsbühne mieten | 3 / 3 / 0 | in 2 von 3 Messungen gefunden (Platz 8 und 8); in 1 Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Heidenheim an der Brenz | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Heidenheim an der Brenz | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Eintrag mit dem Markennamen im Local Pack (Platz 3: [Markenname]); Standort nicht verifiziert |
+| Heidenheim an der Brenz | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Steinheim am Albuch | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (19, 19 und 19 Ergebnisse) | Eintrag mit dem Markennamen im Local Pack (Platz 2: [Markenname]); Standort nicht verifiziert |
+| Steinheim am Albuch | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | Eintrag mit dem Markennamen im Local Pack (Platz 2: [Markenname]); Standort nicht verifiziert |
 | Steinheim am Albuch | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | kein Local Pack angezeigt |
-| Steinheim am Albuch | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung gefunden: Platz 5 | Eintrag der Marke im Local Pack (Platz 1: [Markenname]), nicht dem Zielstandort zugeordnet |
-| Aalen | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (19, 19 und 18 Ergebnisse) | Eintrag der Marke im Local Pack (Platz 7: [Markenname]), nicht dem Zielstandort zugeordnet |
-| Aalen | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Aalen | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Aalen | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Ulm | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (18, 19 und 19 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Ulm | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Ulm | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Ulm | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Babenhausen | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (19, 19 und 18 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Babenhausen | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | Eintrag der Marke im Local Pack (Platz 6: [Markenname]), nicht dem Zielstandort zugeordnet |
-| Babenhausen | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | Betriebszuordnung nicht verifiziert |
-| Babenhausen | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | Betriebszuordnung nicht verifiziert |
+| Steinheim am Albuch | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung gefunden: Platz 5 | Eintrag mit dem Markennamen im Local Pack (Platz 1: [Markenname]); Standort nicht verifiziert |
+| Aalen | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (19, 19 und 18 Ergebnisse) | Eintrag mit dem Markennamen im Local Pack (Platz 7: [Markenname]); Standort nicht verifiziert |
+| Aalen | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Aalen | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Aalen | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Ulm | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (18, 19 und 19 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Ulm | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Ulm | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Ulm | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Babenhausen | Arbeitsbühne mieten | 3 / 3 / 0 | in keiner der 3 Messungen unter den zurückgegebenen organischen Ergebnissen gefunden (19, 19 und 18 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Babenhausen | Hubarbeitsbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (18 Ergebnisse) | Eintrag mit dem Markennamen im Local Pack (Platz 6: [Markenname]); Standort nicht verifiziert |
+| Babenhausen | Scherenbühne mieten | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (19 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
+| Babenhausen | Arbeitsbühne mieten in der Nähe | 1 / 1 / 0 | in der Messung unter den zurückgegebenen organischen Ergebnissen nicht gefunden (20 Ergebnisse) | unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb |
 
 „Nicht gefunden" = yanıtta dönen organik sonuçlar arasında yok (sayılar ölçüm başına); sıra numaraları tüm ölçümlerde 1..n kesintisiz.
 
@@ -53,13 +53,18 @@ Messungen: planlı / geçerli / başarısız. Local Pack'teki marka adı `[Marke
 
 Rakip kapsaması: 17 gözlem; sınıflandırmalar onaylanmamış („vorläufig"). Organik boşluk 4 belediyede **değerlendirilemedi** (ilk 10'da etiketsiz rakipler), Heidenheim'da **değerlendirildi, koşul sağlanmadı** (hedef bir ölçümde ilk 10'da).
 
-## Local Pack: Google Maps ile profil eşleştirmesi
+## Local Pack: kanıta dayalı eşleştirme (RULES_V0 bölüm 10)
 
-Arama sonuçlarındaki Local Pack öğeleri çoğunlukla kimlik (`cid`) ve adres taşımıyor. Halil'in onayıyla 2 Google Maps sorgusu yapıldı (0,004 $): hedef işletmenin **iki profili** (ofis ve ikinci adres) kimlik ve adresiyle doğrulandı; işletmenin şubeleri Google'da **aynı adı** taşıyor, bu yüzden ad eşleştirmesi (yöntem A) bu işletmede kullanılmıyor, yalnızca `cid`.
+Hedef işletmenin iki Google profili Halil'in onayıyla 2 Maps sorgusuyla (0,004 $) kimlik ve tam adresle doğrulandı. Şubeler aynı adı taşıyor; ofis profili ile başka bir şubenin kaydı aynı puanı ve aynı yorum sayısını da taşıyor. Ad, puan ve yorum sayısı kimlik olarak kullanılmıyor.
 
-- Local Pack'teki marka kayıtlarının 6'sı büyük olasılıkla ofis profili (**çıkarım**: aynı ad, aynı puan ve yorum sayısı); 2'si öğedeki telefon numarasıyla işletmenin başka şubelerine bağlandı (**gözlem**).
-- İkinci adresin profili 30 ölçümün hiçbirinde Local Pack'te görülmedi (bu ölçümler için gözlem).
-- Raporda bilgi notu: Google profil kuralları (yalnızca personelli konumlar); işletmenin diğer konumları için durum bilinmiyor.
+- Marka 8 kayıtta görüldü, hepsi **yalnızca marka gözlemi**. 6 kayıtta ofisin sokak ve bina numarası var; posta kodu ve şehir yok, sokak sınırı belirsiz. Bu yüzden kısmi adres, eşleşme değil. 2 kaydın kimliği doğrulanmış listede yok; açıklamadaki yer adı ve telefon yalnızca yardımcı ipucu.
+- **Bu 30 ölçümde dönen Local Pack kayıtları arasında hedef şubeye doğrulanmış bir eşleşme bulunamadı.** Yokluk kanıtı değildir.
+- Rakip Local Pack sayıları değişmedi: domain yalnızca kaydın kendi web sitesinden. Yalnızca `/g/` kimliği taşıyan 21 rakip profili domaine bağlanmadı.
+- Organik sonuçlar, kural kontrolleri ve 17 kapsama bulgusu değişmedi.
+
+## Konum mantığı
+
+Keyword şehir adı eklenmeden gönderiliyor. Konum, belediye merkez koordinatı ile `location_coordinate` (yarıçap 200 mm) olarak veriliyor; 30/30 yanıtta aynen geri dönüyor. Sağlayıcının `check_url` bağlantısındaki Google konumu (`uule`) gönderilen noktadan 20–110 m uzakta ve farklı bir yarıçap değeri taşıyor (`[10000]`). Nokta yarıçapı, 60 km'lik belediye seçim alanıyla ve işletmenin hizmet alanıyla ilgisizdir. Ölçülen sorgular yalnızca dört keyword; „Arbeitsbühne" tek başına ölçülmedi.
 
 ## Gözlem: zamana yakın ölçümlerde farklı sonuç sayfası
 
@@ -69,7 +74,7 @@ Aynı belediye/keyword/koordinat için aynı saniyede gönderilen ölçümlerde 
 
 **Doğrulandı:** veri çekme (30/30, parametreler eşleşiyor), bütçe muhasebesi (istek öncesi ayırma, confirmed, ortak tavan 0,40 $; panel bakiyesiyle tutarlı), ayrıştırma (organik, Local Pack `cid: null` / Google domaini), kurallar ve raporlama (ölçüm bazında hücreler, kural kontrol durumları, onaysız etiket işaretleri, teknik denemede reklam oranı yok).
 
-**Doğrulanamadı:** organik boşluk (etiket onayı yok), Local Pack hedef şubesi (profil kimliği doğrulanmadı; marka kaydı 4 belediyede görüldü, şubeye atanmadı), reklam gözlemi ve gün içi değişkenlik (planlı oturum yok).
+**Doğrulanamadı:** organik boşluk (etiket onayı yok), Local Pack'teki marka kayıtlarının hangi şubeye ait olduğu (kayıtlarda doğrulanmış kimlik veya tam adres yok), `/g/` kimliğinin kalıcılığı, reklam gözlemi ve gün içi değişkenlik (planlı oturum yok).
 
 ## Sonraki adım (bu işin dışında)
 

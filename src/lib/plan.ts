@@ -26,6 +26,25 @@ const keywordSchema = z.object({
   samples: z.number().int().positive().default(1),
 });
 
+export const verifiedAddressSchema = z.object({
+  street: z.string().trim().min(2),
+  houseNumber: z.string().trim().min(1),
+  postalCode: z.string().regex(/^\d{5}$/, "postalCode must be 5 digits"),
+  city: z.string().trim().min(2),
+});
+
+export const targetLocalBusinessSchema = z
+  .object({
+    /** Short name for reports, e.g. the town of the location. */
+    label: z.string().trim().min(1).optional(),
+    cid: z.string().regex(/^\d+$/, "cid must be digits").optional(),
+    googleId: z.string().regex(/^\/[gm]\/[0-9a-z_]+$/, "googleId must look like /g/…").optional(),
+    profileName: z.string().trim().min(1).optional(),
+    address: verifiedAddressSchema.optional(),
+    source: z.string().trim().min(3, "source of the verified identity is required"),
+  })
+  .refine((b) => b.cid !== undefined || b.googleId !== undefined || b.profileName !== undefined || b.address !== undefined, "cid, googleId, profileName or address is required");
+
 export const projectSchema = z
   .object({
     name: z.string().regex(/^[a-z0-9-]+$/, "name must be lowercase letters, digits and dashes"),
@@ -55,21 +74,13 @@ export const projectSchema = z
     keywords: z.array(keywordSchema).min(1),
     targetDomains: z.array(z.string()).default([]),
     /**
-     * The target business in Google's local results. `profileName` is the exact
-     * name shown on its Google business profile, taken from a verified source
+     * The target business in Google's local results, from a verified source
      * (never guessed from the domain or company name); `source` says where.
+     * `cid` and `googleId` ("/g/…") listed together in one entry are the
+     * evidence that they are the same profile. `profileName` alone never
+     * matches (RULES_V0 section 10). `address` is the verified full address.
      */
-    targetLocalBusinesses: z
-      .array(
-        z
-          .object({
-            cid: z.string().regex(/^\d+$/, "cid must be digits").optional(),
-            profileName: z.string().trim().min(1).optional(),
-            source: z.string().trim().min(3, "source of the verified identity is required"),
-          })
-          .refine((b) => b.cid !== undefined || b.profileName !== undefined, "cid or profileName is required"),
-      )
-      .default([]),
+    targetLocalBusinesses: z.array(targetLocalBusinessSchema).default([]),
     sessions: z.array(sessionSchema).min(1),
   })
   .superRefine((p, ctx) => {

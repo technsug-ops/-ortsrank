@@ -36,10 +36,14 @@ const organicItems = (ags: string, domains: string[]): Item[] => {
   for (let i = all.length; i < 20; i++) all.push(`f-${ags}-${i + 1}.example`);
   return all.map((d, i) => ({ type: "organic", rank_group: i + 1, domain: d, url: `https://${d}/`, title: d }));
 };
-// Live responses carry cid: null and Google as domain; the business is known by its name only.
+// Entries with a cid (and their website), or as in live responses without cid and with Google as domain.
 const PROFILE = "Ziel Betrieb GmbH";
-const pack = (...titles: string[]): Item[] =>
-  titles.map((title, i) => ({ type: "local_pack", rank_group: i + 1, domain: "www.google.com", url: "https://www.google.com/searchviewer/10", title, cid: null, is_paid: false, rating: null, phone: null }));
+const TARGET_CID = "1000000000000000001";
+const pack = (...entries: (string | [string, string])[]): Item[] =>
+  entries.map((e, i) => {
+    const [title, cid] = typeof e === "string" ? [e, null] : e;
+    return { type: "local_pack", rank_group: i + 1, domain: "www.google.com", url: "https://www.google.com/searchviewer/10", title, cid, is_paid: false, rating: null, phone: null };
+  });
 const ads = (...domains: string[]): Item[] => domains.map((d, i) => ({ type: "paid", rank_group: i + 1, position: "top", domain: d, url: `https://${d}/`, title: d }));
 
 /** What Google "shows" per settlement and session for the main keyword. */
@@ -47,9 +51,9 @@ function world(ags: string, session: number): Item[] {
   const filler = (n: number) => Array.from({ length: n }, (_, i) => `x-${ags}-${i}.example`);
   switch (ags) {
     case FRANKFURT:
-      return [...ads("werbung.example"), ...pack(PROFILE, "Lokal A Überdachungen"), ...organicItems(ags, ["lokal-a.example", "lokal-b.example", TARGET])];
+      return [...ads("werbung.example"), ...pack([PROFILE, TARGET_CID], "Lokal A Überdachungen"), ...organicItems(ags, ["lokal-a.example", "lokal-b.example", TARGET])];
     case A:
-      return [...pack("Lokal A Überdachungen", "Portal Terrassen"), ...organicItems(ags, ["lokal-a.example", "lokal-b.example", ...filler(11), TARGET])];
+      return [...pack(["Lokal A Überdachungen", "2000000000000000002"], ["Portal Terrassen", "2000000000000000003"]), ...organicItems(ags, ["lokal-a.example", "lokal-b.example", ...filler(11), TARGET])];
     case B: {
       const comps = session === 1 ? ["lokal-a.example", "lokal-b.example"] : session === 2 ? ["lokal-a.example", "region-c.example"] : ["lokal-a.example", "portal.example"];
       return [...(session === 2 ? ads("werbung.example") : []), ...organicItems(ags, comps)];
@@ -108,7 +112,7 @@ beforeAll(async () => {
     JSON.stringify({
       ...JSON.parse(readFileSync("projects/pilot-rhein-main.json", "utf8")),
       targetDomains: [TARGET],
-      targetLocalBusinesses: [{ profileName: PROFILE, source: "Testdaten (synthetisch)" }],
+      targetLocalBusinesses: [{ label: "Zielbetrieb", cid: TARGET_CID, profileName: PROFILE, source: "Testdaten (synthetisch)" }],
     }),
   );
   const labels = join(root, "labels.json");
@@ -143,7 +147,7 @@ const cellOf = (ags: string, keyword = MAIN) => evaluation.statusTable.find((c) 
 
 describe("findings end to end (synthetic world)", () => {
   it("counts one measurement per session task: retries and repeated runs are not samples", () => {
-    expect(cellOf(FRANKFURT)).toMatchObject({ plannedSamples: 3, validSamples: 3, failedSamples: 0, organic: "in 3 von 3 Messungen gefunden: Platz 3, 3 und 3", localPack: "im Local Pack, Platz 1 (Abgleich über den Profilnamen)", ads: "3/3" });
+    expect(cellOf(FRANKFURT)).toMatchObject({ plannedSamples: 3, validSamples: 3, failedSamples: 0, organic: "in 3 von 3 Messungen gefunden: Platz 3, 3 und 3", localPack: "im Local Pack, Platz 1: Zielbetrieb (Abgleich über verifizierte Kennung)", ads: "3/3" });
   });
 
   it("keeps failed measurements apart", () => {
@@ -168,7 +172,8 @@ describe("findings end to end (synthetic world)", () => {
     // G: target domain in the pack with an unverified cid → no local pack gap.
     // Local Pack gap rule is off in the pilot.
     expect(ids().some((id) => id.startsWith("local_pack_gap"))).toBe(false);
-    expect(cellOf(A).localPack).toBe("im angezeigten Local Pack kein Eintrag mit dem Profilnamen gefunden");
+    // A: every entry carries another cid → no verified match (not "absent").
+    expect(cellOf(A).localPack).toBe("unter den angezeigten Local-Pack-Einträgen kein verifizierter Treffer für den Zielbetrieb");
     // G: "Ziel Betrieb" is similar to the profile name but not equal → unverified.
     expect(cellOf(G).localPack).toBe("Betriebszuordnung nicht verifiziert");
     // B: no local pack shown at all.
