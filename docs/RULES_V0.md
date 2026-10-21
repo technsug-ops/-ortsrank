@@ -294,6 +294,7 @@ Bölüm 10'a taşındı (`brand_other_location` → `brand_only`).
 **Pilot 1 sonucu** (30 ham yanıt, yeni istek yok; rakip kaydı onaylanmadı):
 
 - **Heidenheim:** `not_met`, çünkü hedef bir ölçümde ilk 10'da. Bu sonuç rakip bilgisinden bağımsızdır.
-- **Steinheim, Aalen, Ulm, Babenhausen:** `not_evaluable`. Her ölçümde, konum envanteri eksik okunan veya sitesine erişilemeyen işletmelerle azami sayı en az 2.
+- **Steinheim:** `not_met`. 1. ölçümde azami sayı 1; yalnızca sitesine erişilemeyen bir domain açık. 22.10.2026'da hedefli kaynak kontrolüyle bir işletmenin konum envanteri kapandı: şirket toplam konum sayısını veriyor ve bu konumları adıyla sayıyor. Bu bir yargıdır ve inceleme tablosunda öyle işaretlidir.
+- **Aalen, Ulm, Babenhausen:** `not_evaluable`. Her ölçümde azami sayı en az 2. Kalan açık işletmelerin kendi konum listesi yok ya da sitesine erişilemiyor (ücretsiz kaynaklarla kapatılamadı).
 - Pilot belediyelerinde konumu kayıtlı 5 işletme var. Bir zincirin şubelerinde ölçülen hizmet doğrulanmadığı için o zincir sayılmadı.
 - **Geri alınan önceki sonuç (`592eafb`, „beş belediyede koşul sağlanmadı"):** Bu sonuç, konum sayfası okunmamış işletmelerin `complete` sayılmasından ve „Heidenheim" kısaltmasının reddedilmesinden geliyordu. İkisi de düzeltildi.

@@ -49,9 +49,10 @@ Messungen: planlı / geçerli / başarısız. Local Pack'teki marka adı `[Marke
 | Organische Lücke | geprüft, Bedingung nicht erfüllt: Zieldomain in mindestens einer Messung unter den ersten 10 | 1 |
 | Local-Pack-Lücke | im Pilot abgeschaltet (Betriebszuordnung im Local Pack nicht verifiziert) | 5 |
 | Anzeigenbeobachtung | nicht auswertbar: nur technische Validierung, keine geplanten Sitzungen | 5 |
-| Organische Lücke | nicht auswertbar: noch nicht geprüfte Wettbewerber unter den ersten 10 könnten das Ergebnis ändern | 4 |
+| Organische Lücke | geprüft, Bedingung nicht erfüllt: nicht in jeder Messung mindestens 2 Wettbewerber mit verifiziertem eigenem Standort in dieser Gemeinde und verifiziertem Arbeitsbühnen-Angebot unter den ersten 10 | 1 |
+| Organische Lücke | nicht auswertbar: noch nicht geprüfte Wettbewerber unter den ersten 10 könnten das Ergebnis ändern | 3 |
 
-Rakip kapsaması: 17 gözlem; sınıflandırmalar onaylanmamış („vorläufig"). Organik boşluk (RULES_V0 bölüm 13, onaylanan dar tanım: aynı belediyede doğrulanmış fiziksel konum ve doğrulanmış hizmet, işletme bazında sayım): 1 belediyede **değerlendirildi, koşul sağlanmadı** (Heidenheim an der Brenz: hedef bir ölçümde ilk 10'da), 4 belediyede **değerlendirilemedi** (her ölçümde doğrulanmamış rakiplerle azami sayı en az 2; konum envanteri eksik okunan veya sitesine erişilemeyen işletmeler). Ölçüm bazında kesin/açık/azami sayılar git dışı inceleme tablosunda. Bu, „organik görünürlük sorunu yok" ya da „yerel rekabet yok" anlamına gelmez. Rakip bilgileri kaynakla kısmen doğrulandı; hiçbiri onaylanmadı.
+Rakip kapsaması: 17 gözlem; sınıflandırmalar onaylanmamış („vorläufig"). Organik boşluk (RULES_V0 bölüm 13, onaylanan dar tanım: aynı belediyede doğrulanmış fiziksel konum ve doğrulanmış hizmet, işletme bazında sayım): 2 belediyede **değerlendirildi, koşul sağlanmadı** (Heidenheim an der Brenz: hedef bir ölçümde ilk 10'da, Steinheim am Albuch), 3 belediyede **değerlendirilemedi** (her ölçümde doğrulanmamış rakiplerle azami sayı en az 2; konum envanteri eksik okunan veya sitesine erişilemeyen işletmeler). Ölçüm bazında kesin/açık/azami sayılar git dışı inceleme tablosunda. Bu, „organik görünürlük sorunu yok" ya da „yerel rekabet yok" anlamına gelmez. Rakip bilgileri kaynakla kısmen doğrulandı; hiçbiri onaylanmadı.
 
 ## Local Pack: kanıta dayalı eşleştirme (RULES_V0 bölüm 10)
 
