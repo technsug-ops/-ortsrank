@@ -34,6 +34,8 @@ Sürüm klasörünün kökünde dosya bulunmaz.
 | `3-ic-kullanim/` | `pilotN-rapor-YYYYMMDD-tr-ic-inceleme.pdf`, `pilotN-yonetici-ozeti-YYYYMMDD-tr.pdf` | TR |
 | `4-kaynak-html/` | `pilotN-bericht-YYYYMMDD.html` (etkileşimli rapor), özetlerin HTML'leri | DE/TR |
 
+**Özet standardı:** Almanca kısa özet ve Türkçe yönetici özeti aynı yapıda, tek sayfa: iyi giden · hızlı düzeltilebilecek / dikkat çeken · bu ölçümde görünmedikleri yerler · netleştirilecekler · sonraki adımlar; teknik terim, kanıt kodu ve profil kimliği yok; vaat yok.
+
 **Anket standardı:** Bölüm 1 (yönlendirmesiz, B1–B4) ve Bölüm 3 (karar, B5–B8) her işletmede birebir aynı; yalnızca Bölüm 2 işletmenin raporundaki bulgulardan gelir. HTML ekranda doldurulur ve cevaplarıyla kaydedilir; PDF elle doldurulur ([pilot-interview-form.md](pilot-interview-form.md)).
 
 ## Teslimden önce
