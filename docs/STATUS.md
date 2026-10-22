@@ -14,6 +14,7 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 | Aşama | Durum | Kapı | Kapı durumu |
 | --- | --- | --- | --- |
+| 22.10.2026 | Rapor şablonu baskı düzeni: `#print-summary` (bölüm 1–7) ve `#print-annex` (bölüm 8, kanıt eki) modları; başlıklar içerikten kopmuyor, tablo başlığı her sayfada tekrar ediyor, baskıda en küçük yazı 7 pt; özet kartlarda kaynakların kanıt ekinde olduğu notu; `keywordsLang` (tablo başlıklarında doğru büyük harf). Pilot 1 müşteri teslimi (git dışında): DE özet 5 sayfa + kanıt eki 8 sayfa; HTML ve PDF'ler sürüm damgalı, son kontrol teslim dosyaları üzerinde yapıldı | bu commit |
 | 0 · Altyapı | Neredeyse tamam | – | – |
 | 1 · Veri + talep pilotu | **Devam ediyor** | Kapı 1: rapor sayesinde karar alındı mı? | Açık |
 | 2 · Ücretli pilot | Başlamadı | Kapı 2: ücretli ikinci ölçüm | – |
@@ -151,7 +152,7 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 22.10.2026 | Rapor düzeltmeleri (geri bildirim): müşteri raporunda yerel dosya yolu yok (ham yanıt „projede arşivli, talep üzerine"); rakip kartları üç alan (gözlem / değerlendirme / kaynak ve onay) ve tıklanabilir kaynak URL'leri erişim tarihiyle; profil önerisi uygunluk hükmü olmadan, marka kayıtlarını konumlara eşleme sorusuna odaklı. Şablon: güvenli bağlantı listesi (yalnızca http/https; baskıda URL görünür), üç alanlı kart; İngilizce şablonda duruyor | bu commit |
+| 22.10.2026 | Rapor düzeltmeleri (geri bildirim): müşteri raporunda yerel dosya yolu yok (ham yanıt „projede arşivli, talep üzerine"); rakip kartları üç alan (gözlem / değerlendirme / kaynak ve onay) ve tıklanabilir kaynak URL'leri erişim tarihiyle; profil önerisi uygunluk hükmü olmadan, marka kayıtlarını konumlara eşleme sorusuna odaklı. Şablon: güvenli bağlantı listesi (yalnızca http/https; baskıda URL görünür), üç alanlı kart; İngilizce şablonda duruyor | `eabc534` |
 | 22.10.2026 | Rapor formatı (Halil): `docs/templates/ortsrank-report-template.html` (TR/DE/EN, düzenlenebilir, yazdır/kaydet); JS isteğe bağlı dizilerle genişletildi (tablo satırları, birden çok rakip kartı, öneri adımları, kanıt kayıtları), dizisiz halde şablon aynı. Pilot 1 raporu bu formatta DE + TR üretildi (git dışı `data/reports/pilot1-bericht-20261022.html`); tarayıcıda denetlendi: 0 konsol hatası, yer tutucu yok | `70d0b43` |
 | 22.10.2026 | Pilot 1 iş paketi kapandı; rakip kayıtlarının ve etiketlerin onayı Halil'de açık madde | `6ad033e` |
 | 22.10.2026 | Pilot 1 teslim notu (anonim özet): sonuçların sınırları, işletme açısından anlamı, son kod değişikliğinin doğrulaması (`5ac0ce1`: 407/407 test, tsc ve ESLint temiz); kod değişmedi | `82cf218` |
