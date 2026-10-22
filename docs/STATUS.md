@@ -14,7 +14,8 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 | Aşama | Durum | Kapı | Kapı durumu |
 | --- | --- | --- | --- |
-| 22.10.2026 | Rapor şablonu baskı düzeni: `#print-summary` (bölüm 1–7) ve `#print-annex` (bölüm 8, kanıt eki) modları; başlıklar içerikten kopmuyor, tablo başlığı her sayfada tekrar ediyor, baskıda en küçük yazı 7 pt; özet kartlarda kaynakların kanıt ekinde olduğu notu; `keywordsLang` (tablo başlıklarında doğru büyük harf). Pilot 1 müşteri teslimi (git dışında): DE özet 5 sayfa + kanıt eki 8 sayfa; HTML ve PDF'ler sürüm damgalı, son kontrol teslim dosyaları üzerinde yapıldı | bu commit |
+| 22.10.2026 | Baskı: özet tablosunda gövde 8 pt, ölçüm satırları 7,6 pt; 7 pt yalnızca kanıt kimlikleri ve etiketlerde. Pilot 1 teslimi kapandı (git dışında): ölçüm planında keyword adları ve saatleri yazılı; DE özet + DE kanıt eki birlikte gönderilir, TR iç incelemede kalır; kanıt talepleri e-postaya yanıtla, Halil karşılar; rakip onayları açık, teslimi engellemez. Sonraki adım: işletmenin rapordan hangi kararı çıkarabildiğinin değerlendirilmesi | bu commit |
+| 22.10.2026 | Rapor şablonu baskı düzeni: `#print-summary` (bölüm 1–7) ve `#print-annex` (bölüm 8, kanıt eki) modları; başlıklar içerikten kopmuyor, tablo başlığı her sayfada tekrar ediyor, baskıda en küçük yazı 7 pt; özet kartlarda kaynakların kanıt ekinde olduğu notu; `keywordsLang` (tablo başlıklarında doğru büyük harf). Pilot 1 müşteri teslimi (git dışında): DE özet 5 sayfa + kanıt eki 8 sayfa; HTML ve PDF'ler sürüm damgalı, son kontrol teslim dosyaları üzerinde yapıldı | `b544b6c` |
 | 0 · Altyapı | Neredeyse tamam | – | – |
 | 1 · Veri + talep pilotu | **Devam ediyor** | Kapı 1: rapor sayesinde karar alındı mı? | Açık |
 | 2 · Ücretli pilot | Başlamadı | Kapı 2: ücretli ikinci ölçüm | – |
