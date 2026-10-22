@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchesDomain, normalizeDomain, parseLiveResponse, type ParseResult } from "@/lib/dataforseo/parse";
+import { checkUrlLocation, matchesDomain, normalizeDomain, parseLiveResponse, type ParseResult } from "@/lib/dataforseo/parse";
 import { loadFixture } from "./fixtures/load";
 
 type Ok = Extract<ParseResult, { ok: true }>;
@@ -196,5 +196,23 @@ describe("parseLiveResponse: item issues", () => {
   it("does not let an unknown item type without ranks invalidate the response", () => {
     const r = ok(parseLiveResponse(withItems([{ type: "ai_overview" }])));
     expect(r.otherTypeCounts).toEqual({ ai_overview: 1 });
+  });
+});
+
+describe("checkUrlLocation", () => {
+  // Synthetic record in the shape seen in live check_urls (21.10.2026).
+  const record = "role: 1\nproducer: 12\nlatlng {\n  latitude_e7: 481436778\n  longitude_e7: 102528134\n}\nradius: 10000\nprovenance: 6\n";
+  const url = (uule: string) => `https://www.google.de/search?q=x&hl=de&gl=DE&uule=${encodeURIComponent(uule)}`;
+
+  it("decodes the point and radius of the uule", () => {
+    const uule = "a+" + Buffer.from(record).toString("base64");
+    expect(checkUrlLocation(url(uule))).toEqual({ lat: 48.1436778, lng: 10.2528134, radius: 10000 });
+  });
+
+  it("returns null without a readable uule", () => {
+    expect(checkUrlLocation(null)).toBeNull();
+    expect(checkUrlLocation("not a url")).toBeNull();
+    expect(checkUrlLocation("https://www.google.de/search?q=x")).toBeNull();
+    expect(checkUrlLocation(url("w+CAIQICIGQmVybGlu"))).toBeNull();
   });
 });

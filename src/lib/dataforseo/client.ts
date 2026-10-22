@@ -85,7 +85,7 @@ export function compareEchoedParameters(sent: RequestTask, raw: unknown): string
   const data = (raw as { tasks?: { data?: Record<string, unknown> }[] } | null)?.tasks?.[0]?.data;
   if (!data) return ["data: missing in response"];
   const issues: string[] = [];
-  for (const key of ["keyword", "language_code", "device", "depth"] as const) {
+  for (const key of ["keyword", "language_code", "device", "os", "depth"] as const) {
     if (data[key] !== sent[key]) issues.push(`${key}: sent ${JSON.stringify(sent[key])}, got ${JSON.stringify(data[key])}`);
   }
   const nums = (v: unknown) => (typeof v === "string" ? v.split(",").map(Number) : []);

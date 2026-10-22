@@ -21,7 +21,7 @@ import {
   type Project,
   type Task,
 } from "@/lib/plan";
-import { RunLog, readAttempts, readTasks, sessionDrift, summarizeRun, type RunSummary, type SessionDrift } from "@/lib/runlog";
+import { RunLog, listRawPaths, readAttempts, readTasks, sessionDrift, summarizeRun, type RunSummary, type SessionDrift } from "@/lib/runlog";
 import { DEFAULT_PRICE_PER_SERP_USD, SESSION_TIME_ZONE } from "@/lib/scan-defaults";
 import { DEFAULT_SETTLEMENTS_FILE, readSettlementFile, type Settlement, type SettlementFile } from "@/lib/settlements";
 
@@ -489,6 +489,7 @@ export async function runLiveScan(
         attempts,
         expectedUsd: p.estimate.expectedUsd,
         worstCaseUsd: p.estimate.worstCaseUsd,
+        rawPaths: listRawPaths(ctx.runDir),
       }),
       budget: ledger.snapshot(),
       // Back-to-back trials run sessions at once on purpose; drift is not meaningful there.

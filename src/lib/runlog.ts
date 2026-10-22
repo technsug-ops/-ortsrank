@@ -6,7 +6,7 @@
  * A task links to its attempts through `attemptIds`, so every attempt's
  * cost and error stay visible on their own.
  */
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { roundUsd } from "@/lib/plan";
@@ -80,6 +80,20 @@ export function rawPathFor(taskKey: string, attempt: number): string {
   return `raw/${taskKey}/attempt-${attempt}.json`;
 }
 
+/** Raw attempt files on disk, as run-relative paths (same form as `rawPathFor`). */
+export function listRawPaths(runDir: string): string[] {
+  const rawDir = join(runDir, "raw");
+  if (!existsSync(rawDir)) return [];
+  return readdirSync(rawDir, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .flatMap((d) =>
+      readdirSync(join(rawDir, d.name))
+        .filter((f) => /^attempt-\d+\.json$/.test(f))
+        .map((f) => `raw/${d.name}/${f}`),
+    )
+    .sort();
+}
+
 /** Append-only writer for one run directory. */
 export class RunLog {
   constructor(readonly runDir: string) {
@@ -134,6 +148,12 @@ export interface SummaryInput {
   attempts: readonly AttemptRecord[];
   expectedUsd: number;
   worstCaseUsd: number;
+  /**
+   * Raw files found on disk (`listRawPaths`). A raw file without an attempt
+   * record means a request was sent but not logged (e.g. the run stopped
+   * between writing the response and the log line); its cost is unknown.
+   */
+  rawPaths?: readonly string[];
 }
 
 export interface RunSummary {
@@ -188,6 +208,10 @@ export function summarizeRun(input: SummaryInput): RunSummary {
   const linked = new Set(input.tasks.flatMap((t) => t.attemptIds));
   for (const a of input.attempts) {
     if (!linked.has(a.attemptId)) problems.push(`attempt ${a.attemptId} is not linked to any task`);
+  }
+  const loggedRaw = new Set(input.attempts.map((a) => a.rawPath));
+  for (const path of input.rawPaths ?? []) {
+    if (!loggedRaw.has(path)) problems.push(`raw file ${path} has no attempt record`);
   }
 
   const statusCounts = { success: 0, error: 0, cancelled: 0 };

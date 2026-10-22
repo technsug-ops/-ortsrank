@@ -65,6 +65,38 @@ export interface TargetMatch {
   localPackRank: number | null;
 }
 
+export interface CheckUrlLocation {
+  lat: number;
+  lng: number;
+  /** As written in the uule; unit not documented, not comparable to the sent radius (mm). */
+  radius: number | null;
+}
+
+/**
+ * Decodes the `uule` parameter of a DataForSEO check_url ("a+" + base64 of a
+ * text record with latitude_e7 / longitude_e7 / radius). Returns null if the
+ * URL has no readable uule.
+ */
+export function checkUrlLocation(checkUrl: string | null): CheckUrlLocation | null {
+  if (!checkUrl) return null;
+  let uule: string | null;
+  try {
+    uule = new URL(checkUrl).searchParams.get("uule");
+  } catch {
+    return null;
+  }
+  if (!uule || !/^a[ +]/.test(uule)) return null;
+  const text = Buffer.from(uule.slice(2), "base64").toString("utf8");
+  const num = (name: string) => {
+    const m = text.match(new RegExp(`${name}:\\s*(-?\\d+)`));
+    return m ? Number(m[1]) : null;
+  };
+  const lat = num("latitude_e7");
+  const lng = num("longitude_e7");
+  if (lat === null || lng === null) return null;
+  return { lat: lat / 1e7, lng: lng / 1e7, radius: num("radius") };
+}
+
 export type ParseResult =
   | {
       ok: true;
@@ -73,6 +105,8 @@ export type ParseResult =
       depth: number | null;
       keyword: string | null;
       checkUrl: string | null;
+      /** Point and radius in the `uule` of check_url; not the same as the sent coordinate. */
+      checkUrlLocation: CheckUrlLocation | null;
       datetime: string | null;
       rows: SerpRow[];
       /** Item types we do not turn into rows, e.g. people_also_ask. */
@@ -256,6 +290,7 @@ export function parseLiveResponse(raw: unknown, options: ParseOptions = {}): Par
     depth: task.data?.depth ?? null,
     keyword: result?.keyword ?? null,
     checkUrl: result?.check_url ?? null,
+    checkUrlLocation: checkUrlLocation(result?.check_url ?? null),
     datetime: result?.datetime ?? null,
     rows,
     otherTypeCounts,

@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -7,6 +7,7 @@ import {
   RunLog,
   TASKS_FILE,
   attemptIdFor,
+  listRawPaths,
   rawPathFor,
   readAttempts,
   readTasks,
@@ -122,6 +123,19 @@ describe("summarizeRun", () => {
     expect(s.statusCounts).toEqual({ success: 3, error: 0, cancelled: 0 });
     expect(s.problems).toEqual([]);
     expect(s.cost).toEqual({ ...costs, confirmedUsd: 0.012, uncertainUsd: 0, totalUsd: 0.012 });
+  });
+
+  it("flags raw files on disk that have no attempt record (request sent but not logged)", () => {
+    const a = attempt(K1, 1);
+    const s = summarizeRun({
+      plannedTaskKeys: [K1],
+      tasks: [task(K1, [a])],
+      attempts: [a],
+      rawPaths: [rawPathFor(K1, 1), rawPathFor(K2, 1)],
+      ...costs,
+    });
+    expect(s.recordIntegrity).toBe(1);
+    expect(s.problems).toEqual([`raw file ${rawPathFor(K2, 1)} has no attempt record`]);
   });
 
   it("detects planned tasks without a record", () => {
@@ -254,5 +268,27 @@ describe("sessionDrift", () => {
   it("accepts a custom tolerance", () => {
     const r = sent(K1, 1, "09:00", "2026-10-21T07:30:00Z");
     expect(sessionDrift([r.t], [r.a], { toleranceMinutes: 15 })[0].flagged).toBe(true);
+  });
+});
+
+describe("listRawPaths", () => {
+  it("lists attempt files as run-relative paths and ignores other files", () => {
+    const dir = mkdtempSync(join(tmpdir(), "ortsrank-raw-"));
+    try {
+      expect(listRawPaths(dir)).toEqual([]);
+      mkdirSync(join(dir, "raw", "06412000-k1-s1"), { recursive: true });
+      mkdirSync(join(dir, "raw", "06412000-k2-s1"), { recursive: true });
+      writeFileSync(join(dir, "raw", "06412000-k1-s1", "attempt-1.json"), "{}");
+      writeFileSync(join(dir, "raw", "06412000-k1-s1", "attempt-2.json"), "{}");
+      writeFileSync(join(dir, "raw", "06412000-k2-s1", "attempt-1.json"), "{}");
+      writeFileSync(join(dir, "raw", "06412000-k2-s1", "notes.txt"), "x");
+      expect(listRawPaths(dir)).toEqual([
+        "raw/06412000-k1-s1/attempt-1.json",
+        "raw/06412000-k1-s1/attempt-2.json",
+        "raw/06412000-k2-s1/attempt-1.json",
+      ]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

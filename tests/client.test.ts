@@ -103,6 +103,8 @@ describe("request building", () => {
     expect(compareEchoedParameters(sent, loadFixture("success-mixed"))).toEqual([]);
     const other = JSON.parse(fixtureBody("success-mixed", (r) => (r.tasks[0].data.location_coordinate = "50.1,8.7,200")));
     expect(compareEchoedParameters(sent, other)[0]).toMatch(/^location_coordinate/);
+    const otherOs = JSON.parse(fixtureBody("success-mixed", (r) => (r.tasks[0].data.os = "ios")));
+    expect(compareEchoedParameters(sent, otherOs)).toEqual(['os: sent "android", got "ios"']);
     expect(compareEchoedParameters(sent, {})).toEqual(["data: missing in response"]);
   });
 
