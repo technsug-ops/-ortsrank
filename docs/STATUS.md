@@ -1,7 +1,7 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Pilot 1 küçük gerçek veri denemesi tamamlandı (5 belediye, 0,12 $); sıradaki: etiket onayı, Heidenheim profil kimliği, planlı oturumlar. Önceki: Aşama 1 · Veri + talep pilotu · Aşama 1 teknik hattı adım 1–14 tamam; teslimat raporu [docs/reports/phase1-delivery.md](reports/phase1-delivery.md) değerlendirme bekliyor. Açık karar: pilot alanı (30 km / ≥10k → 66 belediye, üst sınır 30 ile fiilen 17 km)
-> **Son güncelleme:** 21.10.2026
+> **Şu an:** Pilot 1 raporu (DE özet + DE kanıt eki) işletme yetkilisine sunulacak; üç soru: rapordan ne öğrenildi, iki inceleme adımından hangisi öncelikli, karar için hangi bilgi eksik. Sonraki iş paketi bu cevaplara göre seçilir; o zamana kadar yeni kod veya ücretli ölçüm yok. Açık: rakip kayıtlarının onayı (Halil), sabit saatli ölçüm önerisi (ayrı karar)
+> **Son güncelleme:** 22.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.3) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2) · [Veri ihtiyacı WUA](Datenbedarf_Werbe_Umsatzanalyse.md) (sürüm 1.1)
 
 Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncellenir: kutu işaretlenir, tarih ve commit eklenir, "Şu an" satırı değiştirilir. Hem Claude sohbeti hem VS Code bu dosyayı günceller.
@@ -14,9 +14,6 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 | Aşama | Durum | Kapı | Kapı durumu |
 | --- | --- | --- | --- |
-| 22.10.2026 | Şablon baskı düzeltmesi: `dl` içinde çok paragraflı değer tek açıklama hücresinde (önceden ikinci paragraf dar etiket sütununa düşüyordu); altbilgi tek satır. Pilot 1 (git dışında): ortak rapor sürümü iki dilde aynı, dil bazında içerik kimliği altbilgide ayrı | bu commit |
-| 22.10.2026 | Baskı: özet tablosunda gövde 8 pt, ölçüm satırları 7,6 pt; 7 pt yalnızca kanıt kimlikleri ve etiketlerde. Pilot 1 teslimi kapandı (git dışında): ölçüm planında keyword adları ve saatleri yazılı; DE özet + DE kanıt eki birlikte gönderilir, TR iç incelemede kalır; kanıt talepleri e-postaya yanıtla, Halil karşılar; rakip onayları açık, teslimi engellemez. Sonraki adım: işletmenin rapordan hangi kararı çıkarabildiğinin değerlendirilmesi | `8dd1b3a` |
-| 22.10.2026 | Rapor şablonu baskı düzeni: `#print-summary` (bölüm 1–7) ve `#print-annex` (bölüm 8, kanıt eki) modları; başlıklar içerikten kopmuyor, tablo başlığı her sayfada tekrar ediyor, baskıda en küçük yazı 7 pt; özet kartlarda kaynakların kanıt ekinde olduğu notu; `keywordsLang` (tablo başlıklarında doğru büyük harf). Pilot 1 müşteri teslimi (git dışında): DE özet 5 sayfa + kanıt eki 8 sayfa; HTML ve PDF'ler sürüm damgalı, son kontrol teslim dosyaları üzerinde yapıldı | `b544b6c` |
 | 0 · Altyapı | Neredeyse tamam | – | – |
 | 1 · Veri + talep pilotu | **Devam ediyor** | Kapı 1: rapor sayesinde karar alındı mı? | Açık |
 | 2 · Ücretli pilot | Başlamadı | Kapı 2: ücretli ikinci ölçüm | – |
@@ -154,6 +151,10 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
+| 22.10.2026 | Rapor anlatımı ve şablon: özet dört karar sorusuyla (dört kart); kural bölümü yardımcı değerlendirme, ayrıntıları kanıt eki D'de, „bulgu yok ≠ sorun/fırsat yok“ uyarısı görünür; öneriler dört alanlı (`steps[].fields`); rakip girişi (`competitorintro`); ek bölümler (`annexextra`); düzenleme kopyaları veri sürümüne bağlı (`dataVersion`): eski sürüme ait düzenleme güncel verinin üstünde gösterilmez, dosyada kalır ve uyarı çubuğundan açılabilir; özet baskı yazısı büyütüldü (gövde 9,2 pt). Pilot 1 (git dışında): DE özet 6, DE kanıt eki 8, TR 6 sayfa. STATUS: son üç günlük satırı yanlış tabloya girmişti, taşındı | bu commit |
+| 22.10.2026 | Şablon baskı düzeltmesi: `dl` içinde çok paragraflı değer tek açıklama hücresinde (önceden ikinci paragraf dar etiket sütununa düşüyordu); altbilgi tek satır. Pilot 1 (git dışında): ortak rapor sürümü iki dilde aynı, dil bazında içerik kimliği altbilgide ayrı | `835e03a` |
+| 22.10.2026 | Baskı: özet tablosunda gövde 8 pt, ölçüm satırları 7,6 pt; 7 pt yalnızca kanıt kimlikleri ve etiketlerde. Pilot 1 teslimi kapandı (git dışında): ölçüm planında keyword adları ve saatleri yazılı; DE özet + DE kanıt eki birlikte gönderilir, TR iç incelemede kalır; kanıt talepleri e-postaya yanıtla, Halil karşılar; rakip onayları açık, teslimi engellemez. Sonraki adım: işletmenin rapordan hangi kararı çıkarabildiğinin değerlendirilmesi | `8dd1b3a` |
+| 22.10.2026 | Rapor şablonu baskı düzeni: `#print-summary` (bölüm 1–7) ve `#print-annex` (bölüm 8, kanıt eki) modları; başlıklar içerikten kopmuyor, tablo başlığı her sayfada tekrar ediyor, baskıda en küçük yazı 7 pt; özet kartlarda kaynakların kanıt ekinde olduğu notu; `keywordsLang` (tablo başlıklarında doğru büyük harf). Pilot 1 müşteri teslimi (git dışında): DE özet 5 sayfa + kanıt eki 8 sayfa; HTML ve PDF'ler sürüm damgalı, son kontrol teslim dosyaları üzerinde yapıldı | `b544b6c` |
 | 22.10.2026 | Rapor düzeltmeleri (geri bildirim): müşteri raporunda yerel dosya yolu yok (ham yanıt „projede arşivli, talep üzerine"); rakip kartları üç alan (gözlem / değerlendirme / kaynak ve onay) ve tıklanabilir kaynak URL'leri erişim tarihiyle; profil önerisi uygunluk hükmü olmadan, marka kayıtlarını konumlara eşleme sorusuna odaklı. Şablon: güvenli bağlantı listesi (yalnızca http/https; baskıda URL görünür), üç alanlı kart; İngilizce şablonda duruyor | `eabc534` |
 | 22.10.2026 | Rapor formatı (Halil): `docs/templates/ortsrank-report-template.html` (TR/DE/EN, düzenlenebilir, yazdır/kaydet); JS isteğe bağlı dizilerle genişletildi (tablo satırları, birden çok rakip kartı, öneri adımları, kanıt kayıtları), dizisiz halde şablon aynı. Pilot 1 raporu bu formatta DE + TR üretildi (git dışı `data/reports/pilot1-bericht-20261022.html`); tarayıcıda denetlendi: 0 konsol hatası, yer tutucu yok | `70d0b43` |
 | 22.10.2026 | Pilot 1 iş paketi kapandı; rakip kayıtlarının ve etiketlerin onayı Halil'de açık madde | `6ad033e` |
