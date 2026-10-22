@@ -10,18 +10,18 @@ ROADMAP 6: „50 rastgele yanıtta elle kontrol, hata yok".
 
 | | Durum |
 | --- | --- |
-| Arşivdeki başarılı SERP yanıtları | **42**: `trial-20261021` (çalıştırma `…-1d4ae0`) 8 · keşif taraması 21.10.2026 (`…-07fd82`) 4 · Pilot 1 `pilot1-small-20261021` (`…-b5a646`) 30. İki Google Maps yanıtı ayrı uç noktadır, sayılmaz |
+| Arşivdeki başarılı SERP yanıtları | **44** (envanter 22.10.2026; önceki „42“ yeniden sayıldı): `…-1d4ae0` 8 · keşif `…-07fd82` 4 · Pilot 1 `…-b5a646` 30 · `…-96a2e0` 2 (deneme kaydı yok, uzlaştırma kaydında; gerçek sağlayıcı yanıtları, ayrıştırma kontrolü için geçerli). 55 ham dosyadan 11'i dışarıda: 10 × 40104 hata yanıtı, 1 × görevsiz 20000 yanıtı. Yinelenen yanıt yok. İki Google Maps yanıtı ayrı uç noktadır, sayılmaz |
 | Şartı karşılayan belgelenmiş elle kontrol | **0.** Tek kayıt `c1c9098` commit mesajı: trial çalıştırmasında „10/10 parsed organic rows match the raw responses" (sıra, mutlak sıra, URL, domain). Hangi yanıtlar olduğu ve diğer alanlar kayıtlı değil; ön kontrol sayılır, 50'ye eklenmez |
-| Kontrol edilmemiş mevcut yanıtlar | 42'nin tamamı (yukarıdaki üç çalıştırma) |
-| Gereken yeni yanıt | Yaklaşıma bağlı (aşağıda). **Mevcut 42 yanıtın kontrolüne yeni veri beklemeden başlanabilir.** Sırf sayıyı doldurmak için sorgu önerilmez; yeni yanıtlar bölüm 3'teki, başka kabul maddelerine hizmet eden ölçümlerden gelir |
+| Kontrol edilmemiş mevcut yanıtlar | 44'ün tamamı. Kontrol tablosu hazır, hiçbir satır kontrol edilmedi (git dışı `data/parse-checks/20261022/parse-check-sheet.xlsx`: envanter, 44 yanıt, 1.329 öğe satırı) |
+| Gereken yeni yanıt | Yaklaşıma bağlı (aşağıda). **Mevcut 44 yanıtın kontrolüne yeni veri beklemeden başlanabilir.** Sırf sayıyı doldurmak için sorgu önerilmez; yeni yanıtlar bölüm 3'teki, başka kabul maddelerine hizmet eden ölçümlerden gelir |
 
 **Üç yaklaşım (ayrı tutulur):**
 
 | Yaklaşım | Ne zaman mümkün | ROADMAP 6 „50 rastgele yanıt" açısından |
 | --- | --- | --- |
-| 1 · Mevcut 42 yanıtın tümünün kontrolü | Hemen | Tek başına karşılamaz (42 < 50). Hata aramak ve kontrol yöntemini sınamak için yararlı |
-| 2 · Havuz en az 50 olunca 50 kaydın tümünün kontrolü (tam sayım) | Planlanmış ölçümlerden en az 8 yeni başarılı yanıt geldiğinde | Rastgele seçim değil, havuzun tamamı. Eşdeğer sayılıp sayılmayacağı **açık karar**; yanıtların az sayıda ölçüm gününden geldiği not edilir |
-| 3 · Havuz 50'den büyükse önceden kaydedilmiş tohumla (`seed`) 50 rastgele yanıt | Örneğin bölüm 3 planından sonra (havuz 42 + 110 = 152) | Metne en yakın yaklaşım |
+| 1 · Mevcut 44 yanıtın tümünün kontrolü | Hemen (tablo hazır) | Tek başına karşılamaz (44 < 50). Hata aramak ve kontrol yöntemini sınamak için yararlı |
+| 2 · Havuz en az 50 olunca 50 kaydın tümünün kontrolü (tam sayım) | Planlanmış ölçümlerden en az 6 yeni başarılı yanıt geldiğinde | Rastgele seçim değil, havuzun tamamı. Eşdeğer sayılıp sayılmayacağı **açık karar**; yanıtların az sayıda ölçüm gününden geldiği not edilir |
+| 3 · Havuz 50'den büyükse önceden kaydedilmiş tohumla (`seed`) 50 rastgele yanıt | Örneğin bölüm 3 planından sonra (havuz 44 + 110 = 154) | Metne en yakın yaklaşım |
 
 Hangi yaklaşımın şartı karşıladığına Halil karar verir; daha zayıf bir kontrol sessizce eşdeğer sayılmaz. Yaklaşım 1, yaklaşım 2 ve 3'ün yerine geçmez ama onları engellemez: önce kontrol edilen yanıtlar da sonraki seçime girebilir ve yeniden kontrol edilir.
 
@@ -70,7 +70,7 @@ Bütün ölçümler Pilot 1'in 5 belediyesi ve 4 keywordüyle, aynı ayarlarla (
 | **M2** | 2. gün 13:00 | dört keyword × 5 → **20** | T11 günler arası değişkenlik (13:00); T12 ek örneklem; T7; T9 havuzu |
 | **M3** | 3. gün 13:00 | dört keyword × 5 → **20** | T11 (üç gün tamamlanır); T12; T7; T9 havuzu |
 | **V** | M1 ile aynı gün, ayrı saat (ör. 15:00) | **40** (bölüm 2) | T10 koordinat ↔ şehir kodu |
-| **P** | Mevcut 42 için hemen; diğer yaklaşımlar M1–M3 sonrası | sorgu yok | T9: bölüm 1'deki yaklaşıma göre |
+| **P** | Mevcut 44 için hemen; diğer yaklaşımlar M1–M3 sonrası | sorgu yok | T9: bölüm 1'deki yaklaşıma göre |
 
 **Neyi ölçer, neyi ölçmez:**
 
@@ -94,7 +94,7 @@ Fiyat varsayımı: Live 0,002 $ / SERP, derinlik 20 = **0,004 $ / deneme** – 2
 | **Çekirdek M1–M3** | 70 | 0,336 $ | 0,84 $ | 0,90 $ |
 | **Tümü M1–M3 + V** | 110 | 0,528 $ | 1,32 $ | 1,40 $ |
 
-**Bakiye:** son kayıtlı bakiye 0,82 $ ([STATUS](../STATUS.md), 21.10.2026, Pilot 1 ölçümünden sonra); ardından 2 Google Maps sorgusu, 0,004 $ kayıtlı. **Güncel bakiye bilinmiyor** – bu pakette sağlayıcı hesabına erişilmedi.
+**Bakiye:** son kayıtlı bakiye 0,82 $ ([STATUS](../STATUS.md), 21.10.2026, Pilot 1 ölçümünden sonra). Ham yanıt maliyetlerinden hesap (uzlaştırma 22.10.2026): 1 $ kredi − 0,176 $ SERP − 0,004 $ Maps = **0,820 $ (hesaplanmış, gözlenmemiş)**. **Güncel bakiye bilinmiyor** – sağlayıcı hesabına erişilmedi.
 
 - Çekirdek planın beklenen maliyeti (0,336 $) son kayıtlı bakiyeye sığar; **en kötü durumu (0,84 $) ve önerilen tavanları sığmaz.**
 - Seçenek 1: bakiye yüklemesi (Halil'in kararı).
@@ -116,5 +116,5 @@ Bu hesap yalnızca veri toplama maliyetidir; elle kontrol, inceleme ve açıklam
 3. Bakiye: güncel panel bakiyesinin teyidi; yükleme mi, düşük tavan mı.
 4. Oturumları kimin, hangi saatte başlatacağı (Aşama 1'de elle başlatma yeterli).
 5. V için: ayrı doğrulama betiğinin yazılması (kod + test) ve şehir kodu listesinin kaynağı.
-6. P için: elle kontrolü kimin yapacağı, hangi yaklaşımın (bölüm 1) şartı karşıladığı ve sonucun kim tarafından kabul edileceği. Mevcut 42'nin kontrolüne bu kararı beklemeden başlanabilir.
+6. P için: elle kontrolü kimin yapacağı, hangi yaklaşımın (bölüm 1) şartı karşıladığı ve sonucun kim tarafından kabul edileceği. Mevcut 44'ün kontrolüne bu kararı beklemeden başlanabilir.
 7. İsteğe bağlı, M1'den önce: `check_url` içindeki `uule` noktasının her ölçümde kaydı ve `os` parametresinin otomatik karşılaştırmaya eklenmesi (küçük kod değişikliği; denetim T8).

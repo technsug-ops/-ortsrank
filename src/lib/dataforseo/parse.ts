@@ -65,27 +65,35 @@ export interface TargetMatch {
   localPackRank: number | null;
 }
 
-export interface CheckUrlLocation {
-  lat: number;
-  lng: number;
-  /** As written in the uule; unit not documented, not comparable to the sent radius (mm). */
-  radius: number | null;
-}
-
 /**
- * Decodes the `uule` parameter of a DataForSEO check_url ("a+" + base64 of a
- * text record with latitude_e7 / longitude_e7 / radius). Returns null if the
- * URL has no readable uule.
+ * Location decoded from the `uule` value in the provider's `check_url` field.
+ * It is neither the coordinate we sent nor the parameter echoed in the response,
+ * and it does not prove which point Google used. Nothing is guessed: an
+ * unreadable value is reported as such.
  */
-export function checkUrlLocation(checkUrl: string | null): CheckUrlLocation | null {
-  if (!checkUrl) return null;
+export type CheckUrlLocation =
+  | {
+      status: "decoded";
+      lat: number;
+      lng: number;
+      /** As written in the uule. Unit not documented; not comparable to the sent radius (mm). */
+      radius: number | null;
+      radiusUnit: "undocumented";
+    }
+  | { status: "absent"; reason: "no_check_url" | "no_uule" }
+  | { status: "undecodable"; reason: string };
+
+/** Decodes the uule of a check_url ("a+" + base64 of a text record with latitude_e7 / longitude_e7 / radius). */
+export function checkUrlLocation(checkUrl: string | null): CheckUrlLocation {
+  if (!checkUrl) return { status: "absent", reason: "no_check_url" };
   let uule: string | null;
   try {
     uule = new URL(checkUrl).searchParams.get("uule");
   } catch {
-    return null;
+    return { status: "undecodable", reason: "check_url is not a URL" };
   }
-  if (!uule || !/^a[ +]/.test(uule)) return null;
+  if (!uule) return { status: "absent", reason: "no_uule" };
+  if (!/^a[ +]/.test(uule)) return { status: "undecodable", reason: `unknown uule format "${uule.slice(0, 2)}"` };
   const text = Buffer.from(uule.slice(2), "base64").toString("utf8");
   const num = (name: string) => {
     const m = text.match(new RegExp(`${name}:\\s*(-?\\d+)`));
@@ -93,8 +101,8 @@ export function checkUrlLocation(checkUrl: string | null): CheckUrlLocation | nu
   };
   const lat = num("latitude_e7");
   const lng = num("longitude_e7");
-  if (lat === null || lng === null) return null;
-  return { lat: lat / 1e7, lng: lng / 1e7, radius: num("radius") };
+  if (lat === null || lng === null) return { status: "undecodable", reason: "latitude_e7 / longitude_e7 not found" };
+  return { status: "decoded", lat: lat / 1e7, lng: lng / 1e7, radius: num("radius"), radiusUnit: "undocumented" };
 }
 
 export type ParseResult =
@@ -105,8 +113,10 @@ export type ParseResult =
       depth: number | null;
       keyword: string | null;
       checkUrl: string | null;
-      /** Point and radius in the `uule` of check_url; not the same as the sent coordinate. */
-      checkUrlLocation: CheckUrlLocation | null;
+      /** `location_coordinate` as echoed in the response's task data (compare with what was sent). */
+      echoedLocationCoordinate: string | null;
+      /** Decoded from the uule in check_url; see `CheckUrlLocation`. */
+      checkUrlLocation: CheckUrlLocation;
       datetime: string | null;
       rows: SerpRow[];
       /** Item types we do not turn into rows, e.g. people_also_ask. */
@@ -290,6 +300,7 @@ export function parseLiveResponse(raw: unknown, options: ParseOptions = {}): Par
     depth: task.data?.depth ?? null,
     keyword: result?.keyword ?? null,
     checkUrl: result?.check_url ?? null,
+    echoedLocationCoordinate: task.data?.location_coordinate ?? null,
     checkUrlLocation: checkUrlLocation(result?.check_url ?? null),
     datetime: result?.datetime ?? null,
     rows,

@@ -204,15 +204,25 @@ describe("checkUrlLocation", () => {
   const record = "role: 1\nproducer: 12\nlatlng {\n  latitude_e7: 481436778\n  longitude_e7: 102528134\n}\nradius: 10000\nprovenance: 6\n";
   const url = (uule: string) => `https://www.google.de/search?q=x&hl=de&gl=DE&uule=${encodeURIComponent(uule)}`;
 
-  it("decodes the point and radius of the uule", () => {
+  it("decodes the point; the radius unit stays undocumented", () => {
     const uule = "a+" + Buffer.from(record).toString("base64");
-    expect(checkUrlLocation(url(uule))).toEqual({ lat: 48.1436778, lng: 10.2528134, radius: 10000 });
+    expect(checkUrlLocation(url(uule))).toEqual({ status: "decoded", lat: 48.1436778, lng: 10.2528134, radius: 10000, radiusUnit: "undocumented" });
   });
 
-  it("returns null without a readable uule", () => {
-    expect(checkUrlLocation(null)).toBeNull();
-    expect(checkUrlLocation("not a url")).toBeNull();
-    expect(checkUrlLocation("https://www.google.de/search?q=x")).toBeNull();
-    expect(checkUrlLocation(url("w+CAIQICIGQmVybGlu"))).toBeNull();
+  it("says why nothing was decoded instead of guessing", () => {
+    expect(checkUrlLocation(null)).toEqual({ status: "absent", reason: "no_check_url" });
+    expect(checkUrlLocation("https://www.google.de/search?q=x")).toEqual({ status: "absent", reason: "no_uule" });
+    expect(checkUrlLocation("not a url")).toMatchObject({ status: "undecodable" });
+    expect(checkUrlLocation(url("w+CAIQICIGQmVybGlu"))).toEqual({ status: "undecodable", reason: 'unknown uule format "w+"' });
+    expect(checkUrlLocation(url("a+" + Buffer.from("role: 1\n").toString("base64")))).toEqual({
+      status: "undecodable",
+      reason: "latitude_e7 / longitude_e7 not found",
+    });
+  });
+
+  it("keeps the echoed coordinate and the check_url location apart in the parse result", () => {
+    const r = ok(parseLiveResponse(loadFixture("success-mixed")));
+    expect(r.echoedLocationCoordinate).toMatch(/^-?\d+(\.\d+)?,-?\d+(\.\d+)?,\d+$/);
+    expect(r.checkUrlLocation.status).not.toBe("decoded");
   });
 });

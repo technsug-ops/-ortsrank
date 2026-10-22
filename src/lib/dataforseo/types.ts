@@ -53,7 +53,7 @@ export const taskSchema = z.object({
   status_code: z.number().int(),
   status_message: z.string(),
   cost: nullableNumber,
-  data: z.looseObject({ depth: z.number().int().optional() }).nullish(),
+  data: z.looseObject({ depth: z.number().int().optional(), location_coordinate: z.string().optional() }).nullish(),
   result: z.array(resultSchema).nullish().transform((v) => v ?? []),
 });
 
