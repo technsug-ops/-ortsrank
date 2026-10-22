@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Pilot 1 raporu (DE özet + DE kanıt eki) işletme yetkilisine sunulacak; üç soru: rapordan ne öğrenildi, iki inceleme adımından hangisi öncelikli, karar için hangi bilgi eksik. Sonraki iş paketi bu cevaplara göre seçilir; o zamana kadar yeni kod veya ücretli ölçüm yok. Açık: rakip kayıtlarının onayı (Halil), sabit saatli ölçüm önerisi (ayrı karar)
+> **Şu an:** Aşama 1 devam ediyor; Kapı 1 geçilmedi (ölçüm ölçütleri kısmen, öncelik değiştiren işletme 0). Pilot 1 teknik denemesi ve raporlaması kapalı. Sıradaki: Pilot 1 raporunun teslimi ve görüşme (form hazır), görüşmede aksiyon seçimi (P1-A01 / P1-A02), planlı ölçüm kararı (taslak hazır). Denetim: [reports/phase1-status-audit.md](reports/phase1-status-audit.md). Kanıt taleplerini Halil Yapraklı karşılar
 > **Son güncelleme:** 22.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.3) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2) · [Veri ihtiyacı WUA](Datenbedarf_Werbe_Umsatzanalyse.md) (sürüm 1.1)
 
@@ -82,8 +82,8 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 
 - [x] Kurallar v0 (kanıt seviyeli) – [RULES_V0.md](RULES_V0.md) sürüm 0.2 onaylı ve uygulandı (21.10.2026, `f787001`): `src/lib/rules/`, `scripts/findings.ts`; sentetik örnek çıktı [reports/rules-v0-sample.md](reports/rules-v0-sample.md); kod incelemesi düzeltmeleri `babbd61` (RULES_V0 bölüm 8) – canlı pilota hazır. Gerçek veriyle çalıştırma canlı taramadan sonra; rakip etiket listesi `data/competitor-labels.json` (gitignore) elle hazırlanacak
 - [ ] Sayfa taraması (rakip + müşteri sitesi)
-- [ ] Almanca PDF rapor şablonu
-- [ ] İlk rapor elle gözden geçirildi
+- [x] Almanca rapor şablonu (HTML, özet ve kanıt eki olarak PDF baskısı): `docs/templates/ortsrank-report-template.html` (22.10.2026, `3d08f1f`). Pilot betikleri gerçek veri içerdiği için git dışında; ikinci işletme için genel üretim adımı yok
+- [x] İlk rapor elle gözden geçirildi: Pilot 1 DE özet, DE kanıt eki ve TR iç inceleme dış incelemede teslim edilebilir bulundu (22.10.2026; sürüm 22.10.2026 10:40 · 9664f01)
 
 ### İş hattı (Halil)
 
@@ -114,6 +114,24 @@ Bu dosya projenin tek durum kaynağıdır. Her tamamlanan adımdan sonra güncel
 - [ ] Her pilot için 5 kayıt dolduruldu (yeni bilgi, değişen öncelik, işi kim yaptı, ödeme, süre)
 - [ ] Pilot sözleşmesi ve Datenschutz taslağı (Aşama 2 hazırlığı)
 
+### Aşama 1 durum denetimi ve Pilot 1 aksiyonları (22.10.2026)
+
+Denetim: [reports/phase1-status-audit.md](reports/phase1-status-audit.md). Bu iş paketi belge ve kayıt hazırlığıdır; iki incelemenin yapıldığı, müşteri talebinin doğrulandığı veya Kapı 1'in geçildiği anlamına gelmez.
+
+- [x] Kabul maddeleri kanıtlarıyla tablo halinde (veri hattı, kurallar/rapor/maliyet, talep, WUA-0); belgeler arası 12 çelişki kaydedildi
+- [x] Aksiyon kaydı şablonu: [templates/action-register-template.md](templates/action-register-template.md) (6 durum, tamamlanma ≠ etki, `actions` tablosu eşlemesi; şema değişmedi)
+- [x] Pilot 1 aksiyonları git dışında `data/actions/pilot1-actions.md`: P1-A01 ana sayfa incelemesi (planlandı; sayfa kopyası ve işletmenin teslimat bölgesi eksik), P1-A02 marka kayıtlarının eşleştirilmesi (planlandı; mevcut kanıtla 8/8 eşleştirilemedi, işletmenin profil listesi eksik)
+- [x] Görüşme ve karar formu: [templates/pilot-interview-form.md](templates/pilot-interview-form.md) (sorular DE, kullanım notu TR); Pilot 1 boş kopyası git dışında `data/interviews/pilot1-interview.md`
+- [x] Planlı ölçüm karar taslağı: [reports/pilot1-measurement-decision-draft.md](reports/pilot1-measurement-decision-draft.md) – başlatılmadı
+- [ ] Pilot 1 raporunun teslimi ve görüşme (Halil)
+- [ ] Görüşmede seçilen aksiyonun başlatılması
+- [ ] Planlı ölçüm kararı (Halil)
+- [ ] 50 yanıtta elle ayrıştırma kontrolü – arşivde 42 başarılı yanıt var, şart mevcut arşivle karşılanamaz
+- [ ] Koordinat ↔ şehir kodu karşılaştırması (10 belediye; tarama kodu şehir koduyla sorgu desteklemiyor)
+- [ ] Değişkenlik ölçümü (en az 3 gün)
+
+Kanıt talepleri (ham yanıtlar, kaynaklar): **Halil Yapraklı** karşılar.
+
 ### WUA-0 · Reklam ve ciro veri sözleşmesi – [ROADMAP](ROADMAP.md) bölüm 12
 
 Tarama teknik hattından bağımsız, Aşama 1 boyunca paralel; kod gerektirmez. Kabul: net/brüt, para birimi, tarih temeli, dönem ve kanal kapsamı belirli; gerçek müşteri verisinden önce erişim ve işleme koşulları belirlenmiş.
@@ -126,7 +144,7 @@ Tarama teknik hattından bağımsız, Aşama 1 boyunca paralel; kod gerektirmez.
 
 ### Kapı 1
 
-- [ ] Ölçüm ölçütleri karşılandı (kayıt bütünlüğü %100, geçerli sonuç ≥ %98)
+- [ ] Ölçüm ölçütleri karşılandı (ROADMAP bölüm 6): kayıt bütünlüğü %100 ✓, geçerli sonuç ≥ %98 (küçük ölçekte ✓), parametre eşleşmesi otomatik %100 ✓, 50 rastgele yanıtta elle ayrıştırma kontrolü ✗, değişkenlik ölçümü ✗, reklam görülme sıklığı ✗ – [denetim](reports/phase1-status-audit.md)
 - [ ] En az 2 işletme rapor nedeniyle önceliğini değiştirdi
 - [ ] Karar: geç / düzelt / dur → Aşama 2 planı yazılır
 
@@ -151,7 +169,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 22.10.2026 | Rapor anlatımı ve şablon: özet dört karar sorusuyla (dört kart); kural bölümü yardımcı değerlendirme, ayrıntıları kanıt eki D'de, „bulgu yok ≠ sorun/fırsat yok“ uyarısı görünür; öneriler dört alanlı (`steps[].fields`); rakip girişi (`competitorintro`); ek bölümler (`annexextra`); düzenleme kopyaları veri sürümüne bağlı (`dataVersion`): eski sürüme ait düzenleme güncel verinin üstünde gösterilmez, dosyada kalır ve uyarı çubuğundan açılabilir; özet baskı yazısı büyütüldü (gövde 9,2 pt). Pilot 1 (git dışında): DE özet 6, DE kanıt eki 8, TR 6 sayfa. STATUS: son üç günlük satırı yanlış tabloya girmişti, taşındı | bu commit |
+| 22.10.2026 | Aşama 1 durum denetimi (kanıtlı kabul tablosu, 12 belge çelişkisi, sonraki işlerin sırası), aksiyon kaydı şablonu, pilot görüşme ve karar formu, planlı ölçüm karar taslağı; Pilot 1 aksiyonları ve form kopyası git dışında. Aşama 1 devam ediyor, Kapı 1 geçilmedi; ölçüm başlatılmadı; kod değişmedi | bu commit |
+| 22.10.2026 | Rapor anlatımı ve şablon: özet dört karar sorusuyla (dört kart); kural bölümü yardımcı değerlendirme, ayrıntıları kanıt eki D'de, „bulgu yok ≠ sorun/fırsat yok“ uyarısı görünür; öneriler dört alanlı (`steps[].fields`); rakip girişi (`competitorintro`); ek bölümler (`annexextra`); düzenleme kopyaları veri sürümüne bağlı (`dataVersion`): eski sürüme ait düzenleme güncel verinin üstünde gösterilmez, dosyada kalır ve uyarı çubuğundan açılabilir; özet baskı yazısı büyütüldü (gövde 9,2 pt). Pilot 1 (git dışında): DE özet 6, DE kanıt eki 8, TR 6 sayfa. STATUS: son üç günlük satırı yanlış tabloya girmişti, taşındı | `3d08f1f` |
 | 22.10.2026 | Şablon baskı düzeltmesi: `dl` içinde çok paragraflı değer tek açıklama hücresinde (önceden ikinci paragraf dar etiket sütununa düşüyordu); altbilgi tek satır. Pilot 1 (git dışında): ortak rapor sürümü iki dilde aynı, dil bazında içerik kimliği altbilgide ayrı | `835e03a` |
 | 22.10.2026 | Baskı: özet tablosunda gövde 8 pt, ölçüm satırları 7,6 pt; 7 pt yalnızca kanıt kimlikleri ve etiketlerde. Pilot 1 teslimi kapandı (git dışında): ölçüm planında keyword adları ve saatleri yazılı; DE özet + DE kanıt eki birlikte gönderilir, TR iç incelemede kalır; kanıt talepleri e-postaya yanıtla, Halil karşılar; rakip onayları açık, teslimi engellemez. Sonraki adım: işletmenin rapordan hangi kararı çıkarabildiğinin değerlendirilmesi | `8dd1b3a` |
 | 22.10.2026 | Rapor şablonu baskı düzeni: `#print-summary` (bölüm 1–7) ve `#print-annex` (bölüm 8, kanıt eki) modları; başlıklar içerikten kopmuyor, tablo başlığı her sayfada tekrar ediyor, baskıda en küçük yazı 7 pt; özet kartlarda kaynakların kanıt ekinde olduğu notu; `keywordsLang` (tablo başlıklarında doğru büyük harf). Pilot 1 müşteri teslimi (git dışında): DE özet 5 sayfa + kanıt eki 8 sayfa; HTML ve PDF'ler sürüm damgalı, son kontrol teslim dosyaları üzerinde yapıldı | `b544b6c` |
