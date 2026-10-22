@@ -23,6 +23,10 @@ function svidFor(googleId: string): string {
   const entry = [...bytesField(1, ascii("pvq")), ...bytesField(2, ascii(payload))];
   return b64([0x08, 0x0c, ...bytesField(2, bytesField(2, entry)), 0x18, 0x0a], true);
 }
+/** Second layout seen live on 22.10.2026: outer.2 → .5 → { 1: id }. */
+function svidLayoutB(googleId: string): string {
+  return b64([0x08, 0x26, ...bytesField(2, bytesField(5, bytesField(1, ascii(googleId)))), 0x18, 0x0a], true);
+}
 const viewer = (svid: string) => `https://www.google.com/searchviewer/10?hl=de&gl=DE&output=search&svid=${svid}`;
 
 // ── Builders ────────────────────────────────────────────────────────────
@@ -85,7 +89,16 @@ describe("svid → Google id", () => {
     expect(profileIdFromUrl(viewer(svid))).toEqual({ svid, googleId: "/g/11abc_def", status: "decoded" });
   });
 
+  it("decodes the second observed structure (id directly in field 5)", () => {
+    const svid = svidLayoutB("/g/1x2y3z");
+    expect(decodeSvid(svid)).toBe("/g/1x2y3z");
+    expect(profileIdFromUrl(viewer(svid))).toEqual({ svid, googleId: "/g/1x2y3z", status: "decoded" });
+  });
+
   it.each([
+    ["layout B without an id", b64([0x08, 0x26, ...bytesField(2, bytesField(5, bytesField(1, ascii("hello")))), 0x18, 0x0a], true)],
+    ["layout B truncated", svidLayoutB("/g/1x2y3z").slice(0, 14)],
+    ["unknown field in place of 2 / 5", b64([0x08, 0x26, ...bytesField(2, bytesField(7, bytesField(1, ascii("/g/1x2y3z")))), 0x18, 0x0a], true)],
     ["not base64", "%%%"],
     ["random bytes", b64([1, 2, 3, 4, 5, 6], true)],
     ["truncated", svidFor("/g/11abc_def").slice(0, 20)],

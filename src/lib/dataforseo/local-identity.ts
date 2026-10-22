@@ -81,16 +81,28 @@ const text = (b: Uint8Array | null) => (b ? new TextDecoder("utf-8", { fatal: fa
 
 const GOOGLE_ID = /^\/[gm]\/[0-9a-z_]+$/;
 
+/**
+ * Two layouts are known from live responses; anything else gives null (never a guess).
+ * A (21.10.2026): outer.2 → .2 → { 1: "pvq", 2: base64({ 1: id }) }
+ * B (22.10.2026): outer.2 → .5 → { 1: id }
+ */
 export function decodeSvid(svid: string): string | null {
   const outer = base64Bytes(svid);
-  const level1 = outer && onlyBytes(readMessage(outer), 2);
-  const level2 = level1 && onlyBytes(readMessage(level1), 2);
-  const entry = level2 && readMessage(level2);
-  if (!entry || text(onlyBytes(entry, 1)) !== "pvq") return null;
-  const encoded = text(onlyBytes(entry, 2));
-  const payload = encoded && base64Bytes(encoded);
-  const id = payload && text(onlyBytes(readMessage(payload), 1));
-  return id && GOOGLE_ID.test(id) ? id : null;
+  const level1 = outer && readMessage(onlyBytes(readMessage(outer), 2) ?? new Uint8Array());
+  if (!level1) return null;
+  const valid = (id: string | null) => (id && GOOGLE_ID.test(id) ? id : null);
+
+  const layoutA = onlyBytes(level1, 2);
+  if (layoutA) {
+    const entry = readMessage(layoutA);
+    if (!entry || text(onlyBytes(entry, 1)) !== "pvq") return null;
+    const encoded = text(onlyBytes(entry, 2));
+    const payload = encoded && base64Bytes(encoded);
+    return valid(payload && text(onlyBytes(readMessage(payload), 1)));
+  }
+  const layoutB = onlyBytes(level1, 5);
+  if (layoutB) return valid(text(onlyBytes(readMessage(layoutB), 1)));
+  return null;
 }
 
 export function profileIdFromUrl(url: string | null): ProfileIdResult {
