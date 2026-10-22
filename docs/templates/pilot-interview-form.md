@@ -2,6 +2,7 @@
 
 > Anonim şablon. Doldurulmuş formlar gerçek işletme bilgisi içerir ve git dışında tutulur: `data/interviews/<proje>-interview.md`.
 > Dayanak: ROADMAP Aşama 1 „Her pilot için kayıt (zorunlu)" ve Aşama 2 „Ayrı kaydedilecek sinyaller".
+> **Standart:** Her işletmeye aynı sorular sorulur. Görüşmede kullanılan tek sayfalık rehber (DE + TR) bu formdan üretilir: Bölüm 1 = B1–B4, Bölüm 3 = B5–B8, her işletmede birebir aynı; yalnızca Bölüm 2 işletmenin raporundaki bulgulara göre değişir. Rehberler ve cevaplar gerçek işletme verisi içerdiği için git dışında.
 
 ## Halil için kullanım notu (TR)
 
