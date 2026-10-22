@@ -1,6 +1,6 @@
 # Ortsrank – Durum ve Checklist
 
-> **Şu an:** Aşama 1 devam ediyor; Kapı 1 geçilmedi. Pilot 1 kapalı. P1-A01 ana sayfa incelemesi yapıldı (karar/onay bekliyor; değişiklik uygulanmadı), P1-A02 işletmenin profil listesini bekliyor; görüşme akışı ve davet taslağı hazır (gönderilmedi; rapor gönderimi kayıtlı değil). Teknik doğrulama ve ölçüm planı karar bekliyor (başlatılmadı). Kanıt taleplerini Halil Yapraklı karşılar
+> **Şu an:** Aşama 1 devam ediyor; Kapı 1 geçilmedi. Pilot 1 kapalı. P1-A01 ana sayfa incelemesi yapıldı; işletmenin hizmet/teslimat teyidi ve değişiklik kararı bekleniyor (Almanca karar paketi hazır, gönderilmedi); uygulama ayrı kayıtta (P1-A03, önerildi; hiçbir değişiklik uygulanmadı). P1-A02 işletmenin profil listesini bekliyor. Görüşme formu ve davet taslağı hazır (gönderilmedi; rapor gönderimi kayıtlı değil). Ölçüm planı karar bekliyor; mevcut 42 yanıtın elle kontrolüne başlanabilir. Kanıt taleplerini Halil Yapraklı karşılar
 > **Son güncelleme:** 22.10.2026
 > **Kaynaklar:** [ROADMAP](ROADMAP.md) (sürüm 3.3) · [Aşama 1 planı](PHASE1_PLAN.md) (sürüm 1.2) · [Veri ihtiyacı WUA](Datenbedarf_Werbe_Umsatzanalyse.md) (sürüm 1.1)
 
@@ -123,14 +123,15 @@ Denetim: [reports/phase1-status-audit.md](reports/phase1-status-audit.md). Bu i�
 - [x] Pilot 1 aksiyonları git dışında `data/actions/pilot1-actions.md`: P1-A01 ana sayfa incelemesi (planlandı; sayfa kopyası ve işletmenin teslimat bölgesi eksik), P1-A02 marka kayıtlarının eşleştirilmesi (planlandı; mevcut kanıtla 8/8 eşleştirilemedi, işletmenin profil listesi eksik)
 - [x] Görüşme ve karar formu: [templates/pilot-interview-form.md](templates/pilot-interview-form.md) (sorular DE, kullanım notu TR); Pilot 1 boş kopyası git dışında `data/interviews/pilot1-interview.md`
 - [x] Planlı ölçüm karar taslağı: [reports/pilot1-measurement-decision-draft.md](reports/pilot1-measurement-decision-draft.md) – başlatılmadı
-- [x] Görüşme akışı (~20 dk, sorular DE, notlar TR) şablona eklendi; Pilot 1 kopyasında iki inceleme adımının anlatımı, profil bilgisi isteği ve rapor/görüşme davet taslağı (DE, gönderilmedi) – git dışında `data/interviews/pilot1-interview.md` (22.10.2026)
-- [x] P1-A01 ana sayfa incelemesi (ücretsiz, salt okunur, 2 sayfa; 22.10.2026): 5 doğrulanmış eksiklik, 7 açık soru, Almanca değişiklik taslağı V1–V8 – git dışında; durum „karar/onay bekliyor“, **değişiklik uygulanmadı**
+- [x] Görüşme akışı (~20 dk, sorular DE, notlar TR) şablona eklendi; iki başlangıç yolu (rapor önceden okundu / okunmadı), ikinci ölçüm için ayrı alanlar (ilgi · teklif edilen kapsam ve fiyat · sipariş · ödeme); Pilot 1 kopyasında iki inceleme adımının anlatımı, profil bilgisi isteği ve rapor/görüşme davet taslağı (DE, gönderilmedi) – git dışında `data/interviews/pilot1-interview.md` (22.10.2026)
+- [x] P1-A01 ana sayfa incelemesi (ücretsiz, salt okunur, 2 sayfa; 22.10.2026): 5 doğrulanmış eksiklik, 8 açık soru, değişiklik taslağı V1–V8 geri bildirimle düzeltildi; Almanca karar paketi (A ilk düzeltmeler · B önce teyit · C ikinci adım) – git dışında, gönderilmedi; durum „karar/onay bekliyor“
+- [ ] P1-A03 ana sayfa düzeltme paketi (iyileştirme): „karar/onay bekliyor (önerildi)“ – onay, sorumlu ve tarih yok; **hiçbir değişiklik uygulanmadı**
 - [~] P1-A02 marka kayıtları: işletmeden istenecek profil bilgileri hazır (DE); durum „planlandı“, 8/8 eşleştirilemedi
-- [x] Teknik doğrulama ve ölçüm planı sürüm 2: elle kontrol (belgelenmiş tam kontrol 0 / 42), koordinat ↔ şehir kodu deneyi (ayrı doğrulama betiği önerisi, uygulanmadı), M1–M3 + V birleşik plan – [reports/pilot1-measurement-decision-draft.md](reports/pilot1-measurement-decision-draft.md); başlatılmadı
+- [x] Teknik doğrulama ve ölçüm planı sürüm 3: elle kontrol (belgelenmiş tam kontrol 0 / 42; üç yaklaşım ayrı, hangisinin şartı karşıladığı açık karar; hata kuralı), koordinat ↔ şehir kodu deneyi (ayrı doğrulama betiği önerisi, uygulanmadı), M1–M3 + V birleşik plan – [reports/pilot1-measurement-decision-draft.md](reports/pilot1-measurement-decision-draft.md); başlatılmadı
 - [ ] Pilot 1 raporunun teslimi ve görüşme (Halil)
 - [ ] Görüşmede seçilen aksiyonun başlatılması
 - [ ] Ölçüm planı kararı (Halil)
-- [ ] 50 yanıtta elle ayrıştırma kontrolü – arşivde 42 başarılı yanıt, belgelenmiş tam kontrol 0; şart mevcut arşivle karşılanamaz
+- [ ] 50 yanıtta elle ayrıştırma kontrolü – arşivde 42 başarılı yanıt, belgelenmiş tam kontrol 0; şart mevcut arşivle karşılanamaz; mevcut 42'nin kontrolüne başlanabilir
 - [ ] Koordinat ↔ şehir kodu karşılaştırması (10 belediye; tarama kodu şehir koduyla sorgu desteklemiyor)
 - [ ] Değişkenlik ölçümü (en az 3 gün)
 
@@ -173,7 +174,8 @@ Planlanmış başlıklar:
 
 | Tarih | Ne oldu | Commit |
 | --- | --- | --- |
-| 22.10.2026 | Görüşme formuna ~20 dk akış ve yönlendirmesiz sorular; ölçüm planı sürüm 2 (elle kontrolün gerçek durumu, koordinat ↔ şehir kodu deneyi, M1–M3 + V birleşik plan, bakiye bilinmiyor); denetimde T9 ifadesi düzeltildi, T13 „kısmen“. Git dışında: P1-A01 ana sayfa incelemesi ve değişiklik taslağı, P1-A02 profil bilgi isteği, davet taslağı. Ölçüm, sorgu ve harcama yok; kod değişmedi | bu commit |
+| 22.10.2026 | Geri bildirim düzeltmeleri: aksiyon şablonunda inceleme ↔ uygulama ayrımı (iyileştirme kaydı „karar/onay bekliyor (önerildi)“); görüşme formunda iki başlangıç yolu, ikinci ölçüm için ayrı alanlar, Kapı 1'in iki şartı; ölçüm planı sürüm 3 (elle kontrolde üç yaklaşım, hata kuralı). Git dışında: V1–V8 düzeltildi, Almanca karar paketi (gönderilmedi), P1-A03 açıldı, P1-A01 açıklamaları güncellendi, görüşme kopyası yeni şablonla. Değişiklik uygulanmadı; ölçüm yok; kod değişmedi | bu commit |
+| 22.10.2026 | Görüşme formuna ~20 dk akış ve yönlendirmesiz sorular; ölçüm planı sürüm 2 (elle kontrolün gerçek durumu, koordinat ↔ şehir kodu deneyi, M1–M3 + V birleşik plan, bakiye bilinmiyor); denetimde T9 ifadesi düzeltildi, T13 „kısmen“. Git dışında: P1-A01 ana sayfa incelemesi ve değişiklik taslağı, P1-A02 profil bilgi isteği, davet taslağı. Ölçüm, sorgu ve harcama yok; kod değişmedi | `0330779` |
 | 22.10.2026 | Aşama 1 durum denetimi (kanıtlı kabul tablosu, 12 belge çelişkisi, sonraki işlerin sırası), aksiyon kaydı şablonu, pilot görüşme ve karar formu, planlı ölçüm karar taslağı; Pilot 1 aksiyonları ve form kopyası git dışında. Aşama 1 devam ediyor, Kapı 1 geçilmedi; ölçüm başlatılmadı; kod değişmedi | `648b6f0` |
 | 22.10.2026 | Rapor anlatımı ve şablon: özet dört karar sorusuyla (dört kart); kural bölümü yardımcı değerlendirme, ayrıntıları kanıt eki D'de, „bulgu yok ≠ sorun/fırsat yok“ uyarısı görünür; öneriler dört alanlı (`steps[].fields`); rakip girişi (`competitorintro`); ek bölümler (`annexextra`); düzenleme kopyaları veri sürümüne bağlı (`dataVersion`): eski sürüme ait düzenleme güncel verinin üstünde gösterilmez, dosyada kalır ve uyarı çubuğundan açılabilir; özet baskı yazısı büyütüldü (gövde 9,2 pt). Pilot 1 (git dışında): DE özet 6, DE kanıt eki 8, TR 6 sayfa. STATUS: son üç günlük satırı yanlış tabloya girmişti, taşındı | `3d08f1f` |
 | 22.10.2026 | Şablon baskı düzeltmesi: `dl` içinde çok paragraflı değer tek açıklama hücresinde (önceden ikinci paragraf dar etiket sütununa düşüyordu); altbilgi tek satır. Pilot 1 (git dışında): ortak rapor sürümü iki dilde aynı, dil bazında içerik kimliği altbilgide ayrı | `835e03a` |

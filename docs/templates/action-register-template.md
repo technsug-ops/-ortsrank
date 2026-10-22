@@ -26,6 +26,8 @@ Kayıt dosya temellidir: proje başına bir Markdown dosyası, aksiyon başına 
 | takip ediliyor | Sonraki ölçüm/kontrol bekleniyor | Takip ölçümü yapıldı ve kaydedildi |
 | tamamlandı | Kapanış gerekçesi yazılı | – |
 
+İnceleme ile uygulama ayrı kayıtlardır: inceleme aksiyonu, not hazır ve işletmenin kararı kaydedilince tamamlanır; önerilen değişikliklerin uygulanması ayrı bir **iyileştirme** kaydıdır. Bu kayıt, işletme henüz karar vermediği için doğrudan `karar/onay bekliyor (önerildi)` durumunda açılır; onay, sorumlu ve tarih yazılmaz.
+
 Kısa yollar: inceleme sonunda değişiklik gerekmiyorsa `inceleniyor` → `tamamlandı` (gerekçe zorunlu). İşletme değişikliği istemezse `karar/onay bekliyor` → `tamamlandı` (karar „değişmedi" olarak kaydedilir; olumsuz cevap sayılmaz, karar sayılır).
 
 **Veritabanı eşlemesi** (`src/db/schema.ts` › `actions`): tür `inceleme` / `iyileştirme` / `doğrulama çalışması` → `review` / `improvement` / `verification`. Durum: `tamamlandı` → `done`; işletme kararıyla vazgeçilen → `dismissed`; diğer beş durum → `open`. Ayrıntılı durum, tablo genişletilene kadar bu dosyada tutulur.
